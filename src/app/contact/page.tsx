@@ -1,0 +1,121 @@
+"use client";
+
+export default function ContactPage() {
+  return (
+    <div>
+
+      {/* ================= HERO ================= */}
+      <section className="relative h-[420px] flex items-center justify-center text-white">
+
+        {/* Fixed Background */}
+        <div
+          className="fixed top-0 left-0 w-full h-[420px] bg-cover bg-center -z-10"
+          style={{
+            backgroundImage:
+              "url(https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg)",
+          }}
+        />
+
+        <div className="absolute inset-0 bg-black/60" />
+
+        <div className="relative z-10 text-center">
+          <h1 className="text-5xl font-semibold mb-6">Contact Us</h1>
+          <div className="bg-black/40 px-6 py-3 rounded-md text-sm">
+            HOME › CONTACT
+          </div>
+        </div>
+      </section>
+
+      {/* ================= WHITE SLIDING SECTION ================= */}
+      <section className="relative z-20 bg-white -mt-24 pt-24 pb-16">
+
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-3">
+
+          {/* Location */}
+          <div className="p-16 text-center border-r border-gray-200">
+            <div className="text-primary text-4xl mb-6">📍</div>
+            <h3 className="text-xl font-semibold mb-4">OFFICE</h3>
+            <div className="w-10 h-[2px] bg-primary mx-auto mb-6"></div>
+            <p className="text-gray-600 leading-relaxed">
+              Kanke General Hospital, Arsande Road, Near Kanke Block Chowk, Kanke, Jharkhand
+              834006
+            </p>
+          </div>
+
+          {/* Emergency */}
+          <div className="p-16 text-center bg-primary text-white">
+            <div className="text-4xl mb-6">📞</div>
+            <h3 className="text-xl font-semibold mb-4">CONTACT</h3>
+            <div className="w-10 h-[2px] bg-white mx-auto mb-6"></div>
+            <p className="text-2xl font-bold mb-2">+91-6206803663</p>
+            <p className="text-lg">No. 06512450844</p>
+          </div>
+
+          {/* Email */}
+          <div className="p-16 text-center border-l border-gray-200">
+            <div className="text-primary text-4xl mb-6">✉️</div>
+            <h3 className="text-xl font-semibold mb-4">EMAIL</h3>
+            <div className="w-10 h-[2px] bg-primary mx-auto mb-6"></div>
+            <p className="text-gray-600">appointment.kghrc@gmail.com</p>
+            <p className="text-gray-600">Kankegeneralhospital@gmail.com</p>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ================= CONTACT FORM SECTION ================= */}
+      <section className="bg-[#214d80] text-white py-28">
+        <div className="max-w-[1000px] mx-auto px-6 text-center">
+
+          <h2 className="text-4xl font-semibold mb-6">Get in touch</h2>
+
+          <p className="text-white/80 max-w-2xl mx-auto mb-12">
+            Our next drew much you with rank. Tore many held age hold rose than our.
+            She literature sentiments any contrasted.
+          </p>
+
+          <form className="space-y-6">
+
+            <input
+              placeholder="Name"
+              className="w-full bg-transparent border border-white/30 p-4 rounded-md focus:outline-none"
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <input
+                placeholder="Email*"
+                className="bg-transparent border border-white/30 p-4 rounded-md focus:outline-none"
+              />
+              <input
+                placeholder="Phone"
+                className="bg-transparent border border-white/30 p-4 rounded-md focus:outline-none"
+              />
+            </div>
+
+            <textarea
+              placeholder="Tell Us About Project *"
+              rows={5}
+              className="w-full bg-transparent border border-white/30 p-4 rounded-md focus:outline-none"
+            />
+
+            <button className="bg-primary hover:bg-[#00c2c0] transition px-10 py-4 rounded-md font-semibold">
+              SEND MESSAGE ✈
+            </button>
+
+          </form>
+
+        </div>
+      </section>
+
+      {/* ================= MAP ================= */}
+      <section className="w-full h-[450px]">
+        <iframe
+          src="https://maps.google.com/maps?q=Kanke%20General%20Hospital%2C%20Arsande%20Road%2C%20Near%20Kanke%20Block%20Chowk%2C%20Kanke%2C%20Jharkhand%20834006&output=embed"
+          className="w-full h-full"
+          loading="lazy"
+        ></iframe>
+      </section>
+
+    </div>
+  );
+}

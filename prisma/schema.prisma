@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URI")
+}
+
+model Blog {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String
+  author      String
+  category    String
+  image       String?
+  status      String   @default("draft")
+  archived    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("blogs")
+}
+
+model Doctor {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  designation String
+  email       String?
+  phone       String?
+  facebook    String?
+  linkedin    String?
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("doctors")
+}
+
+model Testimonial {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  designation String
+  content     String
+  rating      Int      @default(5)
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("testimonials")
+}
+
+model Statistic {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  label     String
+  value     String
+  icon      String
+  category  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("statistics")
+}
