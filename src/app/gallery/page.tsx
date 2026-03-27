@@ -10,6 +10,12 @@ type GalleryImage = {
   isActive: boolean;
 };
 
+type GalleryApiResponse = {
+  title?: string;
+  bannerImage?: string;
+  images?: GalleryImage[];
+};
+
 const DEFAULT_TITLE = "Latest Gallery";
 const DEFAULT_BANNER =
   "https://validthemes.net/site-template/medihub/assets/img/banner/5.jpg";
@@ -113,7 +119,7 @@ export default function GalleryPage() {
       try {
         const response = await fetch("/api/gallery");
         if (!response.ok) throw new Error("Failed to fetch gallery");
-        const data = await response.json();
+        const data: GalleryApiResponse = await response.json();
         setTitle(data?.title || DEFAULT_TITLE);
         setBannerImage(data?.bannerImage || DEFAULT_BANNER);
         setImages(Array.isArray(data?.images) ? data.images : []);
@@ -123,7 +129,7 @@ export default function GalleryPage() {
               item.category?.trim() || "General"
             )
           )
-        );
+        ).filter((section): section is string => typeof section === "string");
         setSections(sectionList);
       } catch (error) {
         console.error("Error fetching gallery:", error);
