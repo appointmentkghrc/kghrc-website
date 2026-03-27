@@ -44,7 +44,7 @@ export default async function ContactPage() {
           {/* Emergency */}
           <div className="p-16 text-center bg-primary text-white">
             <div className="text-4xl mb-6">📞</div>
-            <h3 className="text-xl font-semibold mb-4">CONTACT</h3>
+            <h3 className="text-xl font-semibold mb-4">Address</h3>
             <div className="w-10 h-[2px] bg-white mx-auto mb-6"></div>
             <p className="text-2xl font-bold mb-2">{contactSettings.primaryPhone}</p>
             <p className="text-lg">No. {contactSettings.secondaryPhone}</p>
@@ -69,8 +69,7 @@ export default async function ContactPage() {
           <h2 className="text-4xl font-semibold mb-6">Get in touch</h2>
 
           <p className="text-white/80 max-w-2xl mx-auto mb-12">
-            Our next drew much you with rank. Tore many held age hold rose than our.
-            She literature sentiments any contrasted.
+          We would love to hear from you. Please share your valuable feedback.
           </p>
 
           <form className="space-y-6">

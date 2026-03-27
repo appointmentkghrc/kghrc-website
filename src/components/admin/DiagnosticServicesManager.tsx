@@ -10,6 +10,7 @@ interface DiagnosticService {
   description: string;
   details: string;
   image: string;
+  headerBackgroundImage?: string | null;
   sortOrder: number;
   isActive: boolean;
   createdAt: string;
@@ -22,6 +23,7 @@ const emptyForm = {
   description: "",
   details: "",
   image: "",
+  headerBackgroundImage: "",
   sortOrder: 0,
   isActive: true,
 };
@@ -38,6 +40,12 @@ export default function DiagnosticServicesManager() {
   const handleImageUpload = (res: Array<{ url: string }>) => {
     if (res && res[0]) {
       setFormData((prev) => ({ ...prev, image: res[0].url }));
+    }
+  };
+
+  const handleHeaderImageUpload = (res: Array<{ url: string }>) => {
+    if (res && res[0]) {
+      setFormData((prev) => ({ ...prev, headerBackgroundImage: res[0].url }));
     }
   };
 
@@ -74,6 +82,7 @@ export default function DiagnosticServicesManager() {
       description: service.description,
       details: service.details,
       image: service.image,
+      headerBackgroundImage: service.headerBackgroundImage || "",
       sortOrder: service.sortOrder,
       isActive: service.isActive,
     });
@@ -300,6 +309,44 @@ export default function DiagnosticServicesManager() {
                 {formData.image && (
                   <div className="mt-2 h-40 bg-gray-100 rounded-lg overflow-hidden">
                     <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Header Background Image URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.headerBackgroundImage}
+                  onChange={(e) =>
+                    setFormData({ ...formData, headerBackgroundImage: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="https://... (used in Home › Diagnostic Services header)"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Or Upload Header Background Image
+                </label>
+                <UploadButton
+                  className="ut-primary-upload"
+                  endpoint="diagnosticServiceImage"
+                  onClientUploadComplete={handleHeaderImageUpload}
+                  onUploadError={(error: Error) => {
+                    alert(`Upload Error: ${error.message}`);
+                  }}
+                />
+                {formData.headerBackgroundImage && (
+                  <div className="mt-2 h-32 bg-gray-100 rounded-lg overflow-hidden">
+                    <img
+                      src={formData.headerBackgroundImage}
+                      alt="Header preview"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 )}
               </div>

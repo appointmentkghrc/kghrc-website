@@ -13,6 +13,7 @@ export type SiteContactSettings = {
   youtubeUrl: string;
   linkedinUrl: string;
   heroBackgroundImage: string;
+  diagnosticServicesDefaultHeaderImage: string;
   heroTitleLine1: string;
   heroTitleLine2: string;
   heroDescription: string;
@@ -37,6 +38,8 @@ export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
   youtubeUrl: "",
   linkedinUrl: "",
   heroBackgroundImage: "/image7.jpeg",
+  diagnosticServicesDefaultHeaderImage:
+    "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg",
   heroTitleLine1: "Best care for your",
   heroTitleLine2: "Good health",
   heroDescription:
@@ -77,6 +80,7 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
           youtubeUrl: string | null;
           linkedinUrl: string | null;
           heroBackgroundImage: string | null;
+          diagnosticServicesDefaultHeaderImage: string | null;
           heroTitleLine1: string | null;
           heroTitleLine2: string | null;
           heroDescription: string | null;
@@ -114,6 +118,9 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
     linkedinUrl: settings.linkedinUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.linkedinUrl,
     heroBackgroundImage:
       settings.heroBackgroundImage ?? DEFAULT_SITE_CONTACT_SETTINGS.heroBackgroundImage,
+    diagnosticServicesDefaultHeaderImage:
+      settings.diagnosticServicesDefaultHeaderImage?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.diagnosticServicesDefaultHeaderImage,
     heroTitleLine1:
       settings.heroTitleLine1?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroTitleLine1,
     heroTitleLine2:
@@ -153,6 +160,7 @@ export async function upsertSiteContactSettings(
             youtubeUrl: string;
             linkedinUrl: string;
             heroBackgroundImage: string;
+            diagnosticServicesDefaultHeaderImage: string;
             heroTitleLine1: string;
             heroTitleLine2: string;
             heroDescription: string;
@@ -174,6 +182,7 @@ export async function upsertSiteContactSettings(
             youtubeUrl: string;
             linkedinUrl: string;
             heroBackgroundImage: string;
+            diagnosticServicesDefaultHeaderImage: string;
             heroTitleLine1: string;
             heroTitleLine2: string;
             heroDescription: string;
@@ -195,6 +204,7 @@ export async function upsertSiteContactSettings(
           youtubeUrl: string | null;
           linkedinUrl: string | null;
           heroBackgroundImage: string | null;
+          diagnosticServicesDefaultHeaderImage: string | null;
           heroTitleLine1: string | null;
           heroTitleLine2: string | null;
           heroDescription: string | null;
@@ -226,6 +236,8 @@ export async function upsertSiteContactSettings(
       youtubeUrl: data.youtubeUrl,
       linkedinUrl: data.linkedinUrl,
       heroBackgroundImage: data.heroBackgroundImage,
+      diagnosticServicesDefaultHeaderImage:
+        data.diagnosticServicesDefaultHeaderImage,
       heroTitleLine1: data.heroTitleLine1,
       heroTitleLine2: data.heroTitleLine2,
       heroDescription: data.heroDescription,
@@ -247,6 +259,8 @@ export async function upsertSiteContactSettings(
       youtubeUrl: data.youtubeUrl,
       linkedinUrl: data.linkedinUrl,
       heroBackgroundImage: data.heroBackgroundImage,
+      diagnosticServicesDefaultHeaderImage:
+        data.diagnosticServicesDefaultHeaderImage,
       heroTitleLine1: data.heroTitleLine1,
       heroTitleLine2: data.heroTitleLine2,
       heroDescription: data.heroDescription,
@@ -271,6 +285,9 @@ export async function upsertSiteContactSettings(
     linkedinUrl: settings.linkedinUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.linkedinUrl,
     heroBackgroundImage:
       settings.heroBackgroundImage ?? DEFAULT_SITE_CONTACT_SETTINGS.heroBackgroundImage,
+    diagnosticServicesDefaultHeaderImage:
+      settings.diagnosticServicesDefaultHeaderImage?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.diagnosticServicesDefaultHeaderImage,
     heroTitleLine1:
       settings.heroTitleLine1?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroTitleLine1,
     heroTitleLine2:

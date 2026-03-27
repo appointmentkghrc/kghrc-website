@@ -35,6 +35,13 @@ type GalleryImageDelegate = {
   }) => Promise<unknown>;
 };
 
+type GalleryImageCreateInput = {
+  imageUrl: string;
+  category: string;
+  sortOrder: number;
+  isActive: boolean;
+};
+
 const getGallerySectionDelegate = (): GallerySectionDelegate | undefined => {
   const prismaClient = prisma as unknown as Record<string, unknown>;
   return prismaClient.gallerySection as GallerySectionDelegate | undefined;
@@ -168,23 +175,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (typeof body.imageUrl !== "string" || body.imageUrl.trim().length === 0) {
-      return NextResponse.json({ error: "imageUrl is required" }, { status: 400 });
+    const category =
+      typeof body.category === "string" && body.category.trim().length > 0
+        ? body.category.trim()
+        : "General";
+    const baseSortOrder = Number(body.sortOrder ?? 0);
+    const isActive = Boolean(body.isActive ?? true);
+
+    const imageUrls: string[] = Array.isArray(body.imageUrls)
+      ? body.imageUrls
+          .filter((item: unknown): item is string => typeof item === "string")
+          .map((item: string) => item.trim())
+          .filter((item: string) => item.length > 0)
+      : [];
+
+    if (typeof body.imageUrl === "string" && body.imageUrl.trim().length > 0) {
+      imageUrls.unshift(body.imageUrl.trim());
     }
 
-    const image = await galleryImageDelegate.create({
-      data: {
-        imageUrl: body.imageUrl.trim(),
-        category:
-          typeof body.category === "string" && body.category.trim().length > 0
-            ? body.category.trim()
-            : "General",
-        sortOrder: Number(body.sortOrder ?? 0),
-        isActive: body.isActive ?? true,
-      },
-    });
+    const uniqueImageUrls: string[] = Array.from(new Set(imageUrls));
 
-    return NextResponse.json(image, { status: 201 });
+    if (uniqueImageUrls.length === 0) {
+      return NextResponse.json(
+        { error: "imageUrl or imageUrls is required" },
+        { status: 400 }
+      );
+    }
+
+    const payloads: GalleryImageCreateInput[] = uniqueImageUrls.map((imageUrl, index) => ({
+      imageUrl,
+      category,
+      sortOrder: baseSortOrder + index,
+      isActive,
+    }));
+
+    const createdImages = await Promise.all(
+      payloads.map((data) => galleryImageDelegate.create({ data }))
+    );
+
+    if (createdImages.length === 1) {
+      return NextResponse.json(createdImages[0], { status: 201 });
+    }
+
+    return NextResponse.json({ createdCount: createdImages.length, images: createdImages }, { status: 201 });
   } catch (error) {
     console.error("Error creating gallery image:", error);
     return NextResponse.json(

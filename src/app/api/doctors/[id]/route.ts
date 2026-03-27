@@ -45,6 +45,9 @@ export async function PATCH(
         ...(body.experience !== undefined && {
           experience: body.experience || null,
         }),
+        ...(body.timings !== undefined && {
+          timings: body.timings || null,
+        }),
         ...(body.bio !== undefined && {
           bio: body.bio || null,
         }),

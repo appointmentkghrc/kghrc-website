@@ -83,6 +83,9 @@ export async function PATCH(
         ...(body.description !== undefined && { description: body.description }),
         ...(body.details !== undefined && { details: body.details }),
         ...(body.image !== undefined && { image: body.image }),
+        ...(body.headerBackgroundImage !== undefined && {
+          headerBackgroundImage: body.headerBackgroundImage || null,
+        }),
         ...(body.sortOrder !== undefined && { sortOrder: Number(body.sortOrder) }),
         ...(body.isActive !== undefined && { isActive: Boolean(body.isActive) }),
       },

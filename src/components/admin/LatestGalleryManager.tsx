@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useMemo, useState } from "react";
 import { UploadButton } from "@/lib/uploadthing";
+import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
 
 const DEFAULT_TITLE = "Latest Gallery";
 const DEFAULT_BANNER =
@@ -127,6 +128,7 @@ export default function LatestGalleryManager() {
   const [images, setImages] = useState<GalleryImage[]>([]);
 
   const [newImageUrl, setNewImageUrl] = useState("");
+  const [newImageUrls, setNewImageUrls] = useState<string[]>([]);
   const [newCategory, setNewCategory] = useState("");
   const [newSortOrder, setNewSortOrder] = useState(0);
   const [newIsActive, setNewIsActive] = useState(true);
@@ -228,11 +230,15 @@ export default function LatestGalleryManager() {
     e.preventDefault();
     try {
       setSubmittingImage(true);
+      const cleanedUploadedUrls = Array.from(
+        new Set(newImageUrls.map((url) => url.trim()).filter((url) => url.length > 0))
+      );
       const response = await fetch("/api/gallery", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           imageUrl: newImageUrl,
+          imageUrls: cleanedUploadedUrls,
           category: newCategory.trim(),
           sortOrder: newSortOrder,
           isActive: newIsActive,
@@ -240,11 +246,16 @@ export default function LatestGalleryManager() {
       });
       if (!response.ok) throw new Error("Failed to add image");
       setNewImageUrl("");
+      setNewImageUrls([]);
       setNewCategory(sections[0] || "");
       setNewSortOrder(0);
       setNewIsActive(true);
       await fetchGallery();
-      alert("Gallery image added successfully!");
+      alert(
+        cleanedUploadedUrls.length > 1
+          ? `${cleanedUploadedUrls.length} gallery images added successfully!`
+          : "Gallery image added successfully!"
+      );
     } catch (error) {
       console.error("Error adding gallery image:", error);
       alert("Failed to add gallery image");
@@ -254,9 +265,14 @@ export default function LatestGalleryManager() {
   };
 
   const handleImageUpload = (res: Array<{ url: string }>) => {
-    if (res && res[0]) {
-      setNewImageUrl(res[0].url);
-    }
+    const uploadedUrls =
+      res?.map((item) => item?.url?.trim()).filter((url): url is string => Boolean(url)) || [];
+
+    if (uploadedUrls.length === 0) return;
+
+    setNewImageUrls(uploadedUrls);
+    // Keep first uploaded URL in the manual field for backward compatibility.
+    setNewImageUrl(uploadedUrls[0]);
   };
 
   const handleBannerUpload = (res: Array<{ url: string }>) => {
@@ -363,6 +379,9 @@ export default function LatestGalleryManager() {
               <UploadButton
                 className="ut-primary-upload"
                 endpoint="galleryImage"
+                onBeforeUploadBegin={(files) =>
+                  optimizeImagesForUpload(files, { maxDimension: 1920, quality: 0.82 })
+                }
                 onClientUploadComplete={handleBannerUpload}
                 onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
               />
@@ -461,19 +480,49 @@ export default function LatestGalleryManager() {
               <UploadButton
                 className="ut-primary-upload"
                 endpoint="galleryImage"
+                appearance={{
+                  button:
+                    "ut-uploading:cursor-not-allowed ut-uploading:bg-blue-700 after:ut-readying:content-['Upload_Image(s)']",
+                }}
+                onBeforeUploadBegin={(files) =>
+                  optimizeImagesForUpload(files, { maxDimension: 1920, quality: 0.82 })
+                }
                 onClientUploadComplete={handleImageUpload}
                 onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
               />
+              <p className="mt-1 text-xs text-gray-500">
+                You can select multiple files to upload and add them together under one category.
+              </p>
             </div>
-            {newImageUrl && (
+            {(newImageUrls.length > 0 || newImageUrl) && (
               <div className="h-40 rounded-lg overflow-hidden border border-gray-200">
-                <img
-                  src={newImageUrl}
-                  alt="New gallery image preview"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
+                {newImageUrls.length > 1 ? (
+                  <div className="h-full p-3 overflow-auto">
+                    <p className="text-sm text-gray-700 mb-2">
+                      {newImageUrls.length} files ready to add
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {newImageUrls.map((url) => (
+                        <img
+                          key={url}
+                          src={url}
+                          alt="New gallery image preview"
+                          className="w-full h-20 object-cover rounded-md border border-gray-200"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    src={newImageUrls[0] || newImageUrl}
+                    alt="New gallery image preview"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                )}
               </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -518,7 +567,9 @@ export default function LatestGalleryManager() {
                 disabled={submittingImage}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {submittingImage ? "Adding..." : "Add Image"}
+                {submittingImage
+                  ? "Adding..."
+                  : `Add ${newImageUrls.length > 1 ? `${newImageUrls.length} Images` : "Image"}`}
               </button>
             </div>
           </form>

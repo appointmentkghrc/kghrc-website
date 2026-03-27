@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type SiteContactSettings = {
   officeAddress: string;
@@ -15,6 +16,12 @@ type SiteContactSettings = {
   twitterUrl: string;
   youtubeUrl: string;
   linkedinUrl: string;
+  heroOpeningHoursRows: string[];
+};
+
+type DiagnosticServiceFooterItem = {
+  id: string;
+  title: string;
 };
 
 const defaultContactSettings: SiteContactSettings = {
@@ -31,12 +38,66 @@ const defaultContactSettings: SiteContactSettings = {
   twitterUrl: "",
   youtubeUrl: "",
   linkedinUrl: "",
+  heroOpeningHoursRows: [],
+};
+
+const fallbackDepartmentTitles = [
+  "Medecine and Health",
+  "Dental Care and Surgery",
+  "Eye Treatment",
+  "Children Chare",
+  "Nuclear magnetic",
+  "Traumatology",
+  "X-ray",
+];
+
+type OpeningHoursRow = {
+  day: string;
+  time: string;
+};
+
+const parseOpeningHoursRows = (
+  rows: unknown
+): OpeningHoursRow[] => {
+  if (!Array.isArray(rows)) return [];
+
+  return rows
+    .filter((row): row is string => typeof row === "string")
+    .map((row) => row.split("|"))
+    .map(([day, time]) => ({
+      day: (day ?? "").trim(),
+      time: (time ?? "").trim(),
+    }))
+    .filter((row) => row.day.length > 0);
+};
+
+const formatOpeningHoursDay = (day: string) =>
+  day.replace(/\s-\s/g, " – ");
+
+const formatOpeningHoursTime = (time: string) => {
+  const normalized = time.trim();
+  if (normalized.toLowerCase() === "closed") return "Closed";
+
+  return normalized
+    .replace(/\s-\s/g, " – ")
+    .replace(/\bAM\b/g, "am")
+    .replace(/\bPM\b/g, "pm");
 };
 
 export default function Footer() {
     const [contactSettings, setContactSettings] = useState<SiteContactSettings>(
       defaultContactSettings
     );
+  const [openingHoursRows, setOpeningHoursRows] = useState<OpeningHoursRow[]>([]);
+    const [departmentItems, setDepartmentItems] = useState<
+      DiagnosticServiceFooterItem[]
+    >([]);
+
+  const fallbackOpeningHoursRows: OpeningHoursRow[] = [
+    { day: "Mon – Tues :", time: "6.00 am – 10.00 pm" },
+    { day: "Wednes – Thurs :", time: "8.00 am – 6.00 pm" },
+    { day: "Sun :", time: "Closed" },
+  ];
 
     useEffect(() => {
       const fetchContactSettings = async () => {
@@ -56,13 +117,43 @@ export default function Footer() {
             twitterUrl: data?.twitterUrl || defaultContactSettings.twitterUrl,
             youtubeUrl: data?.youtubeUrl || defaultContactSettings.youtubeUrl,
             linkedinUrl: data?.linkedinUrl || defaultContactSettings.linkedinUrl,
+          heroOpeningHoursRows: Array.isArray(data?.heroOpeningHoursRows)
+            ? (data.heroOpeningHoursRows as string[])
+            : defaultContactSettings.heroOpeningHoursRows,
           });
+        setOpeningHoursRows(parseOpeningHoursRows(data?.heroOpeningHoursRows));
         } catch (error) {
           console.error("Failed to fetch contact settings for footer:", error);
         }
       };
 
       fetchContactSettings();
+    }, []);
+
+    useEffect(() => {
+      const fetchDepartments = async () => {
+        try {
+          const response = await fetch("/api/diagnostic-services");
+          if (!response.ok) return;
+          const data = (await response.json()) as Array<{
+            id: string;
+            title: string;
+          }>;
+
+          const mapped = data
+            .filter((item) => typeof item?.id === "string" && typeof item?.title === "string")
+            .map((item) => ({
+              id: item.id,
+              title: item.title,
+            }));
+
+          setDepartmentItems(mapped);
+        } catch (error) {
+          console.error("Failed to fetch diagnostic services for footer:", error);
+        }
+      };
+
+      fetchDepartments();
     }, []);
 
     return (
@@ -72,38 +163,41 @@ export default function Footer() {
   
           {/* Top Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-  
-            {/* About */}
+
+            {/* Opening Hours */}
             <div>
-              <h3 className="text-xl font-semibold mb-6 relative">
-                About
-                <span className="block w-10 h-[2px] bg-primary mt-3"></span>
-              </h3>
-  
-              <p className="text-white/80 leading-relaxed mb-6">
-                Excellence decisively nay man yet impression for contrasted
-                remarkably. There spoke happy for you are out.
-              </p>
-  
               <h4 className="font-semibold mb-4">OPENING HOURS</h4>
   
               <div className="space-y-3 text-white/80 text-sm">
-                <div className="flex justify-between border-b border-white/20 pb-2">
-                  <span>Mon – Tues :</span>
-                  <span>6.00 am – 10.00 pm</span>
-                </div>
-  
-                <div className="flex justify-between border-b border-white/20 pb-2">
-                  <span>Wednes – Thurs :</span>
-                  <span>8.00 am – 6.00 pm</span>
-                </div>
-  
-                <div className="flex justify-between items-center">
-                  <span>Sun :</span>
-                  <span className="bg-primary text-white px-4 py-1 rounded-full text-xs">
-                    Closed
-                  </span>
-                </div>
+                {(openingHoursRows.length > 0
+                  ? openingHoursRows
+                  : fallbackOpeningHoursRows
+                ).map((row, idx) => {
+                  const day = formatOpeningHoursDay(row.day);
+                  const time = formatOpeningHoursTime(row.time);
+                  const isClosed = time.toLowerCase() === "closed";
+
+                  return (
+                    <div
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={`${day}-${time}-${idx}`}
+                      className={
+                        isClosed
+                          ? "flex justify-between items-center"
+                          : "flex justify-between border-b border-white/20 pb-2"
+                      }
+                    >
+                      <span>{day}</span>
+                      {isClosed ? (
+                        <span className="bg-primary text-white px-4 py-1 rounded-full text-xs">
+                          Closed
+                        </span>
+                      ) : (
+                        <span>{time}</span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
   
@@ -115,22 +209,22 @@ export default function Footer() {
             </h3>
 
             <ul className="space-y-3 text-white/80">
-              {[
-                "Medecine and Health",
-                "Dental Care and Surgery",
-                "Eye Treatment",
-                "Children Chare",
-                "Nuclear magnetic",
-                "Traumatology",
-                "X-ray",
-              ].map((item) => (
-                <li
-                  key={item}
-                  className="hover:text-primary transition cursor-pointer"
-                >
-                  {item}
-                </li>
-              ))}
+              {departmentItems.length > 0
+                ? departmentItems.map((item) => (
+                    <li key={item.id}>
+                      <Link
+                        href={`/diagnostic-services/${item.id}`}
+                        className="hover:text-primary transition"
+                      >
+                        {item.title}
+                      </Link>
+                    </li>
+                  ))
+                : fallbackDepartmentTitles.map((item) => (
+                    <li key={item} className="text-white/80">
+                      {item}
+                    </li>
+                  ))}
             </ul>
           </div>
 
@@ -166,7 +260,7 @@ export default function Footer() {
                 <div>
                   <p className="text-white font-semibold mb-1">PHONE</p>
                   <p>{contactSettings.primaryPhone}</p>
-                  <p>No. {contactSettings.secondaryPhone}</p>
+                  <p>{contactSettings.secondaryPhone}</p>
                 </div>
   
                 <div>

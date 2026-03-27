@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 type DiagnosticService = {
   id: string;
@@ -120,6 +121,14 @@ export default function DepartmentsSection({
                 <p className="text-gray-600 leading-relaxed wrap-break-word">
                   {truncateWords(selectedService.details, 35)}
                 </p>
+                <div className="mt-4">
+                  <Link
+                    href={`/diagnostic-services/${selectedService.id}`}
+                    className="inline-flex items-center text-primary font-semibold hover:underline"
+                  >
+                    Read more
+                  </Link>
+                </div>
               </>
             ) : (
               <div className="bg-white border border-gray-200 rounded-xl p-8 text-gray-500">

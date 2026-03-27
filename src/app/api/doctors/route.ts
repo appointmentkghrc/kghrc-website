@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
         designation: body.designation,
         qualification: body.qualification || null,
         experience: body.experience || null,
+        timings: body.timings || null,
         bio: body.bio || null,
         appointmentLink: body.appointmentLink || null,
         email: body.email || null,

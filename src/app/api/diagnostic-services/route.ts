@@ -13,6 +13,7 @@ type DiagnosticServiceDelegate = {
       description: string;
       details: string;
       image: string;
+      headerBackgroundImage?: string | null;
       sortOrder: number;
       isActive: boolean;
     };
@@ -70,6 +71,7 @@ export async function POST(request: NextRequest) {
         description: body.description,
         details: body.details,
         image: body.image,
+        headerBackgroundImage: body.headerBackgroundImage || null,
         sortOrder: Number(body.sortOrder ?? 0),
         isActive: body.isActive ?? true,
       },

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { UploadButton } from "@/lib/uploadthing";
+import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
 
 interface Doctor {
   id: string;
@@ -9,6 +10,7 @@ interface Doctor {
   designation: string;
   qualification?: string | null;
   experience?: string | null;
+  timings?: string | null;
   bio?: string | null;
   appointmentLink?: string;
   email?: string;
@@ -34,6 +36,7 @@ export default function DoctorsManager() {
     designation: "",
     qualification: "",
     experience: "",
+    timings: "",
     bio: "",
     appointmentLink: "",
     email: "",
@@ -102,6 +105,7 @@ export default function DoctorsManager() {
       designation: "",
       qualification: "",
       experience: "",
+      timings: "",
       bio: "",
       appointmentLink: "",
       email: "",
@@ -119,6 +123,7 @@ export default function DoctorsManager() {
       designation: doctor.designation,
       qualification: doctor.qualification || "",
       experience: doctor.experience || "",
+      timings: doctor.timings || "",
       bio: doctor.bio || "",
       appointmentLink: doctor.appointmentLink || "",
       email: doctor.email || "",
@@ -458,6 +463,20 @@ export default function DoctorsManager() {
                       placeholder="12+ years"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Timings
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.timings}
+                      onChange={(e) =>
+                        setFormData({ ...formData, timings: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Mon - Sat, 10:00 AM - 2:00 PM"
+                    />
+                  </div>
                 </div>
 
                 <div className="mt-4">
@@ -535,6 +554,9 @@ export default function DoctorsManager() {
                 <UploadButton
                   className="ut-primary-upload"
                   endpoint="doctorImage"
+                  onBeforeUploadBegin={(files) =>
+                    optimizeImagesForUpload(files, { maxDimension: 1400, quality: 0.84 })
+                  }
                   onClientUploadComplete={handleImageUpload}
                   onUploadError={(error: Error) => {
                     alert(`Upload Error: ${error.message}`);

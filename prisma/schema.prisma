@@ -30,6 +30,7 @@ model Doctor {
   designation String
   qualification String?
   experience  String?
+  timings     String?
   bio         String?
   appointmentLink String?
   email       String?
@@ -84,6 +85,7 @@ model SiteSetting {
   youtubeUrl    String?
   linkedinUrl   String?
   heroBackgroundImage String?
+  diagnosticServicesDefaultHeaderImage String?
   heroTitleLine1 String?
   heroTitleLine2 String?
   heroDescription String?
@@ -104,6 +106,7 @@ model DiagnosticService {
   description String
   details     String
   image       String
+  headerBackgroundImage String?
   sortOrder   Int      @default(0)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
