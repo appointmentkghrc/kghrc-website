@@ -13,6 +13,7 @@ import HeroSectionSettingsManager from "@/components/admin/HeroSectionSettingsMa
 import LatestGalleryManager from "@/components/admin/LatestGalleryManager";
 import SocialLinksManager from "@/components/admin/SocialLinksManager";
 import AboutUsManager from "@/components/admin/AboutUsManager";
+import TpaInsurancePartnersManager from "@/components/admin/TpaInsurancePartnersManager";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -29,6 +30,7 @@ export default function AdminDashboard() {
     stats: "Statistics",
     contactSettings: "Contact Settings",
     socialLinks: "Social Links",
+    tpaInsurancePartners: "TPA / Insurance Partners",
   };
 
   const renderContent = () => {
@@ -55,6 +57,8 @@ export default function AdminDashboard() {
         return <ContactSettingsManager />;
       case "socialLinks":
         return <SocialLinksManager />;
+      case "tpaInsurancePartners":
+        return <TpaInsurancePartnersManager />;
       default:
         return <DashboardOverview />;
     }

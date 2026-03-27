@@ -4,6 +4,7 @@ import SpecialistsSection from "@/components/SpecialistsSection";
 import StatsSection from "@/components/StatsSection";
 import PatientTestimonialsSection from "@/components/PatientTestimonialsSection";
 import RecentBlogsSection from "@/components/RecentBlogsSection";
+import AppointmentMobileInput from "@/components/AppointmentMobileInput";
 import { getSiteContactSettings } from "@/lib/siteSettings";
 import Link from "next/link";
 
@@ -63,18 +64,15 @@ export default async function Home() {
                     className="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/70 border border-white/30 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-primary"
                   />
 
-                  <select className="w-full px-4 py-3 rounded-lg bg-white/20 text-white border border-white/30 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option className="text-black">Male</option>
-                    <option className="text-black">Female</option>
-                  </select>
+                  <AppointmentMobileInput />
 
-                  <select className="w-full px-4 py-3 rounded-lg bg-white/20 text-white border border-white/30 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option className="text-black">Department</option>
-                    <option className="text-black">Cardiology</option>
-                    <option className="text-black">Neurology</option>
-                    <option className="text-black">Orthopedics</option>
-                    <option className="text-black">General</option>
-                  </select>
+                  <textarea
+                    name="query"
+                    placeholder="Write your query/problem"
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/70 border border-white/30 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                    required
+                  />
 
                   <button
                     type="submit"

@@ -171,3 +171,13 @@ model AboutSection {
 
   @@map("about_sections")
 }
+
+model TpaInsurancePartner {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  logoUrl   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tpa_insurance_partners")
+}

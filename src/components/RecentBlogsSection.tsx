@@ -58,10 +58,10 @@ export default function RecentBlogsSection() {
     <section className="bg-white py-20">
       <div className="max-w-6xl mx-auto px-6 md:px-10 lg:px-0">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-semibold mb-4">Recent Blog</h2>
+          <h2 className="text-4xl font-semibold mb-4">Recent Blogs</h2>
           <p className="max-w-2xl mx-auto text-gray-500">
-            While mirth large on of front. Ye he greater related proceed entered
-            an. Through it examine express promise no.
+            Stay informed with the latest health insights, hospital updates, and
+            expert guidance from our medical team.
           </p>
         </div>
 

@@ -20,6 +20,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen }: SidebarProp
     { id: "stats", label: "Statistics", icon: "fas fa-chart-bar" },
     { id: "contactSettings", label: "Contact Settings", icon: "fas fa-address-book" },
     { id: "socialLinks", label: "Social Links", icon: "fas fa-share-nodes" },
+    { id: "tpaInsurancePartners", label: "TPA / Insurance Partners", icon: "fas fa-handshake" },
   ];
 
   return (
