@@ -11,11 +11,12 @@ type GallerySectionDelegate = {
     key: string;
     title: string;
     bannerImage: string | null;
+    sections?: string[] | null;
   } | null>;
   upsert: (args: {
     where: { key: string };
-    create: { key: string; title: string; bannerImage: string | null };
-    update: { title?: string; bannerImage?: string | null };
+    create: { key: string; title: string; bannerImage: string | null; sections?: string[] };
+    update: { title?: string; bannerImage?: string | null; sections?: string[] };
   }) => Promise<unknown>;
 };
 
@@ -72,6 +73,11 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
+    const storedSections = Array.isArray(section?.sections) ? section?.sections : [];
+    const imageSections = (images as Array<{ category?: string }>).map((item) =>
+      item.category?.trim() || "General"
+    );
+
     return NextResponse.json({
       title: section?.title || DEFAULT_GALLERY_TITLE,
       bannerImage:
@@ -80,11 +86,9 @@ export async function GET(request: NextRequest) {
       images,
       sections: Array.from(
         new Set(
-          (images as Array<{ category?: string }>).map((item) =>
-            item.category?.trim() || "General"
-          )
+          [...storedSections, ...imageSections]
         )
-      ),
+      ).filter((value) => typeof value === "string" && value.trim().length > 0),
     });
   } catch (error) {
     console.error("Error fetching gallery settings:", error);
@@ -120,13 +124,25 @@ export async function PATCH(request: NextRequest) {
         ? body.bannerImage.trim()
         : DEFAULT_GALLERY_BANNER;
 
+    const sections =
+      Array.isArray(body.sections)
+        ? Array.from(
+            new Set(
+              body.sections
+                .filter((item: unknown): item is string => typeof item === "string")
+                .map((item) => item.trim())
+                .filter((item) => item.length > 0)
+            )
+          ).sort((a, b) => a.localeCompare(b))
+        : undefined;
+
     await gallerySectionDelegate.upsert({
       where: { key: GALLERY_SECTION_KEY },
-      create: { key: GALLERY_SECTION_KEY, title, bannerImage },
-      update: { title, bannerImage },
+      create: { key: GALLERY_SECTION_KEY, title, bannerImage, ...(sections ? { sections } : {}) },
+      update: { title, bannerImage, ...(sections ? { sections } : {}) },
     });
 
-    return NextResponse.json({ title, bannerImage });
+    return NextResponse.json({ title, bannerImage, ...(sections ? { sections } : {}) });
   } catch (error) {
     console.error("Error updating gallery settings:", error);
     return NextResponse.json(

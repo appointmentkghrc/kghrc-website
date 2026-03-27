@@ -7,6 +7,9 @@ interface Doctor {
   id: string;
   name: string;
   designation: string;
+  qualification?: string | null;
+  experience?: string | null;
+  bio?: string | null;
   appointmentLink?: string;
   email?: string;
   phone?: string;
@@ -24,9 +27,14 @@ export default function DoctorsManager() {
   const [searchTerm, setSearchTerm] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [savingOrderId, setSavingOrderId] = useState<string | null>(null);
+  const [doctorsSectionDescription, setDoctorsSectionDescription] = useState("");
+  const [savingSectionDescription, setSavingSectionDescription] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     designation: "",
+    qualification: "",
+    experience: "",
+    bio: "",
     appointmentLink: "",
     email: "",
     phone: "",
@@ -36,6 +44,7 @@ export default function DoctorsManager() {
 
   useEffect(() => {
     fetchDoctors();
+    fetchDoctorsSectionDescription();
   }, []);
 
   const fetchDoctors = async () => {
@@ -53,11 +62,47 @@ export default function DoctorsManager() {
     }
   };
 
+  const fetchDoctorsSectionDescription = async () => {
+    try {
+      const res = await fetch("/api/site-settings");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (typeof data?.doctorsSectionDescription === "string") {
+        setDoctorsSectionDescription(data.doctorsSectionDescription);
+      }
+    } catch (error) {
+      console.error("Error fetching doctors section description:", error);
+    }
+  };
+
+  const handleSaveDoctorsSectionDescription = async () => {
+    try {
+      setSavingSectionDescription(true);
+      const res = await fetch("/api/site-settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          doctorsSectionDescription,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save doctors section description");
+      alert("Doctors section description updated!");
+    } catch (error) {
+      console.error("Error saving doctors section description:", error);
+      alert("Failed to save doctors section description");
+    } finally {
+      setSavingSectionDescription(false);
+    }
+  };
+
   const handleAdd = () => {
     setEditingDoctor(null);
     setFormData({
       name: "",
       designation: "",
+      qualification: "",
+      experience: "",
+      bio: "",
       appointmentLink: "",
       email: "",
       phone: "",
@@ -72,6 +117,9 @@ export default function DoctorsManager() {
     setFormData({
       name: doctor.name,
       designation: doctor.designation,
+      qualification: doctor.qualification || "",
+      experience: doctor.experience || "",
+      bio: doctor.bio || "",
       appointmentLink: doctor.appointmentLink || "",
       email: doctor.email || "",
       phone: doctor.phone || "",
@@ -206,6 +254,29 @@ export default function DoctorsManager() {
           <i className="fas fa-plus"></i>
           Add Doctor
         </button>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-5 space-y-3">
+        <h3 className="text-lg font-semibold text-gray-800">
+          Doctors Section Description (Home + Doctors page)
+        </h3>
+        <textarea
+          value={doctorsSectionDescription}
+          onChange={(e) => setDoctorsSectionDescription(e.target.value)}
+          rows={3}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Short description shown above the doctors grid..."
+        />
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={handleSaveDoctorsSectionDescription}
+            disabled={savingSectionDescription}
+            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {savingSectionDescription ? "Saving..." : "Save Description"}
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-4">
@@ -350,6 +421,55 @@ export default function DoctorsManager() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Cardiologist"
                     required
+                  />
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                  Profile Details (shown on doctor page)
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Qualification
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.qualification}
+                      onChange={(e) =>
+                        setFormData({ ...formData, qualification: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="MBBS, MD (Cardiology)"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Experience
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.experience}
+                      onChange={(e) =>
+                        setFormData({ ...formData, experience: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="12+ years"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    About / Bio
+                  </label>
+                  <textarea
+                    value={formData.bio}
+                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                    rows={4}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Short bio about the doctor..."
                   />
                 </div>
               </div>

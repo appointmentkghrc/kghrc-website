@@ -14,6 +14,7 @@ type GalleryApiResponse = {
   title?: string;
   bannerImage?: string;
   images?: GalleryImage[];
+  sections?: string[];
 };
 
 const DEFAULT_TITLE = "Latest Gallery";
@@ -183,13 +184,15 @@ export default function GalleryPage() {
         setTitle(data?.title || DEFAULT_TITLE);
         setBannerImage(data?.bannerImage || DEFAULT_BANNER);
         setImages(Array.isArray(data?.images) ? data.images : []);
+        const fromApi =
+          Array.isArray(data?.sections) && data.sections.length > 0
+            ? data.sections
+            : (Array.isArray(data?.images) ? data.images : []).map((item: GalleryImage) =>
+                item.category?.trim() || "General"
+              );
         const sectionList = Array.from(
-          new Set(
-            (Array.isArray(data?.images) ? data.images : []).map((item: GalleryImage) =>
-              item.category?.trim() || "General"
-            )
-          )
-        ).filter((section): section is string => typeof section === "string");
+          new Set(fromApi.map((s) => (typeof s === "string" ? s.trim() : "")).filter(Boolean))
+        );
         setSections(sectionList);
       } catch (error) {
         console.error("Error fetching gallery:", error);

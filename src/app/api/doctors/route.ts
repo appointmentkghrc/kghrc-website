@@ -23,6 +23,9 @@ export async function POST(request: NextRequest) {
       data: {
         name: body.name,
         designation: body.designation,
+        qualification: body.qualification || null,
+        experience: body.experience || null,
+        bio: body.bio || null,
         appointmentLink: body.appointmentLink || null,
         email: body.email || null,
         phone: body.phone || null,

@@ -1,6 +1,7 @@
  "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface Doctor {
   id: string;
@@ -17,6 +18,7 @@ interface Doctor {
 export default function SpecialistsSection() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sectionDescription, setSectionDescription] = useState<string>("");
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -36,6 +38,23 @@ export default function SpecialistsSection() {
     fetchDoctors();
   }, []);
 
+  useEffect(() => {
+    const fetchSectionDescription = async () => {
+      try {
+        const res = await fetch("/api/site-settings");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (typeof data?.doctorsSectionDescription === "string") {
+          setSectionDescription(data.doctorsSectionDescription);
+        }
+      } catch (err) {
+        console.error("Error loading doctors section description:", err);
+      }
+    };
+
+    fetchSectionDescription();
+  }, []);
+
   if (loading || doctors.length === 0) {
     return null;
   }
@@ -48,8 +67,8 @@ export default function SpecialistsSection() {
           </h2>
           <div className="w-12 h-[3px] bg-primary mx-auto mt-4 mb-6" />
           <p className="text-gray-500 max-w-2xl mx-auto">
-            While mirth large of on front. Ye he greater related adapted proceed entered
-            an. Through it examine express promise no.
+            {sectionDescription ||
+              "While mirth large of on front. Ye he greater related adapted proceed entered an. Through it examine express promise no."}
           </p>
         </div>
 
@@ -59,13 +78,19 @@ export default function SpecialistsSection() {
               key={doc.id}
               className="bg-white rounded-3xl shadow-md overflow-hidden transition"
             >
-              <div className="relative overflow-hidden">
-                <img
-                  src={doc.image ?? "/placeholder-doctor.jpg"}
-                  alt={doc.name}
-                  className="w-full h-[320px] object-cover"
-                />
-              </div>
+              <Link
+                href={`/doctors/${doc.id}`}
+                className="block focus:outline-none focus:ring-2 focus:ring-primary"
+                aria-label={`View profile of ${doc.name}`}
+              >
+                <div className="relative overflow-hidden">
+                  <img
+                    src={doc.image ?? "/placeholder-doctor.jpg"}
+                    alt={doc.name}
+                    className="w-full h-[320px] object-cover"
+                  />
+                </div>
+              </Link>
 
               <div className="relative">
                 <div className="border-t border-primary" />
@@ -77,7 +102,12 @@ export default function SpecialistsSection() {
               </div>
 
               <div className="text-center px-6 pb-8 pt-6">
-                <h3 className="text-xl font-semibold">{doc.name}</h3>
+                <Link
+                  href={`/doctors/${doc.id}`}
+                  className="inline-block text-xl font-semibold hover:text-primary transition-colors"
+                >
+                  {doc.name}
+                </Link>
                 <p className="text-primary text-sm tracking-widest mt-1">
                   {doc.designation?.toUpperCase()}
                 </p>

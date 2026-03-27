@@ -39,6 +39,15 @@ export async function PATCH(
       data: {
         ...(body.name && { name: body.name }),
         ...(body.designation && { designation: body.designation }),
+        ...(body.qualification !== undefined && {
+          qualification: body.qualification || null,
+        }),
+        ...(body.experience !== undefined && {
+          experience: body.experience || null,
+        }),
+        ...(body.bio !== undefined && {
+          bio: body.bio || null,
+        }),
         ...(body.appointmentLink !== undefined && {
           appointmentLink: body.appointmentLink || null,
         }),

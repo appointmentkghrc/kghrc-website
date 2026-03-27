@@ -18,6 +18,7 @@ export type SiteContactSettings = {
   heroDescription: string;
   heroCtaLabel: string;
   heroCtaHref: string;
+  doctorsSectionDescription: string;
 };
 
 export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
@@ -41,6 +42,8 @@ export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
     "The ourselves suffering the sincerity. Inhabit her manners adapted age certain. Debating offended at branched striking be subjects.",
   heroCtaLabel: "Contact Us",
   heroCtaHref: "/contact",
+  doctorsSectionDescription:
+    "While mirth large of on front. Ye he greater related adapted proceed entered an. Through it examine express promise no.",
 };
 
 const SITE_SETTINGS_KEY = "main";
@@ -67,6 +70,7 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
           heroDescription: string | null;
           heroCtaLabel: string | null;
           heroCtaHref: string | null;
+          doctorsSectionDescription: string | null;
         } | null>;
       }
     | undefined;
@@ -107,6 +111,9 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
       settings.heroCtaLabel?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaLabel,
     heroCtaHref:
       settings.heroCtaHref?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaHref,
+    doctorsSectionDescription:
+      settings.doctorsSectionDescription?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.doctorsSectionDescription,
   };
 }
 
@@ -137,6 +144,7 @@ export async function upsertSiteContactSettings(
             heroDescription: string;
             heroCtaLabel: string;
             heroCtaHref: string;
+            doctorsSectionDescription: string;
           };
           update: {
             officeAddress: string;
@@ -156,6 +164,7 @@ export async function upsertSiteContactSettings(
             heroDescription: string;
             heroCtaLabel: string;
             heroCtaHref: string;
+            doctorsSectionDescription: string;
           };
         }) => Promise<{
           officeAddress: string;
@@ -175,6 +184,7 @@ export async function upsertSiteContactSettings(
           heroDescription: string | null;
           heroCtaLabel: string | null;
           heroCtaHref: string | null;
+          doctorsSectionDescription: string | null;
         }>;
       }
     | undefined;
@@ -204,6 +214,7 @@ export async function upsertSiteContactSettings(
       heroDescription: data.heroDescription,
       heroCtaLabel: data.heroCtaLabel,
       heroCtaHref: data.heroCtaHref,
+      doctorsSectionDescription: data.doctorsSectionDescription,
     },
     update: {
       officeAddress: data.officeAddress,
@@ -223,6 +234,7 @@ export async function upsertSiteContactSettings(
       heroDescription: data.heroDescription,
       heroCtaLabel: data.heroCtaLabel,
       heroCtaHref: data.heroCtaHref,
+      doctorsSectionDescription: data.doctorsSectionDescription,
     },
   });
 
@@ -250,5 +262,8 @@ export async function upsertSiteContactSettings(
       settings.heroCtaLabel?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaLabel,
     heroCtaHref:
       settings.heroCtaHref?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaHref,
+    doctorsSectionDescription:
+      settings.doctorsSectionDescription?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.doctorsSectionDescription,
   };
 }

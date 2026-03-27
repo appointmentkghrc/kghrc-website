@@ -28,6 +28,9 @@ model Doctor {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   designation String
+  qualification String?
+  experience  String?
+  bio         String?
   appointmentLink String?
   email       String?
   phone       String?
@@ -86,6 +89,7 @@ model SiteSetting {
   heroDescription String?
   heroCtaLabel   String?
   heroCtaHref    String?
+  doctorsSectionDescription String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -112,6 +116,7 @@ model GallerySection {
   key         String   @unique
   title       String
   bannerImage String?
+  sections    String[] @default([])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

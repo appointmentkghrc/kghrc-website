@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 const navLinks = [
   { label: "Home", href: "/", hasDropdown: true },
   { label: "About us", href: "/about", hasDropdown: true },
+  { label: "Doctors", href: "/doctors", hasDropdown: true },
   { label: "Services", href: "/services", hasDropdown: true },
   { label: "Gallery", href: "/gallery", hasDropdown: true },
   {
@@ -27,6 +28,7 @@ export default function Navbar() {
     pathname?.startsWith("/blog") ||
     pathname === "/contact" ||
     pathname === "/about" ||
+    pathname?.startsWith("/doctors") ||
     pathname === "/services" ||
     pathname === "/gallery";
 

@@ -6,14 +6,6 @@ import { UploadButton } from "@/lib/uploadthing";
 const DEFAULT_TITLE = "Latest Gallery";
 const DEFAULT_BANNER =
   "https://validthemes.net/site-template/medihub/assets/img/banner/5.jpg";
-const DEFAULT_SECTIONS = [
-  "Development",
-  "Consulting",
-  "Finance",
-  "Branding",
-  "Capital",
-  "General",
-];
 
 interface GalleryImage {
   id: string;
@@ -33,6 +25,7 @@ interface GalleryResponse {
 export default function LatestGalleryManager() {
   const [loading, setLoading] = useState(true);
   const [savingSection, setSavingSection] = useState(false);
+  const [savingCategories, setSavingCategories] = useState(false);
   const [submittingImage, setSubmittingImage] = useState(false);
   const [showInactive, setShowInactive] = useState(false);
 
@@ -41,10 +34,11 @@ export default function LatestGalleryManager() {
   const [images, setImages] = useState<GalleryImage[]>([]);
 
   const [newImageUrl, setNewImageUrl] = useState("");
-  const [newCategory, setNewCategory] = useState("General");
+  const [newCategory, setNewCategory] = useState("");
   const [newSortOrder, setNewSortOrder] = useState(0);
   const [newIsActive, setNewIsActive] = useState(true);
-  const [sections, setSections] = useState<string[]>(DEFAULT_SECTIONS);
+  const [sections, setSections] = useState<string[]>([]);
+  const [newSectionName, setNewSectionName] = useState("");
 
   const fetchGallery = async (includeInactive = showInactive) => {
     try {
@@ -57,11 +51,15 @@ export default function LatestGalleryManager() {
       setTitle(data.title || DEFAULT_TITLE);
       setBannerImage(data.bannerImage || DEFAULT_BANNER);
       setImages(data.images || []);
-      setSections(
-        Array.from(new Set([...(data.sections || []), ...DEFAULT_SECTIONS])).sort((a, b) =>
-          a.localeCompare(b)
-        )
-      );
+      const normalizedSections = Array.from(new Set(data.sections || []))
+        .map((s) => (typeof s === "string" ? s.trim() : ""))
+        .filter((s) => s.length > 0)
+        .sort((a, b) => a.localeCompare(b));
+      setSections(normalizedSections);
+      setNewCategory((prev) => {
+        if (prev && normalizedSections.includes(prev)) return prev;
+        return normalizedSections[0] || "";
+      });
     } catch (error) {
       console.error("Error fetching gallery:", error);
       alert("Failed to load gallery data");
@@ -98,6 +96,40 @@ export default function LatestGalleryManager() {
     }
   };
 
+  const handleAddSection = () => {
+    const next = newSectionName.trim();
+    if (!next) return;
+    setSections((prev) =>
+      Array.from(new Set([...prev, next])).sort((a, b) => a.localeCompare(b))
+    );
+    setNewCategory(next);
+    setNewSectionName("");
+  };
+
+  const handleRemoveSection = (section: string) => {
+    setSections((prev) => prev.filter((s) => s !== section));
+    setNewCategory((prev) => (prev === section ? "" : prev));
+  };
+
+  const handleSaveCategories = async () => {
+    try {
+      setSavingCategories(true);
+      const response = await fetch("/api/gallery", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, bannerImage, sections }),
+      });
+      if (!response.ok) throw new Error("Failed to save categories");
+      await fetchGallery(true);
+      alert("Gallery categories updated successfully!");
+    } catch (error) {
+      console.error("Error saving gallery categories:", error);
+      alert("Failed to save gallery categories");
+    } finally {
+      setSavingCategories(false);
+    }
+  };
+
   const handleAddImage = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -107,14 +139,14 @@ export default function LatestGalleryManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           imageUrl: newImageUrl,
-          category: newCategory,
+          category: newCategory.trim(),
           sortOrder: newSortOrder,
           isActive: newIsActive,
         }),
       });
       if (!response.ok) throw new Error("Failed to add image");
       setNewImageUrl("");
-      setNewCategory("General");
+      setNewCategory(sections[0] || "");
       setNewSortOrder(0);
       setNewIsActive(true);
       await fetchGallery();
@@ -245,6 +277,62 @@ export default function LatestGalleryManager() {
             </div>
           </form>
 
+          <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">Gallery Categories</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Add custom categories to use in the gallery.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleSaveCategories}
+                disabled={savingCategories}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {savingCategories ? "Saving..." : "Save Categories"}
+              </button>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-3">
+              <input
+                type="text"
+                value={newSectionName}
+                onChange={(e) => setNewSectionName(e.target.value)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="e.g. Events, Facilities, Camp 2026..."
+              />
+              <button
+                type="button"
+                onClick={handleAddSection}
+                className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                Add category
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {sections.map((section) => (
+                <span
+                  key={section}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-200 text-sm text-gray-800"
+                >
+                  {section}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSection(section)}
+                    className="text-gray-500 hover:text-red-600"
+                    aria-label={`Remove ${section}`}
+                    title="Remove"
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+
           <form onSubmit={handleAddImage} className="bg-white rounded-lg shadow-md p-6 space-y-4">
             <h3 className="text-lg font-semibold text-gray-800">Add Gallery Image</h3>
             <div>
@@ -275,17 +363,19 @@ export default function LatestGalleryManager() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Section</label>
-                <select
+                <input
+                  list="gallery-sections"
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
+                  placeholder="Select or type a category"
+                  required
+                />
+                <datalist id="gallery-sections">
                   {sections.map((section) => (
-                    <option key={section} value={section}>
-                      {section}
-                    </option>
+                    <option key={section} value={section} />
                   ))}
-                </select>
+                </datalist>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Sort Order</label>
@@ -354,7 +444,10 @@ export default function LatestGalleryManager() {
                           }
                           className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                         >
-                          {sections.map((section) => (
+                          {Array.from(new Set([...(sections || []), image.category || "General"]))
+                            .filter((s) => typeof s === "string" && s.trim().length > 0)
+                            .sort((a, b) => a.localeCompare(b))
+                            .map((section) => (
                             <option key={section} value={section}>
                               {section}
                             </option>

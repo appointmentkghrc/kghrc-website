@@ -69,6 +69,11 @@ export async function PATCH(request: NextRequest) {
         typeof body.heroCtaHref === "string" && body.heroCtaHref.trim().length > 0
           ? body.heroCtaHref.trim()
           : currentSettings.heroCtaHref,
+      doctorsSectionDescription:
+        typeof body.doctorsSectionDescription === "string" &&
+        body.doctorsSectionDescription.trim().length > 0
+          ? body.doctorsSectionDescription.trim()
+          : currentSettings.doctorsSectionDescription,
     };
 
     const updatedSettings = await upsertSiteContactSettings(nextSettings);
