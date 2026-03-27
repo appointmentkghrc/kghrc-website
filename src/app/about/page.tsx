@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import PatientTestimonialsSection from "@/components/PatientTestimonialsSection";
+import Link from "next/link";
 
 interface Doctor {
   id: string;
@@ -289,21 +290,32 @@ export default function AboutPage() {
                     key={doctor.id}
                     className="bg-white rounded-3xl shadow-lg overflow-hidden flex flex-col hover:shadow-2xl transition-shadow duration-300"
                   >
-                    {doctor.image ? (
-                      <img
-                        src={doctor.image}
-                        alt={doctor.name}
-                        className="w-full h-64 object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-64 bg-gradient-to-br from-primary to-[#00c2c0] flex items-center justify-center">
-                        <span className="text-white text-6xl font-bold">
-                          {doctor.name.charAt(0)}
-                        </span>
-                      </div>
-                    )}
+                    <Link
+                      href={`/doctors/${doctor.id}`}
+                      className="block focus:outline-none focus:ring-2 focus:ring-primary"
+                      aria-label={`View profile of ${doctor.name}`}
+                    >
+                      {doctor.image ? (
+                        <img
+                          src={doctor.image}
+                          alt={doctor.name}
+                          className="w-full h-64 object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-64 bg-linear-to-br from-primary to-[#00c2c0] flex items-center justify-center">
+                          <span className="text-white text-6xl font-bold">
+                            {doctor.name.charAt(0)}
+                          </span>
+                        </div>
+                      )}
+                    </Link>
                     <div className="p-6 flex flex-col items-center text-center gap-3">
-                      <h4 className="font-semibold text-lg">{doctor.name}</h4>
+                      <Link
+                        href={`/doctors/${doctor.id}`}
+                        className="font-semibold text-lg hover:text-primary transition-colors"
+                      >
+                        {doctor.name}
+                      </Link>
                       <p className="text-primary text-sm font-medium">
                         {doctor.designation}
                       </p>
