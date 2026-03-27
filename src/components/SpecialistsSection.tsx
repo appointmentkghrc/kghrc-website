@@ -6,6 +6,7 @@ interface Doctor {
   id: string;
   name: string;
   designation: string;
+  appointmentLink?: string | null;
   email?: string | null;
   phone?: string | null;
   facebook?: string | null;
@@ -88,9 +89,20 @@ export default function SpecialistsSection() {
                       <div className="w-16 h-[3px] bg-primary -translate-y-px" />
                     </div>
                   </div>
-                  <div className="text-gray-600 text-sm tracking-wide cursor-pointer hover:text-primary">
-                    MAKE APPOINTMENT
-                  </div>
+                  {doc.appointmentLink ? (
+                    <a
+                      href={doc.appointmentLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-gray-600 text-sm tracking-wide hover:text-primary"
+                    >
+                      MAKE APPOINTMENT
+                    </a>
+                  ) : (
+                    <div className="text-gray-400 text-sm tracking-wide cursor-not-allowed">
+                      MAKE APPOINTMENT
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

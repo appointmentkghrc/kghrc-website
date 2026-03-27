@@ -7,6 +7,7 @@ interface Doctor {
   id: string;
   name: string;
   designation: string;
+  appointmentLink?: string;
   email?: string;
   phone?: string;
   image: string;
@@ -24,6 +25,7 @@ export default function DoctorsManager() {
   const [formData, setFormData] = useState({
     name: "",
     designation: "",
+    appointmentLink: "",
     email: "",
     phone: "",
     image: "",
@@ -53,6 +55,7 @@ export default function DoctorsManager() {
     setFormData({
       name: "",
       designation: "",
+      appointmentLink: "",
       email: "",
       phone: "",
       image: "",
@@ -65,6 +68,7 @@ export default function DoctorsManager() {
     setFormData({
       name: doctor.name,
       designation: doctor.designation,
+      appointmentLink: doctor.appointmentLink || "",
       email: doctor.email || "",
       phone: doctor.phone || "",
       image: doctor.image,
@@ -267,6 +271,24 @@ export default function DoctorsManager() {
                 </div>
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Make Appointment Link
+                </label>
+                <input
+                  type="url"
+                  value={formData.appointmentLink}
+                  onChange={(e) =>
+                    setFormData({ ...formData, appointmentLink: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="https://example.com/appointment"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  When users click MAKE APPOINTMENT, they will be redirected to this link.
+                </p>
+              </div>
+
               <div className="border-t pt-4">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3">Contact Information (Optional)</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -330,6 +352,6 @@ export default function DoctorsManager() {
           </div>
         </div>
       )}
-    </ div>
+    </div>
   );
 }

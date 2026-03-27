@@ -1,6 +1,55 @@
 // components/Footer.tsx
+"use client";
+
+import { useEffect, useState } from "react";
+
+type SiteContactSettings = {
+  officeAddress: string;
+  primaryPhone: string;
+  secondaryPhone: string;
+  primaryEmail: string;
+  secondaryEmail: string;
+  mapEmbedUrl: string;
+};
+
+const defaultContactSettings: SiteContactSettings = {
+  officeAddress:
+    "Kanke General Hospital, Arsande Road, Near Kanke Block Chowk, Kanke, Jharkhand 834006",
+  primaryPhone: "+91-6206803663",
+  secondaryPhone: "06512450844",
+  primaryEmail: "appointment.kghrc@gmail.com",
+  secondaryEmail: "Kankegeneralhospital@gmail.com",
+  mapEmbedUrl:
+    "https://maps.google.com/maps?q=Kanke%20General%20Hospital%2C%20Arsande%20Road%2C%20Near%20Kanke%20Block%20Chowk%2C%20Kanke%2C%20Jharkhand%20834006&output=embed",
+};
 
 export default function Footer() {
+    const [contactSettings, setContactSettings] = useState<SiteContactSettings>(
+      defaultContactSettings
+    );
+
+    useEffect(() => {
+      const fetchContactSettings = async () => {
+        try {
+          const response = await fetch("/api/site-settings");
+          if (!response.ok) return;
+          const data = await response.json();
+          setContactSettings({
+            officeAddress: data?.officeAddress || defaultContactSettings.officeAddress,
+            primaryPhone: data?.primaryPhone || defaultContactSettings.primaryPhone,
+            secondaryPhone: data?.secondaryPhone || defaultContactSettings.secondaryPhone,
+            primaryEmail: data?.primaryEmail || defaultContactSettings.primaryEmail,
+            secondaryEmail: data?.secondaryEmail || defaultContactSettings.secondaryEmail,
+            mapEmbedUrl: data?.mapEmbedUrl || defaultContactSettings.mapEmbedUrl,
+          });
+        } catch (error) {
+          console.error("Failed to fetch contact settings for footer:", error);
+        }
+      };
+
+      fetchContactSettings();
+    }, []);
+
     return (
       <footer className="bg-[#214d80] text-white pt-20 pb-8">
   
@@ -80,7 +129,7 @@ export default function Footer() {
             <div className="rounded-lg overflow-hidden border border-white/10 shadow-md h-40">
               <iframe
                 title="Office location map"
-                src="https://www.google.com/maps?q=Kanke%20General%20Hospital%2C%20Arsande%20Road%2C%20Near%20Kanke%20Block%20Chowk%2C%20Kanke%2C%20Jharkhand%20834006&output=embed"
+                src={contactSettings.mapEmbedUrl}
                 width="100%"
                 height="100%"
                 loading="lazy"
@@ -101,22 +150,19 @@ export default function Footer() {
   
                 <div>
                   <p className="text-white font-semibold mb-1">PHONE</p>
-                  <p>+91-6206803663</p>
-                  <p>No. 06512450844</p>
+                  <p>{contactSettings.primaryPhone}</p>
+                  <p>No. {contactSettings.secondaryPhone}</p>
                 </div>
   
                 <div>
                   <p className="text-white font-semibold mb-1">EMAIL</p>
-                  <p>appointment.kghrc@gmail.com</p>
-                  <p>Kankegeneralhospital@gmail.com</p>
+                  <p>{contactSettings.primaryEmail}</p>
+                  <p>{contactSettings.secondaryEmail}</p>
                 </div>
   
                 <div>
                   <p className="text-white font-semibold mb-1">OFFICE</p>
-                  <p>
-                    Kanke General Hospital, Arsande Road, Near Kanke Block Chowk,
-                    Kanke, Jharkhand 834006
-                  </p>
+                  <p>{contactSettings.officeAddress}</p>
                 </div>
   
               </div>

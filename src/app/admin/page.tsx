@@ -7,6 +7,7 @@ import TestimonialsManager from "@/components/admin/TestimonialsManager";
 import BlogsManager from "@/components/admin/BlogsManager";
 import DoctorsManager from "@/components/admin/DoctorsManager";
 import StatsManager from "@/components/admin/StatsManager";
+import ContactSettingsManager from "@/components/admin/ContactSettingsManager";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -24,6 +25,8 @@ export default function AdminDashboard() {
         return <DoctorsManager />;
       case "stats":
         return <StatsManager />;
+      case "contactSettings":
+        return <ContactSettingsManager />;
       default:
         return <DashboardOverview />;
     }

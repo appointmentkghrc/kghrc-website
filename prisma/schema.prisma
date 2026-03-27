@@ -28,6 +28,7 @@ model Doctor {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   designation String
+  appointmentLink String?
   email       String?
   phone       String?
   facebook    String?
@@ -62,4 +63,19 @@ model Statistic {
   updatedAt DateTime @updatedAt
 
   @@map("statistics")
+}
+
+model SiteSetting {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  key           String   @unique
+  officeAddress String
+  primaryPhone  String
+  secondaryPhone String
+  primaryEmail  String
+  secondaryEmail String
+  mapEmbedUrl   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("site_settings")
 }

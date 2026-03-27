@@ -14,6 +14,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen }: SidebarProp
     { id: "blogs", label: "Blogs", icon: "fas fa-blog" },
     { id: "doctors", label: "Doctors", icon: "fas fa-user-doctor" },
     { id: "stats", label: "Statistics", icon: "fas fa-chart-bar" },
+    { id: "contactSettings", label: "Contact Settings", icon: "fas fa-address-book" },
   ];
 
   return (

@@ -7,6 +7,7 @@ interface Doctor {
   id: string;
   name: string;
   designation: string;
+  appointmentLink?: string;
   email?: string;
   phone?: string;
   facebook?: string;
@@ -318,9 +319,24 @@ export default function AboutPage() {
                         {doctor.designation}
                       </p>
 
-                      <button className="mt-4 text-xs font-semibold text-primary border border-primary px-6 py-2 rounded-full hover:bg-primary hover:text-white transition">
-                        MAKE APPOINTMENT
-                      </button>
+                      {doctor.appointmentLink ? (
+                        <a
+                          href={doctor.appointmentLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-4 text-xs font-semibold text-primary border border-primary px-6 py-2 rounded-full hover:bg-primary hover:text-white transition"
+                        >
+                          MAKE APPOINTMENT
+                        </a>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled
+                          className="mt-4 text-xs font-semibold text-gray-400 border border-gray-300 px-6 py-2 rounded-full cursor-not-allowed"
+                        >
+                          MAKE APPOINTMENT
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}

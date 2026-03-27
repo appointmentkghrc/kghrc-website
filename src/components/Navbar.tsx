@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 
 const navLinks = [
   { label: "Home", href: "/", hasDropdown: true },
-  { label: "Pages", href: "/about", hasDropdown: true },
+  { label: "About us", href: "/about", hasDropdown: true },
   { label: "Services", href: "/services", hasDropdown: true },
   { label: "Gallery", href: "/gallery", hasDropdown: true },
   {
@@ -21,6 +21,7 @@ const navLinks = [
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+  const [emergencyPhone, setEmergencyPhone] = useState("");
   const pathname = usePathname();
   const isWhiteNavPage =
     pathname?.startsWith("/blog") ||
@@ -38,6 +39,21 @@ export default function Navbar() {
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const fetchContactSettings = async () => {
+      try {
+        const response = await fetch("/api/site-settings");
+        if (!response.ok) return;
+        const data = await response.json();
+        setEmergencyPhone(data?.secondaryPhone || "");
+      } catch (error) {
+        console.error("Failed to fetch contact settings for navbar:", error);
+      }
+    };
+
+    fetchContactSettings();
   }, []);
 
   return (
@@ -104,10 +120,10 @@ export default function Navbar() {
               <div>
                 <p className="text-xs text-gray-600">EMERGENCY CASE</p>
                 <a
-                  href="tel:06512450844"
+                  href={`tel:${emergencyPhone.replace(/[^\d+]/g, "")}`}
                   className="text-sm font-semibold text-gray-800 hover:text-primary transition-colors"
                 >
-                  No. 06512450844
+                  No. {emergencyPhone || "N/A"}
                 </a>
               </div>
             </div>
@@ -211,12 +227,12 @@ export default function Navbar() {
                   EMERGENCY CASE
                 </p>
                 <a
-                  href="tel:06512450844"
+                  href={`tel:${emergencyPhone.replace(/[^\d+]/g, "")}`}
                   className={`text-sm font-semibold hover:text-primary transition-colors ${
                     isWhiteNavPage ? "text-gray-800" : "text-white"
                   }`}
                 >
-                  No. 06512450844
+                  No. {emergencyPhone || "N/A"}
                 </a>
               </div>
             </div>

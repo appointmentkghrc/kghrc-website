@@ -1,6 +1,8 @@
-"use client";
+import { getSiteContactSettings } from "@/lib/siteSettings";
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const contactSettings = await getSiteContactSettings();
+
   return (
     <div>
 
@@ -36,10 +38,7 @@ export default function ContactPage() {
             <div className="text-primary text-4xl mb-6">📍</div>
             <h3 className="text-xl font-semibold mb-4">OFFICE</h3>
             <div className="w-10 h-[2px] bg-primary mx-auto mb-6"></div>
-            <p className="text-gray-600 leading-relaxed">
-              Kanke General Hospital, Arsande Road, Near Kanke Block Chowk, Kanke, Jharkhand
-              834006
-            </p>
+            <p className="text-gray-600 leading-relaxed">{contactSettings.officeAddress}</p>
           </div>
 
           {/* Emergency */}
@@ -47,8 +46,8 @@ export default function ContactPage() {
             <div className="text-4xl mb-6">📞</div>
             <h3 className="text-xl font-semibold mb-4">CONTACT</h3>
             <div className="w-10 h-[2px] bg-white mx-auto mb-6"></div>
-            <p className="text-2xl font-bold mb-2">+91-6206803663</p>
-            <p className="text-lg">No. 06512450844</p>
+            <p className="text-2xl font-bold mb-2">{contactSettings.primaryPhone}</p>
+            <p className="text-lg">No. {contactSettings.secondaryPhone}</p>
           </div>
 
           {/* Email */}
@@ -56,8 +55,8 @@ export default function ContactPage() {
             <div className="text-primary text-4xl mb-6">✉️</div>
             <h3 className="text-xl font-semibold mb-4">EMAIL</h3>
             <div className="w-10 h-[2px] bg-primary mx-auto mb-6"></div>
-            <p className="text-gray-600">appointment.kghrc@gmail.com</p>
-            <p className="text-gray-600">Kankegeneralhospital@gmail.com</p>
+            <p className="text-gray-600">{contactSettings.primaryEmail}</p>
+            <p className="text-gray-600">{contactSettings.secondaryEmail}</p>
           </div>
 
         </div>
@@ -110,7 +109,7 @@ export default function ContactPage() {
       {/* ================= MAP ================= */}
       <section className="w-full h-[450px]">
         <iframe
-          src="https://maps.google.com/maps?q=Kanke%20General%20Hospital%2C%20Arsande%20Road%2C%20Near%20Kanke%20Block%20Chowk%2C%20Kanke%2C%20Jharkhand%20834006&output=embed"
+          src={contactSettings.mapEmbedUrl}
           className="w-full h-full"
           loading="lazy"
         ></iframe>
