@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import PatientTestimonialsSection from "@/components/PatientTestimonialsSection";
 import Link from "next/link";
+import type { AboutSettings } from "@/lib/aboutSettings";
 
 interface Doctor {
   id: string;
@@ -21,10 +22,47 @@ interface Doctor {
 export default function AboutPage() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loadingDoctors, setLoadingDoctors] = useState(true);
+  const [aboutSettings, setAboutSettings] = useState<AboutSettings | null>(null);
+  const [loadingAboutSettings, setLoadingAboutSettings] = useState(true);
 
   useEffect(() => {
+    fetchAboutSettings();
     fetchDoctors();
   }, []);
+
+  const fetchAboutSettings = async () => {
+    try {
+      setLoadingAboutSettings(true);
+      const response = await fetch("/api/about-settings");
+      if (!response.ok) throw new Error("Failed to fetch about settings");
+      const data: AboutSettings = await response.json();
+
+      const preloadImage = (src: string) =>
+        new Promise<void>((resolve) => {
+          if (!src) {
+            resolve();
+            return;
+          }
+          const img = new Image();
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+          img.src = src;
+        });
+
+      await Promise.all([
+        preloadImage(data.heroBackgroundImage),
+        preloadImage(data.profileImagePrimary),
+        preloadImage(data.profileImageSecondary),
+      ]);
+
+      setAboutSettings(data);
+    } catch (error) {
+      console.error("Error fetching about settings:", error);
+      setAboutSettings(null);
+    } finally {
+      setLoadingAboutSettings(false);
+    }
+  };
 
   const fetchDoctors = async () => {
     try {
@@ -70,6 +108,14 @@ export default function AboutPage() {
     { name: "Health India Insurance TPA", logoSrc: "/health-india.jpg" },
   ] as const;
 
+  if (loadingAboutSettings || !aboutSettings) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-14 w-14 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div>
 
@@ -79,17 +125,16 @@ export default function AboutPage() {
         <div
           className="fixed top-0 left-0 w-full h-[420px] bg-cover bg-center -z-10"
           style={{
-            backgroundImage:
-              "url(https://validthemes.net/site-template/medihub/assets/img/banner/5.jpg)",
+            backgroundImage: `url(${aboutSettings.heroBackgroundImage})`,
           }}
         />
 
         <div className="absolute inset-0 bg-black/60" />
 
         <div className="relative z-10 text-center">
-          <h1 className="text-5xl font-semibold mb-6">About Us</h1>
+          <h1 className="text-5xl font-semibold mb-6">{aboutSettings.heroTitle}</h1>
           <div className="bg-black/40 px-6 py-3 rounded-md text-sm">
-            HOME › ABOUT
+            {aboutSettings.heroBreadcrumb}
           </div>
         </div>
       </section>
@@ -100,12 +145,12 @@ export default function AboutPage() {
           {/* Left Images */}
           <div className="relative">
             <img
-              src="https://validthemes.net/site-template/medihub/assets/img/about/1.jpg"
+              src={aboutSettings.profileImagePrimary}
               className="rounded-md"
               alt="About hospital"
             />
             <img
-              src="https://validthemes.net/site-template/medihub/assets/img/about/2.jpg"
+              src={aboutSettings.profileImageSecondary}
               className="absolute bottom-[-60px] right-[-40px] w-[220px] rounded-md shadow-xl"
               alt="Hospital team"
             />
@@ -114,20 +159,15 @@ export default function AboutPage() {
           {/* Right Text */}
           <div>
             <p className="text-primary mb-3 font-medium uppercase tracking-wide">
-              KANKE GENERAL HOSPITAL &amp; RESEARCH CENTRE
+              {aboutSettings.aboutTagline}
             </p>
 
             <h2 className="text-4xl lg:text-5xl font-bold leading-tight mb-4">
-              Hospital Profile
+              {aboutSettings.profileTitle}
             </h2>
 
             <p className="text-gray-700 leading-relaxed mb-8">
-              Kanke General Hospital &amp; Research Centre is a 100 bedded multi-speciality hospital
-              located in Ranchi. The hospital started as a small OPD in 1990 by Dr. Shambhu Prasad
-              Singh and later developed into a modern healthcare institution. It was registered
-              under the Clinical Establishment Act on 9 March 2009. The hospital is committed to
-              providing high quality and affordable healthcare services with experienced doctors,
-              trained staff and modern medical equipment.
+              {aboutSettings.profileDescription}
             </p>
 
           </div>
@@ -137,43 +177,44 @@ export default function AboutPage() {
       {/* ================= FEATURES STRIP (ORIGINAL UI) ================= */}
       <section className="grid grid-cols-1 md:grid-cols-3">
         <div className="p-16 text-center bg-white shadow-md">
-          <h3 className="text-xl font-semibold mb-4">Contact Us</h3>
+          <h3 className="text-xl font-semibold mb-4">{aboutSettings.contactTitle}</h3>
           <p className="text-gray-600 mb-6">
-            Moment he at on wonder at season little. Six garden result summer set family esteem nay
-            estate. End admiration mrs unreserved.
+            {aboutSettings.contactDescription}
           </p>
-          <button className="bg-secondary hover:bg-secondary/90 transition text-white px-6 py-3 rounded-md">
-            READ MORE
-          </button>
+          <a
+            href={aboutSettings.contactButtonHref}
+            className="inline-block bg-secondary hover:bg-secondary/90 transition text-white px-6 py-3 rounded-md"
+          >
+            {aboutSettings.contactButtonLabel}
+          </a>
         </div>
 
         <div className="p-16 text-center bg-primary text-white">
-          <h3 className="text-xl font-semibold mb-4">OPENING HOURS</h3>
+          <h3 className="text-xl font-semibold mb-4">{aboutSettings.openingHoursTitle}</h3>
           <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span>Mon - Tues :</span>
-              <span>6.00 AM - 10.00 PM</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Wednes - Thurs :</span>
-              <span>8.00 AM - 6.00 PM</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Sun :</span>
-              <span>Closed</span>
-            </div>
+            {aboutSettings.openingHoursRows.map((row, index) => {
+              const [label, value] = row.split("|");
+              return (
+                <div key={`${row}-${index}`} className="flex justify-between">
+                  <span>{label?.trim() || "-"}</span>
+                  <span>{value?.trim() || "-"}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
         <div className="p-16 text-center bg-white shadow-md">
-          <h3 className="text-xl font-semibold mb-4">CANCER CARE</h3>
+          <h3 className="text-xl font-semibold mb-4">{aboutSettings.cancerTitle}</h3>
           <p className="text-gray-600 mb-6">
-            Moment he at on wonder at season little. Six garden result summer set family esteem nay
-            estate. End admiration mrs unreserved.
+            {aboutSettings.cancerDescription}
           </p>
-          <button className="bg-secondary hover:bg-secondary/90 transition text-white px-6 py-3 rounded-md">
-            READ MORE
-          </button>
+          <a
+            href={aboutSettings.cancerButtonHref}
+            className="inline-block bg-secondary hover:bg-secondary/90 transition text-white px-6 py-3 rounded-md"
+          >
+            {aboutSettings.cancerButtonLabel}
+          </a>
         </div>
       </section>
 
@@ -182,55 +223,46 @@ export default function AboutPage() {
         <div className="max-w-[1200px] mx-auto px-6 space-y-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
             <div className="bg-gray-50 rounded-2xl p-8 lg:p-10">
-              <h3 className="text-2xl font-semibold mb-4 text-[#214d80]">Mission</h3>
+              <h3 className="text-2xl font-semibold mb-4 text-[#214d80]">{aboutSettings.missionTitle}</h3>
               <ul className="space-y-3 text-gray-700">
-                <li>• To provide the best quality healthcare services at an affordable cost.</li>
-                <li>• To deliver ethical and patient-centered treatment.</li>
-                <li>• To ensure accurate diagnosis using modern technology.</li>
-                <li>• To continuously improve healthcare quality.</li>
+                {aboutSettings.missionPoints.map((point, index) => (
+                  <li key={`${point}-${index}`}>• {point}</li>
+                ))}
               </ul>
             </div>
             <div className="bg-gray-50 rounded-2xl p-8 lg:p-10">
-              <h3 className="text-2xl font-semibold mb-4 text-[#214d80]">Vision</h3>
+              <h3 className="text-2xl font-semibold mb-4 text-[#214d80]">{aboutSettings.visionTitle}</h3>
               <ul className="space-y-3 text-gray-700">
-                <li>• To become one of the leading healthcare institutions.</li>
-                <li>• To provide world-class healthcare facilities.</li>
-                <li>• To promote medical education and research.</li>
-                <li>• To ensure accessible healthcare for all.</li>
+                {aboutSettings.visionPoints.map((point, index) => (
+                  <li key={`${point}-${index}`}>• {point}</li>
+                ))}
               </ul>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-              <h3 className="text-xl font-semibold mb-4 text-[#214d80]">Diagnostic Services</h3>
+              <h3 className="text-xl font-semibold mb-4 text-[#214d80]">{aboutSettings.diagnosticTitle}</h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• Laboratory</li>
-                <li>• CT Scan</li>
-                <li>• X-Ray</li>
-                <li>• Ultrasound</li>
-                <li>• MRI</li>
-                <li>• 3D Vasculography</li>
-                <li>• TMT</li>
+                {aboutSettings.diagnosticItems.map((item, index) => (
+                  <li key={`${item}-${index}`}>• {item}</li>
+                ))}
               </ul>
             </div>
             <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-              <h3 className="text-xl font-semibold mb-4 text-[#214d80]">Hospital Facilities</h3>
+              <h3 className="text-xl font-semibold mb-4 text-[#214d80]">{aboutSettings.facilitiesTitle}</h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• Operation Theatre</li>
-                <li>• Electronic Fetal Monitoring</li>
-                <li>• Endoscopy</li>
-                <li>• EECP</li>
+                {aboutSettings.facilitiesItems.map((item, index) => (
+                  <li key={`${item}-${index}`}>• {item}</li>
+                ))}
               </ul>
             </div>
             <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-              <h3 className="text-xl font-semibold mb-4 text-[#214d80]">Hospital Services</h3>
+              <h3 className="text-xl font-semibold mb-4 text-[#214d80]">{aboutSettings.servicesTitle}</h3>
               <ul className="space-y-2 text-gray-700">
-                <li>• Ayushman Bharat Help Desk</li>
-                <li>• 15000+ Ayushman Bharat cases treated</li>
-                <li>• Cashless TPA treatment</li>
-                <li>• Emergency services</li>
-                <li>• 24×7 patient care</li>
+                {aboutSettings.servicesItems.map((item, index) => (
+                  <li key={`${item}-${index}`}>• {item}</li>
+                ))}
               </ul>
             </div>
           </div>

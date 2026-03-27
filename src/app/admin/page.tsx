@@ -12,12 +12,14 @@ import DiagnosticServicesManager from "@/components/admin/DiagnosticServicesMana
 import HeroSectionSettingsManager from "@/components/admin/HeroSectionSettingsManager";
 import LatestGalleryManager from "@/components/admin/LatestGalleryManager";
 import SocialLinksManager from "@/components/admin/SocialLinksManager";
+import AboutUsManager from "@/components/admin/AboutUsManager";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const tabTitles: Record<string, string> = {
     overview: "Overview",
+    aboutUs: "About Us",
     diagnosticServices: "Diagnostic Services",
     heroSectionImage: "Hero Section",
     latestGallery: "Latest Gallery",
@@ -37,6 +39,8 @@ export default function AdminDashboard() {
         return <TestimonialsManager />;
       case "diagnosticServices":
         return <DiagnosticServicesManager />;
+      case "aboutUs":
+        return <AboutUsManager />;
       case "heroSectionImage":
         return <HeroSectionSettingsManager />;
       case "latestGallery":

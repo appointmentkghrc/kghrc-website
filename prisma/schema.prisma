@@ -134,3 +134,40 @@ model GalleryImage {
 
   @@map("gallery_images")
 }
+
+model AboutSection {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  key                   String   @unique
+  heroTitle             String   @default("About Us")
+  heroBreadcrumb        String   @default("HOME › ABOUT")
+  heroBackgroundImage   String
+  aboutTagline          String
+  profileTitle          String
+  profileDescription    String
+  profileImagePrimary   String
+  profileImageSecondary String
+  contactTitle          String
+  contactDescription    String
+  contactButtonLabel    String
+  contactButtonHref     String
+  openingHoursTitle     String
+  openingHoursRows      String[] @default([])
+  cancerTitle           String
+  cancerDescription     String
+  cancerButtonLabel     String
+  cancerButtonHref      String
+  missionTitle          String
+  missionPoints         String[] @default([])
+  visionTitle           String
+  visionPoints          String[] @default([])
+  diagnosticTitle       String
+  diagnosticItems       String[] @default([])
+  facilitiesTitle       String
+  facilitiesItems       String[] @default([])
+  servicesTitle         String
+  servicesItems         String[] @default([])
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("about_sections")
+}

@@ -86,6 +86,20 @@ export const ourFileRouter = {
       console.log("Gallery image upload complete:", file.ufsUrl);
       return { uploadedBy: metadata.uploadedBy, url: file.ufsUrl };
     }),
+
+  aboutImage: f({
+    image: {
+      maxFileSize: "8MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      return { uploadedBy: "admin" };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("About image upload complete:", file.ufsUrl);
+      return { uploadedBy: metadata.uploadedBy, url: file.ufsUrl };
+    }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

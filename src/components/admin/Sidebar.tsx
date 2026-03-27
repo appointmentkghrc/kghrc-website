@@ -10,6 +10,7 @@ interface SidebarProps {
 export default function Sidebar({ activeTab, setActiveTab, isOpen }: SidebarProps) {
   const menuItems = [
     { id: "overview", label: "Overview", icon: "fas fa-chart-line" },
+    { id: "aboutUs", label: "About Us", icon: "fas fa-info-circle" },
     { id: "diagnosticServices", label: "Diagnostic Services", icon: "fas fa-microscope" },
     { id: "heroSectionImage", label: "Hero Section", icon: "fas fa-image" },
     { id: "latestGallery", label: "Latest Gallery", icon: "fas fa-images" },

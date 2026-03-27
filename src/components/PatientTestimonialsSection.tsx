@@ -93,9 +93,7 @@ export default function PatientTestimonialsSection() {
           </h2>
 
           <p className="text-gray-500 max-w-2xl mx-auto mt-4">
-            While mirth large of on front. Ye he greater related adapted proceed
-            entered an. Through it examine express promise no. Past add size game
-            cold girl off how old
+            Real experiences shared by our patients.
           </p>
         </div>
 
@@ -148,18 +146,12 @@ export default function PatientTestimonialsSection() {
                     <p className="text-gray-600 leading-relaxed mb-8">{t.content}</p>
 
                     <div className="flex items-center gap-4">
-                      {t.image ? (
-                        <img
-                          src={t.image}
-                          alt={t.name}
-                          className="w-12 h-12 rounded-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center font-semibold">
-                          {initials(t.name)}
-                        </div>
-                      )}
+                      <div
+                        className="w-12 h-12 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center font-semibold"
+                        aria-hidden
+                      >
+                        {initials(t.name)}
+                      </div>
 
                       <div>
                         <p className="font-semibold">{t.name}</p>
@@ -193,18 +185,12 @@ export default function PatientTestimonialsSection() {
                   <p className="text-gray-600 leading-relaxed mb-8">{t.content}</p>
 
                   <div className="flex items-center gap-4">
-                    {t.image ? (
-                      <img
-                        src={t.image}
-                        alt={t.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center font-semibold">
-                        {initials(t.name)}
-                      </div>
-                    )}
+                    <div
+                      className="w-12 h-12 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center font-semibold"
+                      aria-hidden
+                    >
+                      {initials(t.name)}
+                    </div>
 
                     <div>
                       <p className="font-semibold">{t.name}</p>
