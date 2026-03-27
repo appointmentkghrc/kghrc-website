@@ -38,6 +38,7 @@ export async function PATCH(
       where: { id },
       data: {
         ...(body.imageUrl !== undefined && { imageUrl: body.imageUrl }),
+        ...(body.category !== undefined && { category: body.category }),
         ...(body.sortOrder !== undefined && { sortOrder: Number(body.sortOrder) }),
         ...(body.isActive !== undefined && { isActive: Boolean(body.isActive) }),
       },

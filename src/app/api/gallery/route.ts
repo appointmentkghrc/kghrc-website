@@ -25,7 +25,12 @@ type GalleryImageDelegate = {
     orderBy: Array<Record<string, "asc" | "desc">>;
   }) => Promise<unknown[]>;
   create: (args: {
-    data: { imageUrl: string; sortOrder: number; isActive: boolean };
+    data: {
+      imageUrl: string;
+      category: string;
+      sortOrder: number;
+      isActive: boolean;
+    };
   }) => Promise<unknown>;
 };
 
@@ -73,6 +78,13 @@ export async function GET(request: NextRequest) {
         (section?.bannerImage && section.bannerImage.trim()) ||
         DEFAULT_GALLERY_BANNER,
       images,
+      sections: Array.from(
+        new Set(
+          (images as Array<{ category?: string }>).map((item) =>
+            item.category?.trim() || "General"
+          )
+        )
+      ),
     });
   } catch (error) {
     console.error("Error fetching gallery settings:", error);
@@ -146,6 +158,10 @@ export async function POST(request: NextRequest) {
     const image = await galleryImageDelegate.create({
       data: {
         imageUrl: body.imageUrl.trim(),
+        category:
+          typeof body.category === "string" && body.category.trim().length > 0
+            ? body.category.trim()
+            : "General",
         sortOrder: Number(body.sortOrder ?? 0),
         isActive: body.isActive ?? true,
       },

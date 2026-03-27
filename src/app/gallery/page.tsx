@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 type GalleryImage = {
   id: string;
   imageUrl: string;
+  category: string;
   sortOrder: number;
   isActive: boolean;
 };
@@ -43,10 +44,39 @@ function GalleryHeader({ title, bannerImage }: { title: string; bannerImage: str
   );
 }
 
-function GalleryGrid({ images }: { images: string[] }) {
+function GalleryGrid({
+  images,
+  sections,
+  activeSection,
+  onChangeSection,
+}: {
+  images: string[];
+  sections: string[];
+  activeSection: string;
+  onChangeSection: (section: string) => void;
+}) {
   return (
     <section className="bg-white -mt-24 pt-24 pb-28">
       <div className="max-w-[1200px] mx-auto px-6">
+        <div className="flex justify-center mt-12 mb-12">
+          <div className="inline-flex items-center gap-6 border border-gray-200 px-8 py-3 bg-white shadow-sm">
+            {["All", ...sections].map((label, index) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => onChangeSection(label)}
+                  className={`text-xs md:text-sm font-medium tracking-wide uppercase ${
+                    activeSection === label
+                      ? "text-primary"
+                      : "text-gray-700 hover:text-primary"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {images.map((src, index) => (
             <div
@@ -75,6 +105,8 @@ export default function GalleryPage() {
   const [title, setTitle] = useState(DEFAULT_TITLE);
   const [bannerImage, setBannerImage] = useState(DEFAULT_BANNER);
   const [images, setImages] = useState<GalleryImage[]>([]);
+  const [sections, setSections] = useState<string[]>([]);
+  const [activeSection, setActiveSection] = useState("All");
 
   useEffect(() => {
     const fetchGallery = async () => {
@@ -85,6 +117,14 @@ export default function GalleryPage() {
         setTitle(data?.title || DEFAULT_TITLE);
         setBannerImage(data?.bannerImage || DEFAULT_BANNER);
         setImages(Array.isArray(data?.images) ? data.images : []);
+        const sectionList = Array.from(
+          new Set(
+            (Array.isArray(data?.images) ? data.images : []).map((item: GalleryImage) =>
+              item.category?.trim() || "General"
+            )
+          )
+        );
+        setSections(sectionList);
       } catch (error) {
         console.error("Error fetching gallery:", error);
       }
@@ -93,15 +133,27 @@ export default function GalleryPage() {
     fetchGallery();
   }, []);
 
-  const imageSources = useMemo(() => {
+  const filteredImages = useMemo(() => {
     if (images.length === 0) return DEFAULT_IMAGES;
-    return images.filter((item) => item.isActive).map((item) => item.imageUrl);
-  }, [images]);
+    return images
+      .filter(
+        (item) =>
+          item.isActive && (activeSection === "All" || item.category === activeSection)
+      )
+      .map((item) => item.imageUrl);
+  }, [activeSection, images]);
+
+  const imageSources = filteredImages.length > 0 ? filteredImages : DEFAULT_IMAGES;
 
   return (
     <div>
       <GalleryHeader title={title} bannerImage={bannerImage} />
-      <GalleryGrid images={imageSources} />
+      <GalleryGrid
+        images={imageSources}
+        sections={sections}
+        activeSection={activeSection}
+        onChangeSection={setActiveSection}
+      />
     </div>
   );
 }

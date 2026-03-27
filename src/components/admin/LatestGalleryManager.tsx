@@ -6,10 +6,19 @@ import { UploadButton } from "@/lib/uploadthing";
 const DEFAULT_TITLE = "Latest Gallery";
 const DEFAULT_BANNER =
   "https://validthemes.net/site-template/medihub/assets/img/banner/5.jpg";
+const DEFAULT_SECTIONS = [
+  "Development",
+  "Consulting",
+  "Finance",
+  "Branding",
+  "Capital",
+  "General",
+];
 
 interface GalleryImage {
   id: string;
   imageUrl: string;
+  category: string;
   sortOrder: number;
   isActive: boolean;
 }
@@ -18,6 +27,7 @@ interface GalleryResponse {
   title: string;
   bannerImage: string;
   images: GalleryImage[];
+  sections?: string[];
 }
 
 export default function LatestGalleryManager() {
@@ -31,8 +41,10 @@ export default function LatestGalleryManager() {
   const [images, setImages] = useState<GalleryImage[]>([]);
 
   const [newImageUrl, setNewImageUrl] = useState("");
+  const [newCategory, setNewCategory] = useState("General");
   const [newSortOrder, setNewSortOrder] = useState(0);
   const [newIsActive, setNewIsActive] = useState(true);
+  const [sections, setSections] = useState<string[]>(DEFAULT_SECTIONS);
 
   const fetchGallery = async (includeInactive = showInactive) => {
     try {
@@ -45,6 +57,11 @@ export default function LatestGalleryManager() {
       setTitle(data.title || DEFAULT_TITLE);
       setBannerImage(data.bannerImage || DEFAULT_BANNER);
       setImages(data.images || []);
+      setSections(
+        Array.from(new Set([...(data.sections || []), ...DEFAULT_SECTIONS])).sort((a, b) =>
+          a.localeCompare(b)
+        )
+      );
     } catch (error) {
       console.error("Error fetching gallery:", error);
       alert("Failed to load gallery data");
@@ -90,12 +107,14 @@ export default function LatestGalleryManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           imageUrl: newImageUrl,
+          category: newCategory,
           sortOrder: newSortOrder,
           isActive: newIsActive,
         }),
       });
       if (!response.ok) throw new Error("Failed to add image");
       setNewImageUrl("");
+      setNewCategory("General");
       setNewSortOrder(0);
       setNewIsActive(true);
       await fetchGallery();
@@ -114,9 +133,15 @@ export default function LatestGalleryManager() {
     }
   };
 
+  const handleBannerUpload = (res: Array<{ url: string }>) => {
+    if (res && res[0]) {
+      setBannerImage(res[0].url);
+    }
+  };
+
   const handleUpdateImage = async (
     id: string,
-    updates: Partial<Pick<GalleryImage, "sortOrder" | "isActive" | "imageUrl">>
+    updates: Partial<Pick<GalleryImage, "sortOrder" | "isActive" | "imageUrl" | "category">>
   ) => {
     try {
       const response = await fetch(`/api/gallery/${id}`, {
@@ -191,6 +216,17 @@ export default function LatestGalleryManager() {
                 required
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Or Upload Banner Image
+              </label>
+              <UploadButton
+                className="ut-primary-upload"
+                endpoint="galleryImage"
+                onClientUploadComplete={handleBannerUpload}
+                onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
+              />
+            </div>
             <div className="h-52 rounded-lg overflow-hidden border border-gray-200">
               <img
                 src={bannerImage || DEFAULT_BANNER}
@@ -238,6 +274,20 @@ export default function LatestGalleryManager() {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Section</label>
+                <select
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {sections.map((section) => (
+                    <option key={section} value={section}>
+                      {section}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Sort Order</label>
                 <input
                   type="number"
@@ -247,7 +297,7 @@ export default function LatestGalleryManager() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-              <label className="inline-flex items-center gap-2 text-sm text-gray-700 mt-8">
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700 mt-8 md:mt-0">
                 <input
                   type="checkbox"
                   checked={newIsActive}
@@ -292,6 +342,26 @@ export default function LatestGalleryManager() {
                     <img src={image.imageUrl} alt="Gallery item" className="w-full h-40 object-cover" />
                     <div className="p-4 space-y-3">
                       <div>
+                        <label className="block text-xs text-gray-600 mb-1">Section</label>
+                        <select
+                          value={image.category || "General"}
+                          onChange={(e) =>
+                            setImages((prev) =>
+                              prev.map((item) =>
+                                item.id === image.id ? { ...item, category: e.target.value } : item
+                              )
+                            )
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                        >
+                          {sections.map((section) => (
+                            <option key={section} value={section}>
+                              {section}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
                         <label className="block text-xs text-gray-600 mb-1">Sort order</label>
                         <input
                           type="number"
@@ -328,6 +398,7 @@ export default function LatestGalleryManager() {
                           type="button"
                           onClick={() =>
                             handleUpdateImage(image.id, {
+                              category: image.category,
                               sortOrder: image.sortOrder,
                               isActive: image.isActive,
                             })
