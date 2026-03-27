@@ -7,7 +7,17 @@ export type SiteContactSettings = {
   primaryEmail: string;
   secondaryEmail: string;
   mapEmbedUrl: string;
+  facebookUrl: string;
+  instagramUrl: string;
+  twitterUrl: string;
+  youtubeUrl: string;
+  linkedinUrl: string;
   heroBackgroundImage: string;
+  heroTitleLine1: string;
+  heroTitleLine2: string;
+  heroDescription: string;
+  heroCtaLabel: string;
+  heroCtaHref: string;
 };
 
 export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
@@ -19,7 +29,18 @@ export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
   secondaryEmail: "Kankegeneralhospital@gmail.com",
   mapEmbedUrl:
     "https://maps.google.com/maps?q=Kanke%20General%20Hospital%2C%20Arsande%20Road%2C%20Near%20Kanke%20Block%20Chowk%2C%20Kanke%2C%20Jharkhand%20834006&output=embed",
+  facebookUrl: "",
+  instagramUrl: "",
+  twitterUrl: "",
+  youtubeUrl: "",
+  linkedinUrl: "",
   heroBackgroundImage: "/image7.jpeg",
+  heroTitleLine1: "Best care for your",
+  heroTitleLine2: "Good health",
+  heroDescription:
+    "The ourselves suffering the sincerity. Inhabit her manners adapted age certain. Debating offended at branched striking be subjects.",
+  heroCtaLabel: "Contact Us",
+  heroCtaHref: "/contact",
 };
 
 const SITE_SETTINGS_KEY = "main";
@@ -35,7 +56,17 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
           primaryEmail: string;
           secondaryEmail: string;
           mapEmbedUrl: string;
+          facebookUrl: string | null;
+          instagramUrl: string | null;
+          twitterUrl: string | null;
+          youtubeUrl: string | null;
+          linkedinUrl: string | null;
           heroBackgroundImage: string | null;
+          heroTitleLine1: string | null;
+          heroTitleLine2: string | null;
+          heroDescription: string | null;
+          heroCtaLabel: string | null;
+          heroCtaHref: string | null;
         } | null>;
       }
     | undefined;
@@ -59,8 +90,23 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
     primaryEmail: settings.primaryEmail,
     secondaryEmail: settings.secondaryEmail,
     mapEmbedUrl: settings.mapEmbedUrl,
+    facebookUrl: settings.facebookUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.facebookUrl,
+    instagramUrl: settings.instagramUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.instagramUrl,
+    twitterUrl: settings.twitterUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.twitterUrl,
+    youtubeUrl: settings.youtubeUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.youtubeUrl,
+    linkedinUrl: settings.linkedinUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.linkedinUrl,
     heroBackgroundImage:
       settings.heroBackgroundImage ?? DEFAULT_SITE_CONTACT_SETTINGS.heroBackgroundImage,
+    heroTitleLine1:
+      settings.heroTitleLine1?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroTitleLine1,
+    heroTitleLine2:
+      settings.heroTitleLine2?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroTitleLine2,
+    heroDescription:
+      settings.heroDescription?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroDescription,
+    heroCtaLabel:
+      settings.heroCtaLabel?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaLabel,
+    heroCtaHref:
+      settings.heroCtaHref?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaHref,
   };
 }
 
@@ -80,7 +126,17 @@ export async function upsertSiteContactSettings(
             primaryEmail: string;
             secondaryEmail: string;
             mapEmbedUrl: string;
+            facebookUrl: string;
+            instagramUrl: string;
+            twitterUrl: string;
+            youtubeUrl: string;
+            linkedinUrl: string;
             heroBackgroundImage: string;
+            heroTitleLine1: string;
+            heroTitleLine2: string;
+            heroDescription: string;
+            heroCtaLabel: string;
+            heroCtaHref: string;
           };
           update: {
             officeAddress: string;
@@ -89,7 +145,17 @@ export async function upsertSiteContactSettings(
             primaryEmail: string;
             secondaryEmail: string;
             mapEmbedUrl: string;
+            facebookUrl: string;
+            instagramUrl: string;
+            twitterUrl: string;
+            youtubeUrl: string;
+            linkedinUrl: string;
             heroBackgroundImage: string;
+            heroTitleLine1: string;
+            heroTitleLine2: string;
+            heroDescription: string;
+            heroCtaLabel: string;
+            heroCtaHref: string;
           };
         }) => Promise<{
           officeAddress: string;
@@ -98,7 +164,17 @@ export async function upsertSiteContactSettings(
           primaryEmail: string;
           secondaryEmail: string;
           mapEmbedUrl: string;
+          facebookUrl: string | null;
+          instagramUrl: string | null;
+          twitterUrl: string | null;
+          youtubeUrl: string | null;
+          linkedinUrl: string | null;
           heroBackgroundImage: string | null;
+          heroTitleLine1: string | null;
+          heroTitleLine2: string | null;
+          heroDescription: string | null;
+          heroCtaLabel: string | null;
+          heroCtaHref: string | null;
         }>;
       }
     | undefined;
@@ -117,7 +193,17 @@ export async function upsertSiteContactSettings(
       primaryEmail: data.primaryEmail,
       secondaryEmail: data.secondaryEmail,
       mapEmbedUrl: data.mapEmbedUrl,
+      facebookUrl: data.facebookUrl,
+      instagramUrl: data.instagramUrl,
+      twitterUrl: data.twitterUrl,
+      youtubeUrl: data.youtubeUrl,
+      linkedinUrl: data.linkedinUrl,
       heroBackgroundImage: data.heroBackgroundImage,
+      heroTitleLine1: data.heroTitleLine1,
+      heroTitleLine2: data.heroTitleLine2,
+      heroDescription: data.heroDescription,
+      heroCtaLabel: data.heroCtaLabel,
+      heroCtaHref: data.heroCtaHref,
     },
     update: {
       officeAddress: data.officeAddress,
@@ -126,7 +212,17 @@ export async function upsertSiteContactSettings(
       primaryEmail: data.primaryEmail,
       secondaryEmail: data.secondaryEmail,
       mapEmbedUrl: data.mapEmbedUrl,
+      facebookUrl: data.facebookUrl,
+      instagramUrl: data.instagramUrl,
+      twitterUrl: data.twitterUrl,
+      youtubeUrl: data.youtubeUrl,
+      linkedinUrl: data.linkedinUrl,
       heroBackgroundImage: data.heroBackgroundImage,
+      heroTitleLine1: data.heroTitleLine1,
+      heroTitleLine2: data.heroTitleLine2,
+      heroDescription: data.heroDescription,
+      heroCtaLabel: data.heroCtaLabel,
+      heroCtaHref: data.heroCtaHref,
     },
   });
 
@@ -137,7 +233,22 @@ export async function upsertSiteContactSettings(
     primaryEmail: settings.primaryEmail,
     secondaryEmail: settings.secondaryEmail,
     mapEmbedUrl: settings.mapEmbedUrl,
+    facebookUrl: settings.facebookUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.facebookUrl,
+    instagramUrl: settings.instagramUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.instagramUrl,
+    twitterUrl: settings.twitterUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.twitterUrl,
+    youtubeUrl: settings.youtubeUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.youtubeUrl,
+    linkedinUrl: settings.linkedinUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.linkedinUrl,
     heroBackgroundImage:
       settings.heroBackgroundImage ?? DEFAULT_SITE_CONTACT_SETTINGS.heroBackgroundImage,
+    heroTitleLine1:
+      settings.heroTitleLine1?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroTitleLine1,
+    heroTitleLine2:
+      settings.heroTitleLine2?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroTitleLine2,
+    heroDescription:
+      settings.heroDescription?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroDescription,
+    heroCtaLabel:
+      settings.heroCtaLabel?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaLabel,
+    heroCtaHref:
+      settings.heroCtaHref?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaHref,
   };
 }

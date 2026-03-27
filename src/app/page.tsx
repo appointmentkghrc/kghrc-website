@@ -5,6 +5,7 @@ import StatsSection from "@/components/StatsSection";
 import PatientTestimonialsSection from "@/components/PatientTestimonialsSection";
 import RecentBlogsSection from "@/components/RecentBlogsSection";
 import { getSiteContactSettings } from "@/lib/siteSettings";
+import Link from "next/link";
 
 export default async function Home() {
   const siteSettings = await getSiteContactSettings();
@@ -31,19 +32,20 @@ export default async function Home() {
             {/* Left: Hero text */}
             <div className="max-w-2xl -translate-y-16">
               <h1 className="text-5xl lg:text-7xl font-semibold text-white leading-[1.1] mb-6">
-                <span className="block whitespace-nowrap">Best care for your</span>
-                <span className="block text-primary whitespace-nowrap">Good health</span>
+                <span className="block whitespace-nowrap">{siteSettings.heroTitleLine1}</span>
+                <span className="block text-primary whitespace-nowrap">{siteSettings.heroTitleLine2}</span>
               </h1>
 
               <p className="text-white/85 text-lg mb-8 leading-relaxed">
-                The ourselves suffering the sincerity. Inhabit her manners
-                adapted age certain. Debating offended at branched striking be
-                subjects.
+                {siteSettings.heroDescription}
               </p>
 
-              <button className="px-12 py-4 bg-white text-gray-600 font-semibold rounded-full hover:bg-gray-100 transition">
-                Contact Us
-              </button>
+              <Link
+                href={siteSettings.heroCtaHref || "/contact"}
+                className="inline-flex items-center justify-center px-12 py-4 bg-white text-gray-600 font-semibold rounded-full hover:bg-gray-100 transition"
+              >
+                {siteSettings.heroCtaLabel || "Contact Us"}
+              </Link>
             </div>
 
             {/* Right: Appointment box */}

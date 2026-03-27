@@ -224,7 +224,7 @@ export default function Navbar() {
                     isWhiteNavPage ? "text-gray-600" : "text-white/80"
                   }`}
                 >
-                  EMERGENCY CASE
+                  Contact Us
                 </p>
                 <a
                   href={`tel:${emergencyPhone.replace(/[^\d+]/g, "")}`}
@@ -232,7 +232,7 @@ export default function Navbar() {
                     isWhiteNavPage ? "text-gray-800" : "text-white"
                   }`}
                 >
-                  No. {emergencyPhone || "N/A"}
+                  {emergencyPhone || "N/A"}
                 </a>
               </div>
             </div>

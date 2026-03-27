@@ -4,9 +4,7 @@ import prisma from "@/lib/prisma";
 export async function GET() {
   try {
     const doctors = await prisma.doctor.findMany({
-      orderBy: {
-        createdAt: "asc",
-      },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     });
     return NextResponse.json(doctors);
   } catch (error) {
@@ -31,6 +29,9 @@ export async function POST(request: NextRequest) {
         facebook: body.facebook || null,
         linkedin: body.linkedin || null,
         image: body.image || null,
+        sortOrder: Number.isFinite(Number(body.sortOrder))
+          ? Number(body.sortOrder)
+          : 0,
       },
     });
     return NextResponse.json(doctor, { status: 201 });

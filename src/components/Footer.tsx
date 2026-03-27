@@ -10,6 +10,11 @@ type SiteContactSettings = {
   primaryEmail: string;
   secondaryEmail: string;
   mapEmbedUrl: string;
+  facebookUrl: string;
+  instagramUrl: string;
+  twitterUrl: string;
+  youtubeUrl: string;
+  linkedinUrl: string;
 };
 
 const defaultContactSettings: SiteContactSettings = {
@@ -21,6 +26,11 @@ const defaultContactSettings: SiteContactSettings = {
   secondaryEmail: "Kankegeneralhospital@gmail.com",
   mapEmbedUrl:
     "https://maps.google.com/maps?q=Kanke%20General%20Hospital%2C%20Arsande%20Road%2C%20Near%20Kanke%20Block%20Chowk%2C%20Kanke%2C%20Jharkhand%20834006&output=embed",
+  facebookUrl: "",
+  instagramUrl: "",
+  twitterUrl: "",
+  youtubeUrl: "",
+  linkedinUrl: "",
 };
 
 export default function Footer() {
@@ -41,6 +51,11 @@ export default function Footer() {
             primaryEmail: data?.primaryEmail || defaultContactSettings.primaryEmail,
             secondaryEmail: data?.secondaryEmail || defaultContactSettings.secondaryEmail,
             mapEmbedUrl: data?.mapEmbedUrl || defaultContactSettings.mapEmbedUrl,
+            facebookUrl: data?.facebookUrl || defaultContactSettings.facebookUrl,
+            instagramUrl: data?.instagramUrl || defaultContactSettings.instagramUrl,
+            twitterUrl: data?.twitterUrl || defaultContactSettings.twitterUrl,
+            youtubeUrl: data?.youtubeUrl || defaultContactSettings.youtubeUrl,
+            linkedinUrl: data?.linkedinUrl || defaultContactSettings.linkedinUrl,
           });
         } catch (error) {
           console.error("Failed to fetch contact settings for footer:", error);
@@ -171,14 +186,14 @@ export default function Footer() {
           </div>
   
           {/* Bottom Bar */}
-          <div className="border-t border-white/20 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-white/70">
+          <div className="border-t border-white/20 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-white/70 gap-4">
   
               <p>
                 © Copyright 2025. All Rights Reserved by{" "}
                 <span className="text-primary">KGH</span>
               </p>
   
-            <div className="flex gap-6 mt-4 md:mt-0">
+            <div className="flex gap-6 md:mt-0 flex-wrap items-center justify-center">
               <span className="hover:text-primary cursor-pointer">
                 Terms of user
               </span>
@@ -188,6 +203,29 @@ export default function Footer() {
               <span className="hover:text-primary cursor-pointer">
                 Support
               </span>
+            </div>
+
+            <div className="flex gap-3">
+              {[
+                { key: "facebook", href: contactSettings.facebookUrl, icon: "fab fa-facebook-f", label: "Facebook" },
+                { key: "instagram", href: contactSettings.instagramUrl, icon: "fab fa-instagram", label: "Instagram" },
+                { key: "twitter", href: contactSettings.twitterUrl, icon: "fab fa-x-twitter", label: "X" },
+                { key: "youtube", href: contactSettings.youtubeUrl, icon: "fab fa-youtube", label: "YouTube" },
+                { key: "linkedin", href: contactSettings.linkedinUrl, icon: "fab fa-linkedin-in", label: "LinkedIn" },
+              ]
+                .filter((item) => typeof item.href === "string" && item.href.trim().length > 0)
+                .map((item) => (
+                  <a
+                    key={item.key}
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={item.label}
+                    className="w-9 h-9 rounded-full border border-white/25 flex items-center justify-center hover:border-primary hover:text-primary transition"
+                  >
+                    <i className={item.icon}></i>
+                  </a>
+                ))}
             </div>
   
           </div>

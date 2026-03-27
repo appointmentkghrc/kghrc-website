@@ -30,17 +30,17 @@ const DEFAULT_IMAGES = [
 
 function GalleryHeader({ title, bannerImage }: { title: string; bannerImage: string }) {
   return (
-    <section className="relative h-[420px] flex items-center justify-center text-white">
+    <section className="relative h-[420px] flex items-center justify-center text-white overflow-hidden">
       <div
-        className="fixed top-0 left-0 w-full h-[420px] bg-cover bg-center -z-10"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
         style={{
           backgroundImage: `url(${bannerImage || DEFAULT_BANNER})`,
         }}
       />
 
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-black/60 z-10" />
 
-      <div className="relative z-10 text-center">
+      <div className="relative z-20 text-center">
         <h1 className="text-5xl font-semibold mb-6">{title}</h1>
         <div className="bg-black/40 px-6 py-3 rounded-md text-sm">
           HOME › GALLERY
@@ -55,18 +55,20 @@ function GalleryGrid({
   sections,
   activeSection,
   onChangeSection,
+  onSelectImage,
 }: {
   images: string[];
   sections: string[];
   activeSection: string;
   onChangeSection: (section: string) => void;
+  onSelectImage: (src: string) => void;
 }) {
   return (
     <section className="bg-white -mt-24 pt-24 pb-28">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="flex justify-center mt-12 mb-12">
           <div className="inline-flex items-center gap-6 border border-gray-200 px-8 py-3 bg-white shadow-sm">
-            {["All", ...sections].map((label, index) => (
+            {["All", ...sections].map((label) => (
                 <button
                   key={label}
                   type="button"
@@ -85,25 +87,82 @@ function GalleryGrid({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {images.map((src, index) => (
-            <div
-              key={src}
-              className="group relative overflow-hidden rounded-2xl shadow-md bg-gray-100"
+            <button
+              key={`${src}-${index}`}
+              type="button"
+              onClick={() => onSelectImage(src)}
+              className="group relative overflow-hidden rounded-2xl shadow-md bg-gray-100 text-left"
+              aria-label={`View gallery image ${index + 1}`}
             >
               <img
                 src={src}
                 alt={`Gallery image ${index + 1}`}
                 className="w-full h-72 object-cover transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                 <span className="text-white text-sm font-medium tracking-wide">
                   View Photo
                 </span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function PhotoViewer({
+  src,
+  alt,
+  onClose,
+}: {
+  src: string;
+  alt: string;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-100 bg-black/80 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Photo viewer"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="relative w-full max-w-5xl">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute -top-12 right-0 text-white/90 hover:text-white text-sm font-semibold"
+          aria-label="Close photo viewer"
+        >
+          Close ✕
+        </button>
+        <div className="rounded-2xl overflow-hidden bg-black shadow-2xl">
+          <img
+            src={src}
+            alt={alt}
+            className="w-full max-h-[80vh] object-contain bg-black"
+          />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -113,6 +172,7 @@ export default function GalleryPage() {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [sections, setSections] = useState<string[]>([]);
   const [activeSection, setActiveSection] = useState("All");
+  const [viewerSrc, setViewerSrc] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchGallery = async () => {
@@ -159,7 +219,15 @@ export default function GalleryPage() {
         sections={sections}
         activeSection={activeSection}
         onChangeSection={setActiveSection}
+        onSelectImage={(src) => setViewerSrc(src)}
       />
+      {viewerSrc ? (
+        <PhotoViewer
+          src={viewerSrc}
+          alt="Expanded gallery image"
+          onClose={() => setViewerSrc(null)}
+        />
+      ) : null}
     </div>
   );
 }

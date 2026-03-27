@@ -9,8 +9,9 @@ import DoctorsManager from "@/components/admin/DoctorsManager";
 import StatsManager from "@/components/admin/StatsManager";
 import ContactSettingsManager from "@/components/admin/ContactSettingsManager";
 import DiagnosticServicesManager from "@/components/admin/DiagnosticServicesManager";
-import HeroSectionManager from "@/components/admin/HeroSectionManager";
+import HeroSectionSettingsManager from "@/components/admin/HeroSectionSettingsManager";
 import LatestGalleryManager from "@/components/admin/LatestGalleryManager";
+import SocialLinksManager from "@/components/admin/SocialLinksManager";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -18,13 +19,14 @@ export default function AdminDashboard() {
   const tabTitles: Record<string, string> = {
     overview: "Overview",
     diagnosticServices: "Diagnostic Services",
-    heroSectionImage: "Hero Section Image",
+    heroSectionImage: "Hero Section",
     latestGallery: "Latest Gallery",
     testimonials: "Testimonials",
     blogs: "Blogs",
     doctors: "Doctors",
     stats: "Statistics",
     contactSettings: "Contact Settings",
+    socialLinks: "Social Links",
   };
 
   const renderContent = () => {
@@ -36,7 +38,7 @@ export default function AdminDashboard() {
       case "diagnosticServices":
         return <DiagnosticServicesManager />;
       case "heroSectionImage":
-        return <HeroSectionManager />;
+        return <HeroSectionSettingsManager />;
       case "latestGallery":
         return <LatestGalleryManager />;
       case "blogs":
@@ -47,6 +49,8 @@ export default function AdminDashboard() {
         return <StatsManager />;
       case "contactSettings":
         return <ContactSettingsManager />;
+      case "socialLinks":
+        return <SocialLinksManager />;
       default:
         return <DashboardOverview />;
     }

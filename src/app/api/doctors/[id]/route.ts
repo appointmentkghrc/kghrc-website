@@ -47,6 +47,11 @@ export async function PATCH(
         ...(body.facebook !== undefined && { facebook: body.facebook || null }),
         ...(body.linkedin !== undefined && { linkedin: body.linkedin || null }),
         ...(body.image !== undefined && { image: body.image || null }),
+        ...(body.sortOrder !== undefined && {
+          sortOrder: Number.isFinite(Number(body.sortOrder))
+            ? Number(body.sortOrder)
+            : 0,
+        }),
       },
     });
     return NextResponse.json(doctor);

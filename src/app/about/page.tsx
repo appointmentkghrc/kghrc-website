@@ -129,17 +129,6 @@ export default function AboutPage() {
               trained staff and modern medical equipment.
             </p>
 
-            <div className="bg-white rounded-xl p-8 flex items-center gap-6 shadow-lg">
-              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white text-2xl">
-                ▶
-              </div>
-              <div>
-                <h4 className="font-semibold text-lg">LET’S SEE OUR INTRO VIDEO</h4>
-                <p className="text-gray-500 text-sm">
-                  If your smile is not becoming to you, then you should be coming to me!
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -147,7 +136,7 @@ export default function AboutPage() {
       {/* ================= FEATURES STRIP (ORIGINAL UI) ================= */}
       <section className="grid grid-cols-1 md:grid-cols-3">
         <div className="p-16 text-center bg-white shadow-md">
-          <h3 className="text-xl font-semibold mb-4">EMERGENCY CASE</h3>
+          <h3 className="text-xl font-semibold mb-4">Contact Us</h3>
           <p className="text-gray-600 mb-6">
             Moment he at on wonder at season little. Six garden result summer set family esteem nay
             estate. End admiration mrs unreserved.

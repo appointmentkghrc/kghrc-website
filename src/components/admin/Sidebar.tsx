@@ -11,13 +11,14 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen }: SidebarProp
   const menuItems = [
     { id: "overview", label: "Overview", icon: "fas fa-chart-line" },
     { id: "diagnosticServices", label: "Diagnostic Services", icon: "fas fa-microscope" },
-    { id: "heroSectionImage", label: "Hero Section Image", icon: "fas fa-image" },
+    { id: "heroSectionImage", label: "Hero Section", icon: "fas fa-image" },
     { id: "latestGallery", label: "Latest Gallery", icon: "fas fa-images" },
     { id: "testimonials", label: "Testimonials", icon: "fas fa-comment-dots" },
     { id: "blogs", label: "Blogs", icon: "fas fa-blog" },
     { id: "doctors", label: "Doctors", icon: "fas fa-user-doctor" },
     { id: "stats", label: "Statistics", icon: "fas fa-chart-bar" },
     { id: "contactSettings", label: "Contact Settings", icon: "fas fa-address-book" },
+    { id: "socialLinks", label: "Social Links", icon: "fas fa-share-nodes" },
   ];
 
   return (

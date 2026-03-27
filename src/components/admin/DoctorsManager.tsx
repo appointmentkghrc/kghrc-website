@@ -11,6 +11,7 @@ interface Doctor {
   email?: string;
   phone?: string;
   image: string;
+  sortOrder?: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -22,6 +23,7 @@ export default function DoctorsManager() {
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [savingOrderId, setSavingOrderId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     designation: "",
@@ -29,6 +31,7 @@ export default function DoctorsManager() {
     email: "",
     phone: "",
     image: "",
+    sortOrder: "",
   });
 
   useEffect(() => {
@@ -59,6 +62,7 @@ export default function DoctorsManager() {
       email: "",
       phone: "",
       image: "",
+      sortOrder: "",
     });
     setIsModalOpen(true);
   };
@@ -72,6 +76,7 @@ export default function DoctorsManager() {
       email: doctor.email || "",
       phone: doctor.phone || "",
       image: doctor.image,
+      sortOrder: String(typeof doctor.sortOrder === "number" ? doctor.sortOrder : 0),
     });
     setIsModalOpen(true);
   };
@@ -101,11 +106,17 @@ export default function DoctorsManager() {
     setSubmitting(true);
 
     try {
+      const payload = {
+        ...formData,
+        sortOrder:
+          formData.sortOrder.trim() === "" ? 0 : Number(formData.sortOrder),
+      };
+
       if (editingDoctor) {
         const response = await fetch(`/api/doctors/${editingDoctor.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         });
 
         if (!response.ok) throw new Error("Failed to update doctor");
@@ -117,7 +128,7 @@ export default function DoctorsManager() {
         const response = await fetch("/api/doctors", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         });
 
         if (!response.ok) throw new Error("Failed to create doctor");
@@ -135,16 +146,48 @@ export default function DoctorsManager() {
     }
   };
 
-  const handleImageUpload = (res: any) => {
-    if (res && res[0]) {
+  const handleImageUpload = (res: Array<{ url: string }>) => {
+    if (res && res[0]?.url) {
       setFormData({ ...formData, image: res[0].url });
     }
   };
 
-  const filteredDoctors = doctors.filter((doctor) =>
-    doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doctor.designation.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredDoctors = doctors
+    .filter(
+      (doctor) =>
+        doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doctor.designation.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      const aOrder = typeof a.sortOrder === "number" ? a.sortOrder : 0;
+      const bOrder = typeof b.sortOrder === "number" ? b.sortOrder : 0;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
+
+  const handleSaveOrder = async (doctor: Doctor) => {
+    try {
+      setSavingOrderId(doctor.id);
+      const response = await fetch(`/api/doctors/${doctor.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sortOrder:
+            doctor.sortOrder === null || doctor.sortOrder === undefined
+              ? 0
+              : Number(doctor.sortOrder),
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to update doctor order");
+      const updated = await response.json();
+      setDoctors((prev) => prev.map((d) => (d.id === updated.id ? updated : d)));
+    } catch (error) {
+      console.error("Error saving doctor order:", error);
+      alert("Failed to save doctor order");
+    } finally {
+      setSavingOrderId(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -188,6 +231,46 @@ export default function DoctorsManager() {
             <div className="p-6">
               <h3 className="font-semibold text-gray-800 text-xl mb-1">{doctor.name}</h3>
               <p className="text-blue-600 font-medium mb-4">{doctor.designation}</p>
+
+              <div className="flex items-end gap-2 mb-4">
+                <div className="flex-1">
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Arrange order (lower shows first)
+                  </label>
+                  <input
+                    type="number"
+                    value={
+                      doctor.sortOrder === null || doctor.sortOrder === undefined
+                        ? ""
+                        : String(doctor.sortOrder)
+                    }
+                    onChange={(e) =>
+                      setDoctors((prev) =>
+                        prev.map((d) =>
+                          d.id === doctor.id
+                            ? {
+                                ...d,
+                                sortOrder:
+                                  e.target.value === ""
+                                    ? null
+                                    : Number(e.target.value),
+                              }
+                            : d
+                        )
+                      )
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleSaveOrder(doctor)}
+                  disabled={savingOrderId === doctor.id}
+                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingOrderId === doctor.id ? "Saving..." : "Save"}
+                </button>
+              </div>
 
               {(doctor.email || doctor.phone) && (
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
@@ -269,6 +352,18 @@ export default function DoctorsManager() {
                     required
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Arrange order (lower shows first)
+                </label>
+                <input
+                  type="number"
+                  value={formData.sortOrder}
+                  onChange={(e) => setFormData({ ...formData, sortOrder: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
               </div>
 
               <div>
