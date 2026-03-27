@@ -89,6 +89,7 @@ model SiteSetting {
   heroDescription String?
   heroCtaLabel   String?
   heroCtaHref    String?
+  heroOpeningHoursRows String[] @default([])
   doctorsSectionDescription String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

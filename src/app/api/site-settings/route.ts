@@ -29,6 +29,17 @@ export async function PATCH(request: NextRequest) {
       return trimmed;
     };
 
+    const normalizeOpeningHoursRows = (value: unknown, fallback: string[]) => {
+      if (!Array.isArray(value)) return fallback;
+
+      const nextRows = value
+        .filter((item): item is string => typeof item === "string")
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0 && item.includes("|"));
+
+      return nextRows.length > 0 ? nextRows : fallback;
+    };
+
     const nextSettings = {
       officeAddress:
         body.officeAddress ?? currentSettings.officeAddress,
@@ -69,6 +80,10 @@ export async function PATCH(request: NextRequest) {
         typeof body.heroCtaHref === "string" && body.heroCtaHref.trim().length > 0
           ? body.heroCtaHref.trim()
           : currentSettings.heroCtaHref,
+      heroOpeningHoursRows: normalizeOpeningHoursRows(
+        body.heroOpeningHoursRows,
+        currentSettings.heroOpeningHoursRows
+      ),
       doctorsSectionDescription:
         typeof body.doctorsSectionDescription === "string" &&
         body.doctorsSectionDescription.trim().length > 0

@@ -228,6 +228,55 @@ Mental health influences:
     ],
   });
 
+  await prisma.siteSetting.upsert({
+    where: { key: "main" },
+    create: {
+      key: "main",
+      officeAddress:
+        "Kanke General Hospital, Arsande Road, Near Kanke Block Chowk, Kanke, Jharkhand 834006",
+      primaryPhone: "+91-6206803663",
+      secondaryPhone: "06512450844",
+      primaryEmail: "appointment.kghrc@gmail.com",
+      secondaryEmail: "Kankegeneralhospital@gmail.com",
+      mapEmbedUrl:
+        "https://maps.google.com/maps?q=Kanke%20General%20Hospital%2C%20Arsande%20Road%2C%20Near%20Kanke%20Block%20Chowk%2C%20Kanke%2C%20Jharkhand%20834006&output=embed",
+      facebookUrl: "",
+      instagramUrl: "",
+      twitterUrl: "",
+      youtubeUrl: "",
+      linkedinUrl: "",
+      heroBackgroundImage: "/image7.jpeg",
+      heroTitleLine1: "Best care for your",
+      heroTitleLine2: "Good health",
+      heroDescription:
+        "The ourselves suffering the sincerity. Inhabit her manners adapted age certain. Debating offended at branched striking be subjects.",
+      heroCtaLabel: "Contact Us",
+      heroCtaHref: "/contact",
+      heroOpeningHoursRows: [
+        "Sunday|6.00 AM - 10.00 PM",
+        "Monday|8.00 AM - 4.00 PM",
+        "Tuesday|9.00 AM - 6.00 PM",
+        "Wednesday|10.00 AM - 7.00 PM",
+        "Thursday|11.00 AM - 9.00 PM",
+        "Friday|12.00 AM - 12.00 PM",
+        "Saturday|CLOSED",
+      ],
+      doctorsSectionDescription:
+        "While mirth large of on front. Ye he greater related adapted proceed entered an. Through it examine express promise no.",
+    },
+    update: {
+      heroOpeningHoursRows: [
+        "Sunday|6.00 AM - 10.00 PM",
+        "Monday|8.00 AM - 4.00 PM",
+        "Tuesday|9.00 AM - 6.00 PM",
+        "Wednesday|10.00 AM - 7.00 PM",
+        "Thursday|11.00 AM - 9.00 PM",
+        "Friday|12.00 AM - 12.00 PM",
+        "Saturday|CLOSED",
+      ],
+    },
+  });
+
   console.log('Seed completed successfully!');
 }
 

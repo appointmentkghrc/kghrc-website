@@ -10,6 +10,13 @@ import Link from "next/link";
 
 export default async function Home() {
   const siteSettings = await getSiteContactSettings();
+  const openingHours = siteSettings.heroOpeningHoursRows
+    .map((row) => row.split("|"))
+    .map(([day, time]) => ({
+      day: (day ?? "").trim(),
+      time: (time ?? "").trim(),
+    }))
+    .filter((row) => row.day.length > 0);
 
   return (
     <div className="min-h-screen relative">
@@ -88,7 +95,7 @@ export default async function Home() {
       </main>
 
       {/* Section below hero - enables scrolling */}
-      <DepartmentsSection />
+      <DepartmentsSection openingHours={openingHours} />
       <ServicesHighlightSection />
       <SpecialistsSection />
       <StatsSection />

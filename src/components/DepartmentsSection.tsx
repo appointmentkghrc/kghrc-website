@@ -13,19 +13,30 @@ type DiagnosticService = {
   isActive?: boolean;
 };
 
+type OpeningHoursItem = {
+  day: string;
+  time: string;
+};
+
 const truncateWords = (text: string, maxWords: number) => {
   const words = text.trim().split(/\s+/);
   if (words.length <= maxWords) return text;
   return `${words.slice(0, maxWords).join(" ")}...`;
 };
 
-export default function DepartmentsSection() {
+export default function DepartmentsSection({
+  openingHours,
+}: {
+  openingHours: OpeningHoursItem[];
+}) {
   const [diagnosticServices, setDiagnosticServices] = useState<DiagnosticService[]>([]);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+  const [loadingServices, setLoadingServices] = useState(true);
 
   useEffect(() => {
     const fetchServices = async () => {
       try {
+        setLoadingServices(true);
         const response = await fetch("/api/diagnostic-services");
         if (!response.ok) throw new Error("Failed to fetch diagnostic services");
         const services: DiagnosticService[] = await response.json();
@@ -33,6 +44,8 @@ export default function DepartmentsSection() {
         setSelectedServiceId(services[0]?.id ?? null);
       } catch (error) {
         console.error("Error fetching diagnostic services:", error);
+      } finally {
+        setLoadingServices(false);
       }
     };
 
@@ -47,16 +60,6 @@ export default function DepartmentsSection() {
     );
   }, [diagnosticServices, selectedServiceId]);
 
-  const openingHours = [
-    { day: "Sunday", time: "6.00 AM - 10.00 PM" },
-    { day: "Monday", time: "8.00 AM - 4.00 PM", active: true },
-    { day: "Tuesday", time: "9.00 AM - 6.00 PM" },
-    { day: "Wednesday", time: "10.00 AM - 7.00 PM" },
-    { day: "Thursday", time: "11.00 AM - 9.00 PM" },
-    { day: "Friday", time: "12.00 AM - 12.00 PM" },
-    { day: "Saturday", time: "Closed", closed: true },
-  ];
-
   return (
     <section className="bg-[#f7f7f7] py-24">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
@@ -69,7 +72,12 @@ export default function DepartmentsSection() {
             </h3>
 
             <div className="space-y-4">
-              {diagnosticServices.map((service) => (
+              {loadingServices && diagnosticServices.length === 0 ? (
+                <div className="bg-white rounded-lg border border-gray-200 p-4 text-sm text-gray-500">
+                  Loading diagnostic services...
+                </div>
+              ) : (
+                diagnosticServices.map((service) => (
                 <button
                   key={service.id}
                   type="button"
@@ -82,13 +90,18 @@ export default function DepartmentsSection() {
                 >
                   {service.name}
                 </button>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
           {/* MIDDLE - Image + Content */}
           <div className="lg:col-span-5">
-            {selectedService ? (
+            {loadingServices && !selectedService ? (
+              <div className="bg-white border border-gray-200 rounded-xl p-8 text-gray-500">
+                Loading service details...
+              </div>
+            ) : selectedService ? (
               <>
                 <img
                   src={selectedService.image}
@@ -100,11 +113,11 @@ export default function DepartmentsSection() {
                   {selectedService.title}
                 </h2>
 
-                <p className="text-gray-600 leading-relaxed mb-6 break-words">
+                <p className="text-gray-600 leading-relaxed mb-6 wrap-break-word">
                   {truncateWords(selectedService.description, 45)}
                 </p>
 
-                <p className="text-gray-600 leading-relaxed break-words">
+                <p className="text-gray-600 leading-relaxed wrap-break-word">
                   {truncateWords(selectedService.details, 35)}
                 </p>
               </>
@@ -125,30 +138,36 @@ export default function DepartmentsSection() {
               <div className="w-10 h-[3px] bg-primary mb-6" />
 
               <div className="space-y-3">
-                {openingHours.map((item, index) => (
-                  <div
-                    key={index}
-                    className={`flex justify-between items-center px-4 py-3 rounded-lg text-sm ${
-                      item.active
-                        ? "bg-gray-200"
-                        : "bg-gray-100"
-                    }`}
-                  >
-                    <span className="uppercase text-gray-600">
-                      {item.day}
-                    </span>
-
-                    {item.closed ? (
-                      <span className="bg-primary text-white px-4 py-1 rounded-full text-xs">
-                        CLOSED
-                      </span>
-                    ) : (
-                      <span className="text-gray-700">
-                        {item.time}
-                      </span>
-                    )}
+                {openingHours.length === 0 ? (
+                  <div className="px-4 py-3 rounded-lg text-sm bg-gray-100 text-gray-500">
+                    Opening hours are not configured yet.
                   </div>
-                ))}
+                ) : (
+                  openingHours.map((item, index) => (
+                    <div
+                      key={index}
+                      className={`flex justify-between items-center px-4 py-3 rounded-lg text-sm ${
+                        item.day.toLowerCase() === "monday"
+                          ? "bg-gray-200"
+                          : "bg-gray-100"
+                      }`}
+                    >
+                      <span className="uppercase text-gray-600">
+                        {item.day}
+                      </span>
+
+                      {item.time.trim().toUpperCase() === "CLOSED" ? (
+                        <span className="bg-primary text-white px-4 py-1 rounded-full text-xs">
+                          CLOSED
+                        </span>
+                      ) : (
+                        <span className="text-gray-700">
+                          {item.time}
+                        </span>
+                      )}
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

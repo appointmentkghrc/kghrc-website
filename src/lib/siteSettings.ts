@@ -18,6 +18,7 @@ export type SiteContactSettings = {
   heroDescription: string;
   heroCtaLabel: string;
   heroCtaHref: string;
+  heroOpeningHoursRows: string[];
   doctorsSectionDescription: string;
 };
 
@@ -42,11 +43,22 @@ export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
     "The ourselves suffering the sincerity. Inhabit her manners adapted age certain. Debating offended at branched striking be subjects.",
   heroCtaLabel: "Contact Us",
   heroCtaHref: "/contact",
+  heroOpeningHoursRows: [],
   doctorsSectionDescription:
     "While mirth large of on front. Ye he greater related adapted proceed entered an. Through it examine express promise no.",
 };
 
 const SITE_SETTINGS_KEY = "main";
+
+const normalizeOpeningHoursRows = (rows: string[] | null | undefined): string[] => {
+  if (!rows || rows.length === 0) return [];
+
+  const normalizedRows = rows
+    .map((row) => row.trim())
+    .filter((row) => row.length > 0 && row.includes("|"));
+
+  return normalizedRows;
+};
 
 export async function getSiteContactSettings(): Promise<SiteContactSettings> {
   const prismaClient = prisma as unknown as Record<string, unknown>;
@@ -70,6 +82,7 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
           heroDescription: string | null;
           heroCtaLabel: string | null;
           heroCtaHref: string | null;
+          heroOpeningHoursRows: string[];
           doctorsSectionDescription: string | null;
         } | null>;
       }
@@ -111,6 +124,7 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
       settings.heroCtaLabel?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaLabel,
     heroCtaHref:
       settings.heroCtaHref?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaHref,
+    heroOpeningHoursRows: normalizeOpeningHoursRows(settings.heroOpeningHoursRows),
     doctorsSectionDescription:
       settings.doctorsSectionDescription?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.doctorsSectionDescription,
@@ -144,6 +158,7 @@ export async function upsertSiteContactSettings(
             heroDescription: string;
             heroCtaLabel: string;
             heroCtaHref: string;
+            heroOpeningHoursRows: string[];
             doctorsSectionDescription: string;
           };
           update: {
@@ -164,6 +179,7 @@ export async function upsertSiteContactSettings(
             heroDescription: string;
             heroCtaLabel: string;
             heroCtaHref: string;
+            heroOpeningHoursRows: string[];
             doctorsSectionDescription: string;
           };
         }) => Promise<{
@@ -184,6 +200,7 @@ export async function upsertSiteContactSettings(
           heroDescription: string | null;
           heroCtaLabel: string | null;
           heroCtaHref: string | null;
+          heroOpeningHoursRows: string[];
           doctorsSectionDescription: string | null;
         }>;
       }
@@ -214,6 +231,7 @@ export async function upsertSiteContactSettings(
       heroDescription: data.heroDescription,
       heroCtaLabel: data.heroCtaLabel,
       heroCtaHref: data.heroCtaHref,
+      heroOpeningHoursRows: data.heroOpeningHoursRows,
       doctorsSectionDescription: data.doctorsSectionDescription,
     },
     update: {
@@ -234,6 +252,7 @@ export async function upsertSiteContactSettings(
       heroDescription: data.heroDescription,
       heroCtaLabel: data.heroCtaLabel,
       heroCtaHref: data.heroCtaHref,
+      heroOpeningHoursRows: data.heroOpeningHoursRows,
       doctorsSectionDescription: data.doctorsSectionDescription,
     },
   });
@@ -262,6 +281,7 @@ export async function upsertSiteContactSettings(
       settings.heroCtaLabel?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaLabel,
     heroCtaHref:
       settings.heroCtaHref?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaHref,
+    heroOpeningHoursRows: normalizeOpeningHoursRows(settings.heroOpeningHoursRows),
     doctorsSectionDescription:
       settings.doctorsSectionDescription?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.doctorsSectionDescription,

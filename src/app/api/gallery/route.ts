@@ -124,17 +124,18 @@ export async function PATCH(request: NextRequest) {
         ? body.bannerImage.trim()
         : DEFAULT_GALLERY_BANNER;
 
-    const sections =
-      Array.isArray(body.sections)
-        ? Array.from(
-            new Set(
-              body.sections
-                .filter((item: unknown): item is string => typeof item === "string")
-                .map((item) => item.trim())
-                .filter((item) => item.length > 0)
-            )
-          ).sort((a, b) => a.localeCompare(b))
-        : undefined;
+    const sections = Array.isArray(body.sections)
+      ? (() => {
+          const cleanedSections: string[] = body.sections
+            .filter((item: unknown): item is string => typeof item === "string")
+            .map((item: string) => item.trim())
+            .filter((item: string) => item.length > 0);
+
+          return Array.from(new Set<string>(cleanedSections)).sort((a, b) =>
+            a.localeCompare(b)
+          );
+        })()
+      : undefined;
 
     await gallerySectionDelegate.upsert({
       where: { key: GALLERY_SECTION_KEY },

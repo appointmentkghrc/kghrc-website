@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { UploadButton } from "@/lib/uploadthing";
 
 const DEFAULT_TITLE = "Latest Gallery";
 const DEFAULT_BANNER =
   "https://validthemes.net/site-template/medihub/assets/img/banner/5.jpg";
+const IMAGES_BATCH_SIZE = 18;
 
 interface GalleryImage {
   id: string;
@@ -21,6 +22,98 @@ interface GalleryResponse {
   images: GalleryImage[];
   sections?: string[];
 }
+
+interface GalleryImageCardProps {
+  image: GalleryImage;
+  sections: string[];
+  onLocalUpdate: (id: string, updates: Partial<GalleryImage>) => void;
+  onSave: (id: string, updates: Partial<Pick<GalleryImage, "sortOrder" | "isActive" | "imageUrl" | "category">>) => void;
+  onDelete: (id: string) => void;
+}
+
+const GalleryImageCard = memo(function GalleryImageCard({
+  image,
+  sections,
+  onLocalUpdate,
+  onSave,
+  onDelete,
+}: GalleryImageCardProps) {
+  const sectionOptions = useMemo(
+    () =>
+      Array.from(new Set([...(sections || []), image.category || "General"]))
+        .filter((s) => typeof s === "string" && s.trim().length > 0)
+        .sort((a, b) => a.localeCompare(b)),
+    [sections, image.category]
+  );
+
+  return (
+    <div className="border border-gray-200 rounded-lg overflow-hidden [content-visibility:auto] [contain-intrinsic-size:300px]">
+      <img
+        src={image.imageUrl}
+        alt="Gallery item"
+        className="w-full h-40 object-cover"
+        loading="lazy"
+        decoding="async"
+      />
+      <div className="p-4 space-y-3">
+        <div>
+          <label className="block text-xs text-gray-600 mb-1">Section</label>
+          <select
+            value={image.category || "General"}
+            onChange={(e) => onLocalUpdate(image.id, { category: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+          >
+            {sectionOptions.map((section) => (
+              <option key={section} value={section}>
+                {section}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs text-gray-600 mb-1">Sort order</label>
+          <input
+            type="number"
+            min={0}
+            value={image.sortOrder}
+            onChange={(e) => onLocalUpdate(image.id, { sortOrder: Number(e.target.value || 0) })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+          />
+        </div>
+        <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+          <input
+            type="checkbox"
+            checked={image.isActive}
+            onChange={(e) => onLocalUpdate(image.id, { isActive: e.target.checked })}
+          />
+          Active
+        </label>
+        <div className="flex justify-between gap-3">
+          <button
+            type="button"
+            onClick={() =>
+              onSave(image.id, {
+                category: image.category,
+                sortOrder: image.sortOrder,
+                isActive: image.isActive,
+              })
+            }
+            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={() => onDelete(image.id)}
+            className="px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+});
 
 export default function LatestGalleryManager() {
   const [loading, setLoading] = useState(true);
@@ -39,6 +132,7 @@ export default function LatestGalleryManager() {
   const [newIsActive, setNewIsActive] = useState(true);
   const [sections, setSections] = useState<string[]>([]);
   const [newSectionName, setNewSectionName] = useState("");
+  const [visibleCount, setVisibleCount] = useState(IMAGES_BATCH_SIZE);
 
   const fetchGallery = async (includeInactive = showInactive) => {
     try {
@@ -207,9 +301,23 @@ export default function LatestGalleryManager() {
     }
   };
 
-  const visibleImages = showInactive
-    ? images
-    : images.filter((image) => image.isActive);
+  const handleLocalImageUpdate = (id: string, updates: Partial<GalleryImage>) => {
+    setImages((prev) => prev.map((item) => (item.id === id ? { ...item, ...updates } : item)));
+  };
+
+  const visibleImages = useMemo(
+    () => (showInactive ? images : images.filter((image) => image.isActive)),
+    [images, showInactive]
+  );
+  const displayedImages = useMemo(
+    () => visibleImages.slice(0, visibleCount),
+    [visibleImages, visibleCount]
+  );
+  const hasMoreImages = displayedImages.length < visibleImages.length;
+
+  useEffect(() => {
+    setVisibleCount(IMAGES_BATCH_SIZE);
+  }, [showInactive, images.length]);
 
   return (
     <div className="space-y-6">
@@ -264,6 +372,8 @@ export default function LatestGalleryManager() {
                 src={bannerImage || DEFAULT_BANNER}
                 alt="Gallery banner preview"
                 className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <div className="flex justify-end">
@@ -357,7 +467,13 @@ export default function LatestGalleryManager() {
             </div>
             {newImageUrl && (
               <div className="h-40 rounded-lg overflow-hidden border border-gray-200">
-                <img src={newImageUrl} alt="New gallery image preview" className="w-full h-full object-cover" />
+                <img
+                  src={newImageUrl}
+                  alt="New gallery image preview"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -427,90 +543,27 @@ export default function LatestGalleryManager() {
               <p className="text-gray-500 text-center py-6">No gallery images found.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {visibleImages.map((image) => (
-                  <div key={image.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                    <img src={image.imageUrl} alt="Gallery item" className="w-full h-40 object-cover" />
-                    <div className="p-4 space-y-3">
-                      <div>
-                        <label className="block text-xs text-gray-600 mb-1">Section</label>
-                        <select
-                          value={image.category || "General"}
-                          onChange={(e) =>
-                            setImages((prev) =>
-                              prev.map((item) =>
-                                item.id === image.id ? { ...item, category: e.target.value } : item
-                              )
-                            )
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                        >
-                          {Array.from(new Set([...(sections || []), image.category || "General"]))
-                            .filter((s) => typeof s === "string" && s.trim().length > 0)
-                            .sort((a, b) => a.localeCompare(b))
-                            .map((section) => (
-                            <option key={section} value={section}>
-                              {section}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-xs text-gray-600 mb-1">Sort order</label>
-                        <input
-                          type="number"
-                          min={0}
-                          value={image.sortOrder}
-                          onChange={(e) =>
-                            setImages((prev) =>
-                              prev.map((item) =>
-                                item.id === image.id
-                                  ? { ...item, sortOrder: Number(e.target.value || 0) }
-                                  : item
-                              )
-                            )
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                        />
-                      </div>
-                      <label className="inline-flex items-center gap-2 text-sm text-gray-700">
-                        <input
-                          type="checkbox"
-                          checked={image.isActive}
-                          onChange={(e) =>
-                            setImages((prev) =>
-                              prev.map((item) =>
-                                item.id === image.id ? { ...item, isActive: e.target.checked } : item
-                              )
-                            )
-                          }
-                        />
-                        Active
-                      </label>
-                      <div className="flex justify-between gap-3">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleUpdateImage(image.id, {
-                              category: image.category,
-                              sortOrder: image.sortOrder,
-                              isActive: image.isActive,
-                            })
-                          }
-                          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                        >
-                          Save
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteImage(image.id)}
-                          className="px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                {displayedImages.map((image) => (
+                  <GalleryImageCard
+                    key={image.id}
+                    image={image}
+                    sections={sections}
+                    onLocalUpdate={handleLocalImageUpdate}
+                    onSave={handleUpdateImage}
+                    onDelete={handleDeleteImage}
+                  />
                 ))}
+              </div>
+            )}
+            {hasMoreImages && (
+              <div className="pt-2 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((prev) => prev + IMAGES_BATCH_SIZE)}
+                  className="px-5 py-2 text-sm bg-gray-900 text-white rounded-md hover:bg-gray-800"
+                >
+                  Load more images ({visibleImages.length - displayedImages.length} remaining)
+                </button>
               </div>
             )}
           </div>
