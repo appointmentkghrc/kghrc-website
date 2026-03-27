@@ -10,6 +10,7 @@ import StatsManager from "@/components/admin/StatsManager";
 import ContactSettingsManager from "@/components/admin/ContactSettingsManager";
 import DiagnosticServicesManager from "@/components/admin/DiagnosticServicesManager";
 import HeroSectionManager from "@/components/admin/HeroSectionManager";
+import LatestGalleryManager from "@/components/admin/LatestGalleryManager";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -18,6 +19,7 @@ export default function AdminDashboard() {
     overview: "Overview",
     diagnosticServices: "Diagnostic Services",
     heroSectionImage: "Hero Section Image",
+    latestGallery: "Latest Gallery",
     testimonials: "Testimonials",
     blogs: "Blogs",
     doctors: "Doctors",
@@ -35,6 +37,8 @@ export default function AdminDashboard() {
         return <DiagnosticServicesManager />;
       case "heroSectionImage":
         return <HeroSectionManager />;
+      case "latestGallery":
+        return <LatestGalleryManager />;
       case "blogs":
         return <BlogsManager />;
       case "doctors":

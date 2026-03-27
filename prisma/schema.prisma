@@ -95,3 +95,25 @@ model DiagnosticService {
 
   @@map("diagnostic_services")
 }
+
+model GallerySection {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  key         String   @unique
+  title       String
+  bannerImage String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("gallery_sections")
+}
+
+model GalleryImage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  imageUrl  String
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("gallery_images")
+}
