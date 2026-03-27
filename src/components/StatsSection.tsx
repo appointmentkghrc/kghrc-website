@@ -11,6 +11,15 @@ interface Statistic {
   category: string;
 }
 
+const CATEGORY_ORDER = ["patients", "doctors", "departments", "staff"] as const;
+
+const LABEL_KEYWORDS: Record<(typeof CATEGORY_ORDER)[number], string[]> = {
+  patients: ["PATIENT"],
+  doctors: ["DOCTOR", "SPECIALIST"],
+  departments: ["DEPARTMENT", "EXPERIENCE"],
+  staff: ["STAFF", "BED", "SERVANT"],
+};
+
 function getIconForLabel(label: string) {
   const upper = label.toUpperCase();
 
@@ -42,24 +51,35 @@ export default function StatsSection() {
         if (!response.ok) throw new Error("Failed to fetch statistics");
         const data: Statistic[] = await response.json();
 
-        const wantedLabels = [
-          "SATISFIED PATIENTS",
-          "REGULAR DOCTORS",
-          "DEPARTMENTS",
-          "SERVANT",
-        ];
+        // Prefer one stat per expected category, then fall back to label keyword matching.
+        const picked: Statistic[] = [];
+        const usedIds = new Set<string>();
 
-        const filtered = data.filter((stat) =>
-          wantedLabels.includes(stat.label.toUpperCase())
-        );
+        for (const category of CATEGORY_ORDER) {
+          const byCategory = data.find(
+            (stat) => stat.category.toLowerCase() === category
+          );
+          if (byCategory) {
+            picked.push(byCategory);
+            usedIds.add(byCategory.id);
+            continue;
+          }
 
-        filtered.sort(
-          (a, b) =>
-            wantedLabels.indexOf(a.label.toUpperCase()) -
-            wantedLabels.indexOf(b.label.toUpperCase())
-        );
+          const byLabel = data.find((stat) => {
+            if (usedIds.has(stat.id)) return false;
+            const upperLabel = stat.label.toUpperCase();
+            return LABEL_KEYWORDS[category].some((keyword) =>
+              upperLabel.includes(keyword)
+            );
+          });
 
-        setStats(filtered);
+          if (byLabel) {
+            picked.push(byLabel);
+            usedIds.add(byLabel.id);
+          }
+        }
+
+        setStats(picked);
       } catch (error) {
         console.error("Error fetching statistics:", error);
       } finally {
