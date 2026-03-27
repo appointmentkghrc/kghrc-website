@@ -4,15 +4,18 @@ import SpecialistsSection from "@/components/SpecialistsSection";
 import StatsSection from "@/components/StatsSection";
 import PatientTestimonialsSection from "@/components/PatientTestimonialsSection";
 import RecentBlogsSection from "@/components/RecentBlogsSection";
+import { getSiteContactSettings } from "@/lib/siteSettings";
 
-export default function Home() {
+export default async function Home() {
+  const siteSettings = await getSiteContactSettings();
+
   return (
     <div className="min-h-screen relative">
       {/* Background with overlay */}
       <div
         className="fixed inset-0 -z-10 bg-cover bg-center"
         style={{
-          backgroundImage: `url(/image7.jpeg)`,
+          backgroundImage: `url(${siteSettings.heroBackgroundImage})`,
           // no zoom out, use default cover (no backgroundSize override)
         }}
       />

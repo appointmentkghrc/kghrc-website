@@ -7,6 +7,7 @@ export type SiteContactSettings = {
   primaryEmail: string;
   secondaryEmail: string;
   mapEmbedUrl: string;
+  heroBackgroundImage: string;
 };
 
 export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
@@ -18,6 +19,7 @@ export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
   secondaryEmail: "Kankegeneralhospital@gmail.com",
   mapEmbedUrl:
     "https://maps.google.com/maps?q=Kanke%20General%20Hospital%2C%20Arsande%20Road%2C%20Near%20Kanke%20Block%20Chowk%2C%20Kanke%2C%20Jharkhand%20834006&output=embed",
+  heroBackgroundImage: "/image7.jpeg",
 };
 
 const SITE_SETTINGS_KEY = "main";
@@ -33,6 +35,7 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
           primaryEmail: string;
           secondaryEmail: string;
           mapEmbedUrl: string;
+          heroBackgroundImage: string | null;
         } | null>;
       }
     | undefined;
@@ -56,6 +59,8 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
     primaryEmail: settings.primaryEmail,
     secondaryEmail: settings.secondaryEmail,
     mapEmbedUrl: settings.mapEmbedUrl,
+    heroBackgroundImage:
+      settings.heroBackgroundImage ?? DEFAULT_SITE_CONTACT_SETTINGS.heroBackgroundImage,
   };
 }
 
@@ -75,6 +80,7 @@ export async function upsertSiteContactSettings(
             primaryEmail: string;
             secondaryEmail: string;
             mapEmbedUrl: string;
+            heroBackgroundImage: string;
           };
           update: {
             officeAddress: string;
@@ -83,6 +89,7 @@ export async function upsertSiteContactSettings(
             primaryEmail: string;
             secondaryEmail: string;
             mapEmbedUrl: string;
+            heroBackgroundImage: string;
           };
         }) => Promise<{
           officeAddress: string;
@@ -91,6 +98,7 @@ export async function upsertSiteContactSettings(
           primaryEmail: string;
           secondaryEmail: string;
           mapEmbedUrl: string;
+          heroBackgroundImage: string | null;
         }>;
       }
     | undefined;
@@ -109,6 +117,7 @@ export async function upsertSiteContactSettings(
       primaryEmail: data.primaryEmail,
       secondaryEmail: data.secondaryEmail,
       mapEmbedUrl: data.mapEmbedUrl,
+      heroBackgroundImage: data.heroBackgroundImage,
     },
     update: {
       officeAddress: data.officeAddress,
@@ -117,6 +126,7 @@ export async function upsertSiteContactSettings(
       primaryEmail: data.primaryEmail,
       secondaryEmail: data.secondaryEmail,
       mapEmbedUrl: data.mapEmbedUrl,
+      heroBackgroundImage: data.heroBackgroundImage,
     },
   });
 
@@ -127,5 +137,7 @@ export async function upsertSiteContactSettings(
     primaryEmail: settings.primaryEmail,
     secondaryEmail: settings.secondaryEmail,
     mapEmbedUrl: settings.mapEmbedUrl,
+    heroBackgroundImage:
+      settings.heroBackgroundImage ?? DEFAULT_SITE_CONTACT_SETTINGS.heroBackgroundImage,
   };
 }

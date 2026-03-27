@@ -74,8 +74,24 @@ model SiteSetting {
   primaryEmail  String
   secondaryEmail String
   mapEmbedUrl   String
+  heroBackgroundImage String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   @@map("site_settings")
+}
+
+model DiagnosticService {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  title       String
+  description String
+  details     String
+  image       String
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("diagnostic_services")
 }

@@ -21,17 +21,23 @@ export async function GET() {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
+    const currentSettings = await getSiteContactSettings();
 
     const nextSettings = {
       officeAddress:
-        body.officeAddress ?? DEFAULT_SITE_CONTACT_SETTINGS.officeAddress,
-      primaryPhone: body.primaryPhone ?? DEFAULT_SITE_CONTACT_SETTINGS.primaryPhone,
+        body.officeAddress ?? currentSettings.officeAddress,
+      primaryPhone: body.primaryPhone ?? currentSettings.primaryPhone,
       secondaryPhone:
-        body.secondaryPhone ?? DEFAULT_SITE_CONTACT_SETTINGS.secondaryPhone,
-      primaryEmail: body.primaryEmail ?? DEFAULT_SITE_CONTACT_SETTINGS.primaryEmail,
+        body.secondaryPhone ?? currentSettings.secondaryPhone,
+      primaryEmail: body.primaryEmail ?? currentSettings.primaryEmail,
       secondaryEmail:
-        body.secondaryEmail ?? DEFAULT_SITE_CONTACT_SETTINGS.secondaryEmail,
-      mapEmbedUrl: body.mapEmbedUrl ?? DEFAULT_SITE_CONTACT_SETTINGS.mapEmbedUrl,
+        body.secondaryEmail ?? currentSettings.secondaryEmail,
+      mapEmbedUrl: body.mapEmbedUrl ?? currentSettings.mapEmbedUrl,
+      heroBackgroundImage:
+        typeof body.heroBackgroundImage === "string" &&
+        body.heroBackgroundImage.trim().length > 0
+          ? body.heroBackgroundImage.trim()
+          : DEFAULT_SITE_CONTACT_SETTINGS.heroBackgroundImage,
     };
 
     const updatedSettings = await upsertSiteContactSettings(nextSettings);

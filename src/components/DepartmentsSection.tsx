@@ -1,15 +1,51 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+
+type DiagnosticService = {
+  id: string;
+  name: string;
+  title: string;
+  image: string;
+  description: string;
+  details: string;
+  sortOrder?: number;
+  isActive?: boolean;
+};
+
+const truncateWords = (text: string, maxWords: number) => {
+  const words = text.trim().split(/\s+/);
+  if (words.length <= maxWords) return text;
+  return `${words.slice(0, maxWords).join(" ")}...`;
+};
+
 export default function DepartmentsSection() {
-  const departments = [
-    "Laboratory",
-    "CT Scan",
-    "X-Ray",
-    "Ultrasound",
-    "MRI",
-    "3D Vasculography",
-    "TMT",
-  ];
+  const [diagnosticServices, setDiagnosticServices] = useState<DiagnosticService[]>([]);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await fetch("/api/diagnostic-services");
+        if (!response.ok) throw new Error("Failed to fetch diagnostic services");
+        const services: DiagnosticService[] = await response.json();
+        setDiagnosticServices(services);
+        setSelectedServiceId(services[0]?.id ?? null);
+      } catch (error) {
+        console.error("Error fetching diagnostic services:", error);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  const selectedService = useMemo(() => {
+    if (diagnosticServices.length === 0) return null;
+    return (
+      diagnosticServices.find((service) => service.id === selectedServiceId) ??
+      diagnosticServices[0]
+    );
+  }, [diagnosticServices, selectedServiceId]);
 
   const openingHours = [
     { day: "Sunday", time: "6.00 AM - 10.00 PM" },
@@ -33,16 +69,18 @@ export default function DepartmentsSection() {
             </h3>
 
             <div className="space-y-4">
-              {departments.map((dept, index) => (
+              {diagnosticServices.map((service) => (
                 <button
-                  key={index}
+                  key={service.id}
+                  type="button"
+                  onClick={() => setSelectedServiceId(service.id)}
                   className={`w-full text-left px-6 py-4 rounded-lg border transition-all ${
-                    index === 0
+                    selectedService?.id === service.id
                       ? "bg-primary text-white border-primary"
                       : "bg-white text-gray-700 border-gray-200 hover:border-primary"
                   }`}
                 >
-                  {dept}
+                  {service.name}
                 </button>
               ))}
             </div>
@@ -50,27 +88,31 @@ export default function DepartmentsSection() {
 
           {/* MIDDLE - Image + Content */}
           <div className="lg:col-span-5">
-            <img
-              src="https://validthemes.net/site-template/medihub/assets/img/departments/1.jpg"
-              alt="Department"
-              className="rounded-xl w-full object-cover mb-6"
-            />
+            {selectedService ? (
+              <>
+                <img
+                  src={selectedService.image}
+                  alt={selectedService.name}
+                  className="rounded-xl w-full object-cover mb-6"
+                />
 
-            <h2 className="text-3xl font-semibold mb-4">
-              Medecine And Health
-            </h2>
+                <h2 className="text-3xl font-semibold mb-4">
+                  {selectedService.title}
+                </h2>
 
-            <p className="text-gray-600 leading-relaxed mb-6">
-              Calling nothing end fertile for venture way boy. Esteem spirit
-              temper too say adieus who direct esteem. It esteems luckily mr or
-              picture placing drawing no. Apartments frequently or motionless
-              on reasonable projecting expression.
-            </p>
+                <p className="text-gray-600 leading-relaxed mb-6 break-words">
+                  {truncateWords(selectedService.description, 45)}
+                </p>
 
-            <p className="text-gray-600 leading-relaxed">
-              Placing assured be if removed it besides on. Far shed each high
-              read are men over day.
-            </p>
+                <p className="text-gray-600 leading-relaxed break-words">
+                  {truncateWords(selectedService.details, 35)}
+                </p>
+              </>
+            ) : (
+              <div className="bg-white border border-gray-200 rounded-xl p-8 text-gray-500">
+                No diagnostic services available. Add services from Admin Dashboard.
+              </div>
+            )}
           </div>
 
           {/* RIGHT - Opening Hours */}

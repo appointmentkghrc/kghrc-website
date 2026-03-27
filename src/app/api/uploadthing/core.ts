@@ -13,8 +13,8 @@ export const ourFileRouter = {
       return { uploadedBy: "admin" };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Blog image upload complete:", file.url);
-      return { uploadedBy: metadata.uploadedBy, url: file.url };
+      console.log("Blog image upload complete:", file.ufsUrl);
+      return { uploadedBy: metadata.uploadedBy, url: file.ufsUrl };
     }),
 
   doctorImage: f({
@@ -27,8 +27,8 @@ export const ourFileRouter = {
       return { uploadedBy: "admin" };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Doctor image upload complete:", file.url);
-      return { uploadedBy: metadata.uploadedBy, url: file.url };
+      console.log("Doctor image upload complete:", file.ufsUrl);
+      return { uploadedBy: metadata.uploadedBy, url: file.ufsUrl };
     }),
 
   testimonialImage: f({
@@ -41,8 +41,36 @@ export const ourFileRouter = {
       return { uploadedBy: "admin" };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Testimonial image upload complete:", file.url);
-      return { uploadedBy: metadata.uploadedBy, url: file.url };
+      console.log("Testimonial image upload complete:", file.ufsUrl);
+      return { uploadedBy: metadata.uploadedBy, url: file.ufsUrl };
+    }),
+
+  diagnosticServiceImage: f({
+    image: {
+      maxFileSize: "8MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      return { uploadedBy: "admin" };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Diagnostic service image upload complete:", file.ufsUrl);
+      return { uploadedBy: metadata.uploadedBy, url: file.ufsUrl };
+    }),
+
+  heroSectionImage: f({
+    image: {
+      maxFileSize: "8MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      return { uploadedBy: "admin" };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Hero section image upload complete:", file.ufsUrl);
+      return { uploadedBy: metadata.uploadedBy, url: file.ufsUrl };
     }),
 } satisfies FileRouter;
 

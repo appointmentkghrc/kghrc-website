@@ -8,10 +8,22 @@ import BlogsManager from "@/components/admin/BlogsManager";
 import DoctorsManager from "@/components/admin/DoctorsManager";
 import StatsManager from "@/components/admin/StatsManager";
 import ContactSettingsManager from "@/components/admin/ContactSettingsManager";
+import DiagnosticServicesManager from "@/components/admin/DiagnosticServicesManager";
+import HeroSectionManager from "@/components/admin/HeroSectionManager";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const tabTitles: Record<string, string> = {
+    overview: "Overview",
+    diagnosticServices: "Diagnostic Services",
+    heroSectionImage: "Hero Section Image",
+    testimonials: "Testimonials",
+    blogs: "Blogs",
+    doctors: "Doctors",
+    stats: "Statistics",
+    contactSettings: "Contact Settings",
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -19,6 +31,10 @@ export default function AdminDashboard() {
         return <DashboardOverview />;
       case "testimonials":
         return <TestimonialsManager />;
+      case "diagnosticServices":
+        return <DiagnosticServicesManager />;
+      case "heroSectionImage":
+        return <HeroSectionManager />;
       case "blogs":
         return <BlogsManager />;
       case "doctors":
@@ -50,7 +66,7 @@ export default function AdminDashboard() {
             <i className="fas fa-bars text-xl"></i>
           </button>
           <h1 className="text-2xl font-semibold text-gray-800">
-            {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+            {tabTitles[activeTab] ?? "Admin"}
           </h1>
           <div className="ml-auto flex items-center gap-4">
             <button className="text-gray-600 hover:text-gray-900 relative">

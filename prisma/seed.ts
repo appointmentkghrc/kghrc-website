@@ -7,6 +7,7 @@ async function main() {
 
   // Clear existing data
   await prisma.statistic.deleteMany();
+  await prisma.diagnosticService.deleteMany();
   await prisma.testimonial.deleteMany();
   await prisma.doctor.deleteMany();
   await prisma.blog.deleteMany();
@@ -140,6 +141,89 @@ Mental health influences:
         value: "2348",
         icon: "fas fa-users",
         category: "staff",
+      },
+    ],
+  });
+
+  // Seed Diagnostic Services
+  await prisma.diagnosticService.createMany({
+    data: [
+      {
+        name: "Laboratory",
+        title: "Laboratory Services",
+        description:
+          "Our laboratory provides accurate and timely diagnostic testing with modern analyzers, strict quality control, and experienced technicians to support reliable clinical decisions.",
+        details:
+          "From routine blood work to advanced pathology investigations, our team ensures dependable reports and smooth coordination with doctors for faster treatment planning.",
+        image: "https://validthemes.net/site-template/medihub/assets/img/departments/1.jpg",
+        sortOrder: 1,
+        isActive: true,
+      },
+      {
+        name: "CT Scan",
+        title: "CT Scan Imaging",
+        description:
+          "CT scanning delivers fast, high-resolution cross-sectional imaging for emergency and routine diagnostics.",
+        details:
+          "Our imaging staff focuses on patient safety and comfort while delivering clear scans that support faster diagnosis.",
+        image: "https://validthemes.net/site-template/medihub/assets/img/departments/2.jpg",
+        sortOrder: 2,
+        isActive: true,
+      },
+      {
+        name: "X-Ray",
+        title: "Digital X-Ray",
+        description:
+          "Digital X-Ray services provide quick and low-dose imaging for bones, chest, and joints.",
+        details:
+          "With rapid image processing and expert interpretation, we help clinicians make confident decisions.",
+        image: "https://validthemes.net/site-template/medihub/assets/img/departments/3.jpg",
+        sortOrder: 3,
+        isActive: true,
+      },
+      {
+        name: "Ultrasound",
+        title: "Ultrasound Services",
+        description:
+          "Ultrasound offers safe, radiation-free imaging for abdominal organs and soft tissue evaluation.",
+        details:
+          "Real-time imaging performed by trained sonologists ensures dependable assessment for early diagnosis.",
+        image: "https://validthemes.net/site-template/medihub/assets/img/departments/4.jpg",
+        sortOrder: 4,
+        isActive: true,
+      },
+      {
+        name: "MRI",
+        title: "MRI Diagnostics",
+        description:
+          "MRI provides detailed imaging of the brain, spine, joints, and soft tissues for complex cases.",
+        details:
+          "Our MRI workflow is designed for image clarity and patient care with highly detailed scans.",
+        image: "https://validthemes.net/site-template/medihub/assets/img/departments/5.jpg",
+        sortOrder: 5,
+        isActive: true,
+      },
+      {
+        name: "3D Vasculography",
+        title: "3D Vasculography",
+        description:
+          "3D vasculography enables advanced visualization of blood vessels to evaluate vascular abnormalities.",
+        details:
+          "This specialized imaging supports targeted and timely interventions by specialist teams.",
+        image: "https://validthemes.net/site-template/medihub/assets/img/departments/6.jpg",
+        sortOrder: 6,
+        isActive: true,
+      },
+      {
+        name: "TMT",
+        title: "Treadmill Test (TMT)",
+        description:
+          "TMT assesses heart function under controlled exercise to detect cardiovascular risk early.",
+        details:
+          "Conducted under expert supervision, the test supports personalized treatment recommendations.",
+        image: "https://validthemes.net/site-template/medihub/assets/img/departments/7.jpg",
+        sortOrder: 7,
+        isActive: true,
       },
     ],
   });
