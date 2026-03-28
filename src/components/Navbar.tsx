@@ -209,7 +209,7 @@ export default function Navbar() {
                 className="h-9 w-auto object-contain sm:h-10"
               />
               <Image
-                src="/nabh-removebg-preview.png"
+                src="/nabh-remove.png"
                 alt="NABH accredited"
                 width={56}
                 height={56}
