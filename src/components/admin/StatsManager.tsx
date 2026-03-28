@@ -59,7 +59,15 @@ export default function StatsManager() {
     "fas fa-pills",
   ];
 
-  const categories = ["general", "patients", "doctors", "departments", "medical", "achievements"];
+  const categories = [
+    "general",
+    "patients",
+    "doctors",
+    "departments",
+    "medical",
+    "achievements",
+    "pmjay",
+  ];
 
   const handleAdd = () => {
     setEditingStat(null);

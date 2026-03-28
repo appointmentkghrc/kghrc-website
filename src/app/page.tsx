@@ -6,11 +6,15 @@ import StatsSection from "@/components/StatsSection";
 import PatientTestimonialsSection from "@/components/PatientTestimonialsSection";
 import RecentBlogsSection from "@/components/RecentBlogsSection";
 import AppointmentMobileInput from "@/components/AppointmentMobileInput";
+import { resolvePmjayPatientsTreatedValue } from "@/lib/resolvePmjayPatientsTreated";
 import { getSiteContactSettings } from "@/lib/siteSettings";
 import Link from "next/link";
 
 export default async function Home() {
   const siteSettings = await getSiteContactSettings();
+  const pmjayPatientsTreatedValue = await resolvePmjayPatientsTreatedValue(
+    siteSettings.pmjayPatientsTreatedValue
+  );
   const openingHours = siteSettings.heroOpeningHoursRows
     .map((row) => row.split("|"))
     .map(([day, time]) => ({
@@ -97,7 +101,7 @@ export default async function Home() {
 
       {/* Section below hero - enables scrolling */}
       <PmjayPatientsTreatedSection
-        pmjayPatientsTreatedValue={siteSettings.pmjayPatientsTreatedValue}
+        pmjayPatientsTreatedValue={pmjayPatientsTreatedValue}
         pmjayPrimaryLogoUrl={siteSettings.pmjayPrimaryLogoUrl}
         pmjaySecondaryLogoUrl={siteSettings.pmjaySecondaryLogoUrl}
       />

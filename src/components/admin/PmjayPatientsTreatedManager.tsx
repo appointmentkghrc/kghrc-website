@@ -21,20 +21,31 @@ export default function PmjayPatientsTreatedManager() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<PmjayFormData>(emptyForm);
+  const [pmjayStatValue, setPmjayStatValue] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/site-settings");
-        if (!response.ok) throw new Error("Failed to fetch site settings");
-        const data = await response.json();
+        const [settingsRes, statsRes] = await Promise.all([
+          fetch("/api/site-settings"),
+          fetch("/api/statistics"),
+        ]);
+        if (!settingsRes.ok) throw new Error("Failed to fetch site settings");
+        const data = await settingsRes.json();
 
         setFormData({
           pmjayPatientsTreatedValue: String(data?.pmjayPatientsTreatedValue ?? "0"),
           pmjayPrimaryLogoUrl: String(data?.pmjayPrimaryLogoUrl ?? ""),
           pmjaySecondaryLogoUrl: String(data?.pmjaySecondaryLogoUrl ?? ""),
         });
+
+        if (statsRes.ok) {
+          const stats: { category?: string; value?: string }[] = await statsRes.json();
+          const pmjay = stats.find((s) => s.category === "pmjay");
+          const v = pmjay?.value?.trim();
+          setPmjayStatValue(v ? String(v) : null);
+        }
       } catch (error) {
         console.error("Error fetching PMJAY settings:", error);
         alert("Failed to load PMJAY settings");
@@ -94,14 +105,23 @@ export default function PmjayPatientsTreatedManager() {
       <div>
         <h2 className="text-2xl font-bold text-gray-800">PMJAY Patients Treated</h2>
         <p className="text-gray-600 mt-1">
-          Configure the homepage mini-section (PMJAY logo + Patients treated count).
+          Configure the homepage mini-section (PMJAY logos and fallback count). The live number
+          prefers a Statistics row with category <code className="text-sm bg-gray-100 px-1 rounded">pmjay</code>{" "}
+          (Admin → Statistics).
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-5">
+        {pmjayStatValue !== null ? (
+          <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+            Homepage count is taken from the database (Statistics, category{" "}
+            <strong>pmjay</strong>): <strong>{pmjayStatValue}</strong>. The field below is only
+            used if that statistic is removed.
+          </div>
+        ) : null}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Patients treated value
+            Patients treated value (fallback)
           </label>
           <input
             type="text"

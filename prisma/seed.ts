@@ -142,6 +142,12 @@ Mental health influences:
         icon: "fas fa-users",
         category: "staff",
       },
+      {
+        label: "Patients treated under Ayushman Bharat Yojana",
+        value: "15000",
+        icon: "fas fa-heartbeat",
+        category: "pmjay",
+      },
     ],
   });
 
