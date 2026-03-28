@@ -263,6 +263,9 @@ Mental health influences:
       ],
       doctorsSectionDescription:
         "While mirth large of on front. Ye he greater related adapted proceed entered an. Through it examine express promise no.",
+      pmjayPatientsTreatedValue: "0",
+      pmjayPrimaryLogoUrl: null,
+      pmjaySecondaryLogoUrl: null,
     },
     update: {
       heroOpeningHoursRows: [

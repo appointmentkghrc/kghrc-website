@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { UploadButton } from "@/lib/uploadthing";
+import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
 
 interface DiagnosticService {
   id: string;
@@ -28,14 +29,21 @@ const emptyForm = {
   isActive: true,
 };
 
+const FALLBACK_DIAGNOSTIC_HEADER_IMAGE =
+  "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg";
+
 export default function DiagnosticServicesManager() {
   const [services, setServices] = useState<DiagnosticService[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<DiagnosticService | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [savingDefault, setSavingDefault] = useState(false);
   const [showInactive, setShowInactive] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
+  const [diagnosticDefaultHeaderImage, setDiagnosticDefaultHeaderImage] = useState(
+    FALLBACK_DIAGNOSTIC_HEADER_IMAGE
+  );
 
   const handleImageUpload = (res: Array<{ url: string }>) => {
     if (res && res[0]) {
@@ -65,6 +73,58 @@ export default function DiagnosticServicesManager() {
       alert("Failed to load diagnostic services");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDiagnosticDefaultHeader = async () => {
+    try {
+      const response = await fetch("/api/site-settings");
+      if (!response.ok) throw new Error("Failed to fetch diagnostic header default");
+      const data = await response.json();
+      setDiagnosticDefaultHeaderImage(
+        data?.diagnosticServicesDefaultHeaderImage ||
+          FALLBACK_DIAGNOSTIC_HEADER_IMAGE
+      );
+    } catch (error) {
+      console.error("Error fetching diagnostic header default:", error);
+      setDiagnosticDefaultHeaderImage(FALLBACK_DIAGNOSTIC_HEADER_IMAGE);
+    }
+  };
+
+  useEffect(() => {
+    fetchDiagnosticDefaultHeader();
+  }, []);
+
+  const handleDefaultHeaderUpload = (res: Array<{ url: string }>) => {
+    if (res && res[0]) {
+      setDiagnosticDefaultHeaderImage(res[0].url);
+    }
+  };
+
+  const handleSaveDefaultHeader = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSavingDefault(true);
+      const response = await fetch("/api/site-settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          diagnosticServicesDefaultHeaderImage: diagnosticDefaultHeaderImage,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to save default header image");
+      const updated = await response.json();
+      setDiagnosticDefaultHeaderImage(
+        updated?.diagnosticServicesDefaultHeaderImage ||
+          FALLBACK_DIAGNOSTIC_HEADER_IMAGE
+      );
+      alert("Diagnostic default header image updated successfully!");
+    } catch (error) {
+      console.error("Error saving default header image:", error);
+      alert("Failed to save default header image");
+    } finally {
+      setSavingDefault(false);
     }
   };
 
@@ -176,6 +236,79 @@ export default function DiagnosticServicesManager() {
               </button>
             </div>
           </div>
+
+          <form
+            onSubmit={handleSaveDefaultHeader}
+            className="bg-white rounded-lg shadow-md p-6 space-y-5"
+          >
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800">Default Header Image</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Used when a service does not have its own header image.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Default Header Image URL
+              </label>
+              <input
+                type="url"
+                value={diagnosticDefaultHeaderImage}
+                onChange={(e) => setDiagnosticDefaultHeaderImage(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="https://..."
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Or Upload Default Header Image
+              </label>
+              <UploadButton
+                className="ut-primary-upload"
+                endpoint="heroSectionImage"
+                onBeforeUploadBegin={(files) =>
+                  optimizeImagesForUpload(files, { maxDimension: 2200, quality: 0.82 })
+                }
+                onClientUploadComplete={handleDefaultHeaderUpload}
+                onUploadError={(error: Error) => {
+                  alert(`Upload Error: ${error.message}`);
+                }}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Preview</label>
+              <div className="h-40 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                <img
+                  src={diagnosticDefaultHeaderImage || FALLBACK_DIAGNOSTIC_HEADER_IMAGE}
+                  alt="Diagnostic default header preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-between gap-3">
+              <button
+                type="button"
+                onClick={() =>
+                  setDiagnosticDefaultHeaderImage(FALLBACK_DIAGNOSTIC_HEADER_IMAGE)
+                }
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Reset to Default
+              </button>
+              <button
+                type="submit"
+                disabled={savingDefault}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {savingDefault ? "Saving..." : "Save Default Image"}
+              </button>
+            </div>
+          </form>
 
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

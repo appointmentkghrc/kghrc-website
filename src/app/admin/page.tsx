@@ -14,6 +14,8 @@ import LatestGalleryManager from "@/components/admin/LatestGalleryManager";
 import SocialLinksManager from "@/components/admin/SocialLinksManager";
 import AboutUsManager from "@/components/admin/AboutUsManager";
 import TpaInsurancePartnersManager from "@/components/admin/TpaInsurancePartnersManager";
+import PmjayPatientsTreatedManager from "@/components/admin/PmjayPatientsTreatedManager";
+import ServicesHighlightManager from "@/components/admin/ServicesHighlightManager";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -31,6 +33,8 @@ export default function AdminDashboard() {
     contactSettings: "Contact Settings",
     socialLinks: "Social Links",
     tpaInsurancePartners: "TPA / Insurance Partners",
+    pmjayPatientsTreated: "PMJAY Section",
+    servicesHighlight: "Services highlight",
   };
 
   const renderContent = () => {
@@ -59,6 +63,10 @@ export default function AdminDashboard() {
         return <SocialLinksManager />;
       case "tpaInsurancePartners":
         return <TpaInsurancePartnersManager />;
+      case "pmjayPatientsTreated":
+        return <PmjayPatientsTreatedManager />;
+      case "servicesHighlight":
+        return <ServicesHighlightManager />;
       default:
         return <DashboardOverview />;
     }
@@ -85,12 +93,6 @@ export default function AdminDashboard() {
             {tabTitles[activeTab] ?? "Admin"}
           </h1>
           <div className="ml-auto flex items-center gap-4">
-            <button className="text-gray-600 hover:text-gray-900 relative">
-              <i className="fas fa-bell text-xl"></i>
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                3
-              </span>
-            </button>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
                 A

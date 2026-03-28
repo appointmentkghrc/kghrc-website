@@ -40,6 +40,24 @@ export async function PATCH(request: NextRequest) {
       return nextRows.length > 0 ? nextRows : fallback;
     };
 
+    const normalizeServicesHighlightItems = (
+      value: unknown,
+      fallback: typeof currentSettings.servicesHighlightItems
+    ) => {
+      if (!Array.isArray(value)) return fallback;
+      const next: { title: string; href: string; iconKey: string }[] = [];
+      for (const entry of value) {
+        if (!entry || typeof entry !== "object") continue;
+        const obj = entry as Record<string, unknown>;
+        const title = typeof obj.title === "string" ? obj.title.trim() : "";
+        const href = typeof obj.href === "string" ? obj.href.trim() : "";
+        const iconKey = typeof obj.iconKey === "string" ? obj.iconKey.trim() : "userRound";
+        if (title.length === 0 || href.length === 0) continue;
+        next.push({ title, href, iconKey });
+      }
+      return next.length > 0 ? next : fallback;
+    };
+
     const nextSettings = {
       officeAddress:
         body.officeAddress ?? currentSettings.officeAddress,
@@ -94,6 +112,27 @@ export async function PATCH(request: NextRequest) {
         body.doctorsSectionDescription.trim().length > 0
           ? body.doctorsSectionDescription.trim()
           : currentSettings.doctorsSectionDescription,
+      pmjayPatientsTreatedValue:
+        typeof body.pmjayPatientsTreatedValue === "string" &&
+        body.pmjayPatientsTreatedValue.trim().length > 0
+          ? body.pmjayPatientsTreatedValue.trim()
+          : currentSettings.pmjayPatientsTreatedValue,
+      pmjayPrimaryLogoUrl: normalizeUrlField(
+        body.pmjayPrimaryLogoUrl,
+        currentSettings.pmjayPrimaryLogoUrl
+      ),
+      pmjaySecondaryLogoUrl: normalizeUrlField(
+        body.pmjaySecondaryLogoUrl,
+        currentSettings.pmjaySecondaryLogoUrl
+      ),
+      servicesHighlightTitle:
+        typeof body.servicesHighlightTitle === "string"
+          ? body.servicesHighlightTitle.trim()
+          : currentSettings.servicesHighlightTitle,
+      servicesHighlightItems: normalizeServicesHighlightItems(
+        body.servicesHighlightItems,
+        currentSettings.servicesHighlightItems
+      ),
     };
 
     const updatedSettings = await upsertSiteContactSettings(nextSettings);

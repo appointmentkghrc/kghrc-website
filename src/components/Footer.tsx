@@ -283,7 +283,7 @@ export default function Footer() {
           <div className="border-t border-white/20 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-white/70 gap-4">
   
               <p>
-                © Copyright 2025. All Rights Reserved by{" "}
+                © Copyright 2026. All Rights Reserved by{" "}
                 <span className="text-primary">KGH</span>
               </p>
   

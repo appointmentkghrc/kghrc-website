@@ -1,4 +1,11 @@
 import prisma from "@/lib/prisma";
+import {
+  DEFAULT_SERVICES_HIGHLIGHT_ITEMS,
+  DEFAULT_SERVICES_HIGHLIGHT_TITLE,
+  type ServicesHighlightItem,
+} from "@/lib/servicesHighlightDefaults";
+
+export type { ServicesHighlightItem };
 
 export type SiteContactSettings = {
   officeAddress: string;
@@ -14,6 +21,9 @@ export type SiteContactSettings = {
   linkedinUrl: string;
   heroBackgroundImage: string;
   diagnosticServicesDefaultHeaderImage: string;
+  pmjayPatientsTreatedValue: string;
+  pmjayPrimaryLogoUrl: string;
+  pmjaySecondaryLogoUrl: string;
   heroTitleLine1: string;
   heroTitleLine2: string;
   heroDescription: string;
@@ -21,6 +31,8 @@ export type SiteContactSettings = {
   heroCtaHref: string;
   heroOpeningHoursRows: string[];
   doctorsSectionDescription: string;
+  servicesHighlightTitle: string;
+  servicesHighlightItems: ServicesHighlightItem[];
 };
 
 export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
@@ -40,6 +52,9 @@ export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
   heroBackgroundImage: "/image7.jpeg",
   diagnosticServicesDefaultHeaderImage:
     "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg",
+  pmjayPatientsTreatedValue: "0",
+  pmjayPrimaryLogoUrl: "",
+  pmjaySecondaryLogoUrl: "",
   heroTitleLine1: "Best care for your",
   heroTitleLine2: "Good health",
   heroDescription:
@@ -49,9 +64,28 @@ export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
   heroOpeningHoursRows: [],
   doctorsSectionDescription:
     "While mirth large of on front. Ye he greater related adapted proceed entered an. Through it examine express promise no.",
+  servicesHighlightTitle: DEFAULT_SERVICES_HIGHLIGHT_TITLE,
+  servicesHighlightItems: DEFAULT_SERVICES_HIGHLIGHT_ITEMS,
 };
 
 const SITE_SETTINGS_KEY = "main";
+
+const parseServicesHighlightItems = (raw: unknown): ServicesHighlightItem[] => {
+  if (!raw || !Array.isArray(raw)) return DEFAULT_SERVICES_HIGHLIGHT_ITEMS;
+
+  const parsed: ServicesHighlightItem[] = [];
+  for (const entry of raw) {
+    if (!entry || typeof entry !== "object") continue;
+    const obj = entry as Record<string, unknown>;
+    const title = typeof obj.title === "string" ? obj.title.trim() : "";
+    const href = typeof obj.href === "string" ? obj.href.trim() : "";
+    const iconKey = typeof obj.iconKey === "string" ? obj.iconKey.trim() : "userRound";
+    if (title.length === 0 || href.length === 0) continue;
+    parsed.push({ title, href, iconKey });
+  }
+
+  return parsed.length > 0 ? parsed : DEFAULT_SERVICES_HIGHLIGHT_ITEMS;
+};
 
 const normalizeOpeningHoursRows = (rows: string[] | null | undefined): string[] => {
   if (!rows || rows.length === 0) return [];
@@ -81,6 +115,9 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
           linkedinUrl: string | null;
           heroBackgroundImage: string | null;
           diagnosticServicesDefaultHeaderImage: string | null;
+          pmjayPatientsTreatedValue: string | null;
+          pmjayPrimaryLogoUrl: string | null;
+          pmjaySecondaryLogoUrl: string | null;
           heroTitleLine1: string | null;
           heroTitleLine2: string | null;
           heroDescription: string | null;
@@ -88,6 +125,8 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
           heroCtaHref: string | null;
           heroOpeningHoursRows: string[];
           doctorsSectionDescription: string | null;
+          servicesHighlightTitle: string | null;
+          servicesHighlightItems: unknown;
         } | null>;
       }
     | undefined;
@@ -121,6 +160,15 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
     diagnosticServicesDefaultHeaderImage:
       settings.diagnosticServicesDefaultHeaderImage?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.diagnosticServicesDefaultHeaderImage,
+    pmjayPatientsTreatedValue:
+      settings.pmjayPatientsTreatedValue?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.pmjayPatientsTreatedValue,
+    pmjayPrimaryLogoUrl:
+      settings.pmjayPrimaryLogoUrl?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.pmjayPrimaryLogoUrl,
+    pmjaySecondaryLogoUrl:
+      settings.pmjaySecondaryLogoUrl?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.pmjaySecondaryLogoUrl,
     heroTitleLine1:
       settings.heroTitleLine1?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroTitleLine1,
     heroTitleLine2:
@@ -135,6 +183,10 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
     doctorsSectionDescription:
       settings.doctorsSectionDescription?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.doctorsSectionDescription,
+    servicesHighlightTitle:
+      settings.servicesHighlightTitle?.trim() ??
+      DEFAULT_SITE_CONTACT_SETTINGS.servicesHighlightTitle,
+    servicesHighlightItems: parseServicesHighlightItems(settings.servicesHighlightItems),
   };
 }
 
@@ -161,6 +213,9 @@ export async function upsertSiteContactSettings(
             linkedinUrl: string;
             heroBackgroundImage: string;
             diagnosticServicesDefaultHeaderImage: string;
+            pmjayPatientsTreatedValue: string;
+            pmjayPrimaryLogoUrl: string;
+            pmjaySecondaryLogoUrl: string;
             heroTitleLine1: string;
             heroTitleLine2: string;
             heroDescription: string;
@@ -168,6 +223,8 @@ export async function upsertSiteContactSettings(
             heroCtaHref: string;
             heroOpeningHoursRows: string[];
             doctorsSectionDescription: string;
+            servicesHighlightTitle: string;
+            servicesHighlightItems: ServicesHighlightItem[];
           };
           update: {
             officeAddress: string;
@@ -183,6 +240,9 @@ export async function upsertSiteContactSettings(
             linkedinUrl: string;
             heroBackgroundImage: string;
             diagnosticServicesDefaultHeaderImage: string;
+            pmjayPatientsTreatedValue: string;
+            pmjayPrimaryLogoUrl: string;
+            pmjaySecondaryLogoUrl: string;
             heroTitleLine1: string;
             heroTitleLine2: string;
             heroDescription: string;
@@ -190,6 +250,8 @@ export async function upsertSiteContactSettings(
             heroCtaHref: string;
             heroOpeningHoursRows: string[];
             doctorsSectionDescription: string;
+            servicesHighlightTitle: string;
+            servicesHighlightItems: ServicesHighlightItem[];
           };
         }) => Promise<{
           officeAddress: string;
@@ -205,6 +267,9 @@ export async function upsertSiteContactSettings(
           linkedinUrl: string | null;
           heroBackgroundImage: string | null;
           diagnosticServicesDefaultHeaderImage: string | null;
+          pmjayPatientsTreatedValue: string | null;
+          pmjayPrimaryLogoUrl: string | null;
+          pmjaySecondaryLogoUrl: string | null;
           heroTitleLine1: string | null;
           heroTitleLine2: string | null;
           heroDescription: string | null;
@@ -212,6 +277,8 @@ export async function upsertSiteContactSettings(
           heroCtaHref: string | null;
           heroOpeningHoursRows: string[];
           doctorsSectionDescription: string | null;
+          servicesHighlightTitle: string | null;
+          servicesHighlightItems: unknown;
         }>;
       }
     | undefined;
@@ -238,6 +305,9 @@ export async function upsertSiteContactSettings(
       heroBackgroundImage: data.heroBackgroundImage,
       diagnosticServicesDefaultHeaderImage:
         data.diagnosticServicesDefaultHeaderImage,
+      pmjayPatientsTreatedValue: data.pmjayPatientsTreatedValue,
+      pmjayPrimaryLogoUrl: data.pmjayPrimaryLogoUrl,
+      pmjaySecondaryLogoUrl: data.pmjaySecondaryLogoUrl,
       heroTitleLine1: data.heroTitleLine1,
       heroTitleLine2: data.heroTitleLine2,
       heroDescription: data.heroDescription,
@@ -245,6 +315,8 @@ export async function upsertSiteContactSettings(
       heroCtaHref: data.heroCtaHref,
       heroOpeningHoursRows: data.heroOpeningHoursRows,
       doctorsSectionDescription: data.doctorsSectionDescription,
+      servicesHighlightTitle: data.servicesHighlightTitle,
+      servicesHighlightItems: data.servicesHighlightItems,
     },
     update: {
       officeAddress: data.officeAddress,
@@ -261,6 +333,9 @@ export async function upsertSiteContactSettings(
       heroBackgroundImage: data.heroBackgroundImage,
       diagnosticServicesDefaultHeaderImage:
         data.diagnosticServicesDefaultHeaderImage,
+      pmjayPatientsTreatedValue: data.pmjayPatientsTreatedValue,
+      pmjayPrimaryLogoUrl: data.pmjayPrimaryLogoUrl,
+      pmjaySecondaryLogoUrl: data.pmjaySecondaryLogoUrl,
       heroTitleLine1: data.heroTitleLine1,
       heroTitleLine2: data.heroTitleLine2,
       heroDescription: data.heroDescription,
@@ -268,6 +343,8 @@ export async function upsertSiteContactSettings(
       heroCtaHref: data.heroCtaHref,
       heroOpeningHoursRows: data.heroOpeningHoursRows,
       doctorsSectionDescription: data.doctorsSectionDescription,
+      servicesHighlightTitle: data.servicesHighlightTitle,
+      servicesHighlightItems: data.servicesHighlightItems,
     },
   });
 
@@ -288,6 +365,15 @@ export async function upsertSiteContactSettings(
     diagnosticServicesDefaultHeaderImage:
       settings.diagnosticServicesDefaultHeaderImage?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.diagnosticServicesDefaultHeaderImage,
+    pmjayPatientsTreatedValue:
+      settings.pmjayPatientsTreatedValue?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.pmjayPatientsTreatedValue,
+    pmjayPrimaryLogoUrl:
+      settings.pmjayPrimaryLogoUrl?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.pmjayPrimaryLogoUrl,
+    pmjaySecondaryLogoUrl:
+      settings.pmjaySecondaryLogoUrl?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.pmjaySecondaryLogoUrl,
     heroTitleLine1:
       settings.heroTitleLine1?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroTitleLine1,
     heroTitleLine2:
@@ -302,5 +388,9 @@ export async function upsertSiteContactSettings(
     doctorsSectionDescription:
       settings.doctorsSectionDescription?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.doctorsSectionDescription,
+    servicesHighlightTitle:
+      settings.servicesHighlightTitle?.trim() ??
+      DEFAULT_SITE_CONTACT_SETTINGS.servicesHighlightTitle,
+    servicesHighlightItems: parseServicesHighlightItems(settings.servicesHighlightItems),
   };
 }

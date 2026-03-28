@@ -93,6 +93,11 @@ model SiteSetting {
   heroCtaHref    String?
   heroOpeningHoursRows String[] @default([])
   doctorsSectionDescription String?
+  servicesHighlightTitle String?
+  servicesHighlightItems Json?
+  pmjayPatientsTreatedValue String?
+  pmjayPrimaryLogoUrl String?
+  pmjaySecondaryLogoUrl String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

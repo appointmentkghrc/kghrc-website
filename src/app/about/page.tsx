@@ -5,6 +5,34 @@ import PatientTestimonialsSection from "@/components/PatientTestimonialsSection"
 import Link from "next/link";
 import type { AboutSettings } from "@/lib/aboutSettings";
 
+type OpeningHoursRow = {
+  day: string;
+  time: string;
+};
+
+const parseOpeningHoursRows = (rows: string[] | undefined | null): OpeningHoursRow[] => {
+  if (!rows || rows.length === 0) return [];
+
+  return rows
+    .filter((row) => typeof row === "string" && row.includes("|"))
+    .map((row) => row.split("|"))
+    .map(([day, time]) => ({
+      day: (day ?? "").trim(),
+      time: (time ?? "").trim(),
+    }))
+    .filter((row) => row.day.length > 0);
+};
+
+const formatOpeningHoursTime = (time: string) => {
+  const normalized = time.trim();
+  if (normalized.toLowerCase() === "closed") return "Closed";
+
+  return normalized
+    .replace(/\s-\s/g, " - ")
+    .replace(/\bAM\b/gi, "AM")
+    .replace(/\bPM\b/gi, "PM");
+};
+
 interface Doctor {
   id: string;
   name: string;
@@ -24,11 +52,30 @@ export default function AboutPage() {
   const [loadingDoctors, setLoadingDoctors] = useState(true);
   const [aboutSettings, setAboutSettings] = useState<AboutSettings | null>(null);
   const [loadingAboutSettings, setLoadingAboutSettings] = useState(true);
+  const [siteHeroOpeningHoursRows, setSiteHeroOpeningHoursRows] = useState<
+    string[] | null
+  >(null);
 
   useEffect(() => {
     fetchAboutSettings();
     fetchDoctors();
+    fetchSiteHeroOpeningHoursRows();
   }, []);
+
+  const fetchSiteHeroOpeningHoursRows = async () => {
+    try {
+      const response = await fetch("/api/site-settings");
+      if (!response.ok) return;
+      const data = await response.json();
+
+      setSiteHeroOpeningHoursRows(
+        Array.isArray(data?.heroOpeningHoursRows) ? data.heroOpeningHoursRows : []
+      );
+    } catch (error) {
+      console.error("Error fetching hero opening hours:", error);
+      setSiteHeroOpeningHoursRows([]);
+    }
+  };
 
   const fetchAboutSettings = async () => {
     try {
@@ -116,6 +163,11 @@ export default function AboutPage() {
     );
   }
 
+  const openingHoursFromSite = parseOpeningHoursRows(siteHeroOpeningHoursRows);
+  const openingHoursFromAbout = parseOpeningHoursRows(aboutSettings.openingHoursRows);
+  const openingHoursRowsToRender =
+    openingHoursFromSite.length > 0 ? openingHoursFromSite : openingHoursFromAbout;
+
   return (
     <div>
 
@@ -192,12 +244,24 @@ export default function AboutPage() {
         <div className="p-16 text-center bg-primary text-white">
           <h3 className="text-xl font-semibold mb-4">{aboutSettings.openingHoursTitle}</h3>
           <div className="space-y-3 text-sm">
-            {aboutSettings.openingHoursRows.map((row, index) => {
-              const [label, value] = row.split("|");
+            {openingHoursRowsToRender.map((row, index) => {
+              const day = row.day;
+              const timeFormatted = formatOpeningHoursTime(row.time);
+              const isClosed = timeFormatted.toLowerCase() === "closed";
+
               return (
-                <div key={`${row}-${index}`} className="flex justify-between">
-                  <span>{label?.trim() || "-"}</span>
-                  <span>{value?.trim() || "-"}</span>
+                <div
+                  key={`${day}-${timeFormatted}-${index}`}
+                  className="flex justify-between items-center"
+                >
+                  <span>{day}</span>
+                  {isClosed ? (
+                    <span className="bg-white/15 text-white px-4 py-1 rounded-full text-xs">
+                      Closed
+                    </span>
+                  ) : (
+                    <span>{timeFormatted}</span>
+                  )}
                 </div>
               );
             })}

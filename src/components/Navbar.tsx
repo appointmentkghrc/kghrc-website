@@ -86,13 +86,28 @@ export default function Navbar() {
             </button>
             <Link
               href="/"
-              className="flex items-center gap-2 text-gray-800 font-bold text-xl tracking-wide"
+              className="-ml-2 flex items-center gap-2 sm:-ml-4 sm:gap-3 lg:-ml-8 xl:-ml-10 text-gray-800 font-bold text-xl tracking-wide"
             >
+              <Image
+                src="/Ayushman_Bharat_logo.png"
+                alt="Ayushman Bharat"
+                width={168}
+                height={48}
+                className="h-9 w-auto object-contain sm:h-10"
+              />
+              <Image
+                src="/nabh-remove.png"
+                alt="NABH accredited"
+                width={56}
+                height={56}
+                className="h-9 w-auto object-contain sm:h-10"
+              />
               <Image
                 src="/logo.png"
                 alt="KGH logo"
                 width={200}
                 height={56}
+                className="h-10 w-auto object-contain sm:h-12"
                 priority
               />
             </Link>
@@ -120,12 +135,12 @@ export default function Navbar() {
                 />
               </div>
               <div>
-                <p className="text-xs text-gray-600">EMERGENCY CASE</p>
+                <p className="text-xs text-gray-600">Contact Us</p>
                 <a
                   href={`tel:${emergencyPhone.replace(/[^\d+]/g, "")}`}
                   className="text-sm font-semibold text-gray-800 hover:text-primary transition-colors"
                 >
-                  No. {emergencyPhone || "N/A"}
+                   {emergencyPhone || "N/A"}
                 </a>
               </div>
             </div>
@@ -182,12 +197,30 @@ export default function Navbar() {
                 />
               </svg>
             </button>
-            <Link href="/" className="flex items-center gap-2">
+            <Link
+              href="/"
+              className="-ml-2 flex items-center gap-2 sm:-ml-4 sm:gap-3 lg:-ml-8 xl:-ml-10"
+            >
+              <Image
+                src="/Ayushman_Bharat_logo.png"
+                alt="Ayushman Bharat"
+                width={168}
+                height={48}
+                className="h-9 w-auto object-contain sm:h-10"
+              />
+              <Image
+                src="/nabh-removebg-preview.png"
+                alt="NABH accredited"
+                width={56}
+                height={56}
+                className="h-9 w-auto object-contain sm:h-10"
+              />
               <Image
                 src="/logo.png"
                 alt="KGH logo"
                 width={200}
                 height={56}
+                className="h-10 w-auto object-contain sm:h-12"
                 priority
               />
             </Link>

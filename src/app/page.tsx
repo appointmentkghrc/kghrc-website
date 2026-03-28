@@ -1,4 +1,5 @@
 import DepartmentsSection from "@/components/DepartmentsSection";
+import PmjayPatientsTreatedSection from "@/components/PmjayPatientsTreatedSection";
 import ServicesHighlightSection from "@/components/ServicesHighlightSection";
 import SpecialistsSection from "@/components/SpecialistsSection";
 import StatsSection from "@/components/StatsSection";
@@ -95,8 +96,16 @@ export default async function Home() {
       </main>
 
       {/* Section below hero - enables scrolling */}
+      <PmjayPatientsTreatedSection
+        pmjayPatientsTreatedValue={siteSettings.pmjayPatientsTreatedValue}
+        pmjayPrimaryLogoUrl={siteSettings.pmjayPrimaryLogoUrl}
+        pmjaySecondaryLogoUrl={siteSettings.pmjaySecondaryLogoUrl}
+      />
       <DepartmentsSection openingHours={openingHours} />
-      <ServicesHighlightSection />
+      <ServicesHighlightSection
+        sectionTitle={siteSettings.servicesHighlightTitle}
+        items={siteSettings.servicesHighlightItems}
+      />
       <SpecialistsSection />
       <StatsSection />
       <PatientTestimonialsSection />
