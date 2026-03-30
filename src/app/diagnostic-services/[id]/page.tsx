@@ -51,9 +51,9 @@ export default async function DiagnosticServicePage({
 
   return (
     <div className="bg-gray-50 min-h-screen pb-16">
-      <section className="relative h-[320px] flex items-center justify-center text-white">
+      <section className="relative h-[320px] flex items-center justify-center text-white overflow-hidden">
         <div
-          className="fixed top-0 left-0 w-full h-[320px] bg-cover bg-center -z-10"
+          className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: `url(${
               service.headerBackgroundImage ||

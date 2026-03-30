@@ -111,7 +111,9 @@ export default async function Home() {
         items={siteSettings.servicesHighlightItems}
       />
       <SpecialistsSection />
-      <StatsSection />
+      <StatsSection
+        backgroundImageUrl={siteSettings.statsSectionBackgroundImage}
+      />
       <PatientTestimonialsSection />
       <RecentBlogsSection />
     </div>

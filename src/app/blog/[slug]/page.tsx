@@ -144,21 +144,6 @@ export default function BlogDetailsPage() {
                 {blog.category}
               </span>
             </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md">
-              <h3 className="text-2xl font-semibold mb-4">Share this article</h3>
-              <div className="flex gap-4">
-                <button className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition">
-                  <i className="fab fa-facebook-f"></i>
-                </button>
-                <button className="w-10 h-10 bg-sky-500 text-white rounded-full flex items-center justify-center hover:bg-sky-600 transition">
-                  <i className="fab fa-twitter"></i>
-                </button>
-                <button className="w-10 h-10 bg-blue-700 text-white rounded-full flex items-center justify-center hover:bg-blue-800 transition">
-                  <i className="fab fa-linkedin-in"></i>
-                </button>
-              </div>
-            </div>
           </div>
 
           <div className="lg:col-span-4 space-y-8">

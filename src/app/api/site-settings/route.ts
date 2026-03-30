@@ -78,6 +78,11 @@ export async function PATCH(request: NextRequest) {
         body.heroBackgroundImage.trim().length > 0
           ? body.heroBackgroundImage.trim()
           : DEFAULT_SITE_CONTACT_SETTINGS.heroBackgroundImage,
+      statsSectionBackgroundImage:
+        typeof body.statsSectionBackgroundImage === "string" &&
+        body.statsSectionBackgroundImage.trim().length > 0
+          ? body.statsSectionBackgroundImage.trim()
+          : currentSettings.statsSectionBackgroundImage,
       diagnosticServicesDefaultHeaderImage:
         typeof body.diagnosticServicesDefaultHeaderImage === "string" &&
         body.diagnosticServicesDefaultHeaderImage.trim().length > 0

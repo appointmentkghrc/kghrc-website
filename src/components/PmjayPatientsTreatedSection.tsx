@@ -21,23 +21,20 @@ export default function PmjayPatientsTreatedSection({
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="rounded-3xl border border-slate-200 bg-linear-to-r from-[#f8fbff] via-white to-[#f3f9ff] px-6 py-7 md:px-10 md:py-8 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-7">
-            <div className="flex items-center gap-4 md:gap-5">
-              <div className="h-16 w-16 shrink-0 md:h-20 md:w-20 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center p-2">
+            <div className="flex items-stretch gap-5 md:gap-7">
+              <div className="h-36 w-36 shrink-0 self-center overflow-hidden sm:h-40 sm:w-40 md:h-48 md:w-48 lg:h-52 lg:w-52 xl:h-56 xl:w-56 rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <img
                   src={resolvedPrimaryLogo}
                   alt="Ayushman Bharat PMJAY"
-                  className="h-full w-full object-contain"
+                  className="block h-full w-full object-contain"
                 />
               </div>
 
-              <div>
-                <p className="inline-flex items-center rounded-full bg-primary/10 text-primary text-xs font-semibold px-3 py-1">
-                  Ayushman Bharat
-                </p>
-                <p className="text-base md:text-lg font-semibold text-slate-800 mt-3">
+              <div className="flex min-w-0 flex-1 flex-col justify-center gap-3 md:gap-4">
+                <p className="rounded-xl border border-emerald-600/35 bg-emerald-50 px-4 py-3 text-base font-semibold text-emerald-950 md:text-lg md:px-5 md:py-3.5">
                   Patients treated under Ayushman Bharat Yojana
                 </p>
-                <p className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-none mt-3">
+                <p className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-none">
                   {value}
                 </p>
               </div>

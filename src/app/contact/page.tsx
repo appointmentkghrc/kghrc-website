@@ -36,15 +36,15 @@ export default async function ContactPage() {
           {/* Location */}
           <div className="p-16 text-center border-r border-gray-200">
             <div className="text-primary text-4xl mb-6">📍</div>
-            <h3 className="text-xl font-semibold mb-4">OFFICE</h3>
-            <div className="w-10 h-[2px] bg-primary mx-auto mb-6"></div>
+            <h3 className="text-xl font-semibold mb-4">ADDRESS</h3>
+            <div className="w-10 h-[2px] bg-secondary mx-auto mb-6"></div>
             <p className="text-gray-600 leading-relaxed">{contactSettings.officeAddress}</p>
           </div>
 
           {/* Emergency */}
           <div className="p-16 text-center bg-primary text-white">
             <div className="text-4xl mb-6">📞</div>
-            <h3 className="text-xl font-semibold mb-4">Address</h3>
+            <h3 className="text-xl font-semibold mb-4">Contact</h3>
             <div className="w-10 h-[2px] bg-white mx-auto mb-6"></div>
             <p className="text-2xl font-bold mb-2">{contactSettings.primaryPhone}</p>
             <p className="text-lg">No. {contactSettings.secondaryPhone}</p>
@@ -54,7 +54,7 @@ export default async function ContactPage() {
           <div className="p-16 text-center border-l border-gray-200">
             <div className="text-primary text-4xl mb-6">✉️</div>
             <h3 className="text-xl font-semibold mb-4">EMAIL</h3>
-            <div className="w-10 h-[2px] bg-primary mx-auto mb-6"></div>
+            <div className="w-10 h-[2px] bg-secondary mx-auto mb-6"></div>
             <p className="text-gray-600">{contactSettings.primaryEmail}</p>
             <p className="text-gray-600">{contactSettings.secondaryEmail}</p>
           </div>
@@ -91,7 +91,7 @@ export default async function ContactPage() {
             </div>
 
             <textarea
-              placeholder="Tell Us About Project *"
+              placeholder="Message *"
               rows={5}
               className="w-full bg-transparent border border-white/30 p-4 rounded-md focus:outline-none"
             />

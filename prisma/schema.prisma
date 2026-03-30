@@ -85,6 +85,7 @@ model SiteSetting {
   youtubeUrl    String?
   linkedinUrl   String?
   heroBackgroundImage String?
+  statsSectionBackgroundImage String?
   diagnosticServicesDefaultHeaderImage String?
   heroTitleLine1 String?
   heroTitleLine2 String?

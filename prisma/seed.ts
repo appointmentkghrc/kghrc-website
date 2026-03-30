@@ -252,6 +252,7 @@ Mental health influences:
       youtubeUrl: "",
       linkedinUrl: "",
       heroBackgroundImage: "/image7.jpeg",
+      statsSectionBackgroundImage: "/7.jpg",
       heroTitleLine1: "Best care for your",
       heroTitleLine2: "Good health",
       heroDescription:

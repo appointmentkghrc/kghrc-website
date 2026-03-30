@@ -23,6 +23,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const [emergencyPhone, setEmergencyPhone] = useState("");
+  const [contactPhoneLoading, setContactPhoneLoading] = useState(true);
   const pathname = usePathname();
   const isWhiteNavPage =
     pathname?.startsWith("/blog") ||
@@ -30,7 +31,8 @@ export default function Navbar() {
     pathname === "/about" ||
     pathname?.startsWith("/doctors") ||
     pathname === "/services" ||
-    pathname === "/gallery";
+    pathname === "/gallery" ||
+    pathname?.startsWith("/diagnostic-services");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,6 +54,8 @@ export default function Navbar() {
         setEmergencyPhone(data?.secondaryPhone || "");
       } catch (error) {
         console.error("Failed to fetch contact settings for navbar:", error);
+      } finally {
+        setContactPhoneLoading(false);
       }
     };
 
@@ -137,10 +141,17 @@ export default function Navbar() {
               <div>
                 <p className="text-xs text-gray-600">Contact Us</p>
                 <a
-                  href={`tel:${emergencyPhone.replace(/[^\d+]/g, "")}`}
+                  href={
+                    emergencyPhone
+                      ? `tel:${emergencyPhone.replace(/[^\d+]/g, "")}`
+                      : "#"
+                  }
                   className="text-sm font-semibold text-gray-800 hover:text-primary transition-colors"
+                  aria-busy={contactPhoneLoading}
                 >
-                   {emergencyPhone || "N/A"}
+                  {contactPhoneLoading
+                    ? "Loading.."
+                    : emergencyPhone || "N/A"}
                 </a>
               </div>
             </div>
@@ -262,12 +273,19 @@ export default function Navbar() {
                   Contact Us
                 </p>
                 <a
-                  href={`tel:${emergencyPhone.replace(/[^\d+]/g, "")}`}
+                  href={
+                    emergencyPhone
+                      ? `tel:${emergencyPhone.replace(/[^\d+]/g, "")}`
+                      : "#"
+                  }
                   className={`text-sm font-semibold hover:text-primary transition-colors ${
                     isWhiteNavPage ? "text-gray-800" : "text-white"
                   }`}
+                  aria-busy={contactPhoneLoading}
                 >
-                  {emergencyPhone || "N/A"}
+                  {contactPhoneLoading
+                    ? "Loading.."
+                    : emergencyPhone || "N/A"}
                 </a>
               </div>
             </div>

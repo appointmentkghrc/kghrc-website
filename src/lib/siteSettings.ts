@@ -20,6 +20,7 @@ export type SiteContactSettings = {
   youtubeUrl: string;
   linkedinUrl: string;
   heroBackgroundImage: string;
+  statsSectionBackgroundImage: string;
   diagnosticServicesDefaultHeaderImage: string;
   pmjayPatientsTreatedValue: string;
   pmjayPrimaryLogoUrl: string;
@@ -50,6 +51,7 @@ export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
   youtubeUrl: "",
   linkedinUrl: "",
   heroBackgroundImage: "/image7.jpeg",
+  statsSectionBackgroundImage: "/7.jpg",
   diagnosticServicesDefaultHeaderImage:
     "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg",
   pmjayPatientsTreatedValue: "0",
@@ -114,6 +116,7 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
           youtubeUrl: string | null;
           linkedinUrl: string | null;
           heroBackgroundImage: string | null;
+          statsSectionBackgroundImage: string | null;
           diagnosticServicesDefaultHeaderImage: string | null;
           pmjayPatientsTreatedValue: string | null;
           pmjayPrimaryLogoUrl: string | null;
@@ -157,6 +160,9 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
     linkedinUrl: settings.linkedinUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.linkedinUrl,
     heroBackgroundImage:
       settings.heroBackgroundImage ?? DEFAULT_SITE_CONTACT_SETTINGS.heroBackgroundImage,
+    statsSectionBackgroundImage:
+      settings.statsSectionBackgroundImage?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.statsSectionBackgroundImage,
     diagnosticServicesDefaultHeaderImage:
       settings.diagnosticServicesDefaultHeaderImage?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.diagnosticServicesDefaultHeaderImage,
@@ -212,6 +218,7 @@ export async function upsertSiteContactSettings(
             youtubeUrl: string;
             linkedinUrl: string;
             heroBackgroundImage: string;
+            statsSectionBackgroundImage: string;
             diagnosticServicesDefaultHeaderImage: string;
             pmjayPatientsTreatedValue: string;
             pmjayPrimaryLogoUrl: string;
@@ -239,6 +246,7 @@ export async function upsertSiteContactSettings(
             youtubeUrl: string;
             linkedinUrl: string;
             heroBackgroundImage: string;
+            statsSectionBackgroundImage: string;
             diagnosticServicesDefaultHeaderImage: string;
             pmjayPatientsTreatedValue: string;
             pmjayPrimaryLogoUrl: string;
@@ -266,6 +274,7 @@ export async function upsertSiteContactSettings(
           youtubeUrl: string | null;
           linkedinUrl: string | null;
           heroBackgroundImage: string | null;
+          statsSectionBackgroundImage: string | null;
           diagnosticServicesDefaultHeaderImage: string | null;
           pmjayPatientsTreatedValue: string | null;
           pmjayPrimaryLogoUrl: string | null;
@@ -303,6 +312,7 @@ export async function upsertSiteContactSettings(
       youtubeUrl: data.youtubeUrl,
       linkedinUrl: data.linkedinUrl,
       heroBackgroundImage: data.heroBackgroundImage,
+      statsSectionBackgroundImage: data.statsSectionBackgroundImage,
       diagnosticServicesDefaultHeaderImage:
         data.diagnosticServicesDefaultHeaderImage,
       pmjayPatientsTreatedValue: data.pmjayPatientsTreatedValue,
@@ -331,6 +341,7 @@ export async function upsertSiteContactSettings(
       youtubeUrl: data.youtubeUrl,
       linkedinUrl: data.linkedinUrl,
       heroBackgroundImage: data.heroBackgroundImage,
+      statsSectionBackgroundImage: data.statsSectionBackgroundImage,
       diagnosticServicesDefaultHeaderImage:
         data.diagnosticServicesDefaultHeaderImage,
       pmjayPatientsTreatedValue: data.pmjayPatientsTreatedValue,
@@ -362,6 +373,9 @@ export async function upsertSiteContactSettings(
     linkedinUrl: settings.linkedinUrl?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.linkedinUrl,
     heroBackgroundImage:
       settings.heroBackgroundImage ?? DEFAULT_SITE_CONTACT_SETTINGS.heroBackgroundImage,
+    statsSectionBackgroundImage:
+      settings.statsSectionBackgroundImage?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.statsSectionBackgroundImage,
     diagnosticServicesDefaultHeaderImage:
       settings.diagnosticServicesDefaultHeaderImage?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.diagnosticServicesDefaultHeaderImage,

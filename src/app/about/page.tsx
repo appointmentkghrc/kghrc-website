@@ -256,7 +256,7 @@ export default function AboutPage() {
                 >
                   <span>{day}</span>
                   {isClosed ? (
-                    <span className="bg-white/15 text-white px-4 py-1 rounded-full text-xs">
+                    <span className="bg-secondary text-white px-4 py-1 rounded-full text-xs">
                       Closed
                     </span>
                   ) : (
@@ -339,7 +339,7 @@ export default function AboutPage() {
               {insurancePartners.map((partner) => (
                 <div
                   key={partner.name}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col items-center justify-center gap-3 hover:shadow-md transition"
+                  className="bg-[#FAF699] rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col items-center justify-center gap-3 hover:shadow-md transition"
                 >
                   <div className="w-full h-16 flex items-center justify-center">
                     {partner.logoSrc ? (

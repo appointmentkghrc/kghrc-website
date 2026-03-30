@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { UploadButton } from "@/lib/uploadthing";
+import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
+
+const FALLBACK_STATS_BG = "/7.jpg";
 
 interface Stat {
   id: string;
@@ -14,7 +18,10 @@ interface Stat {
 
 export default function StatsManager() {
   const [stats, setStats] = useState<Stat[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [statsBackgroundUrl, setStatsBackgroundUrl] = useState("");
+  const [savingBackground, setSavingBackground] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStat, setEditingStat] = useState<Stat | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -26,21 +33,71 @@ export default function StatsManager() {
   });
 
   useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setStatsLoading(true);
+        const statsRes = await fetch("/api/statistics");
+        if (!statsRes.ok) throw new Error("Failed to fetch statistics");
+        const data = await statsRes.json();
+        setStats(data);
+      } catch (error) {
+        console.error("Error fetching statistics:", error);
+        alert("Failed to load statistics");
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    const fetchSettings = async () => {
+      try {
+        setSettingsLoading(true);
+        const settingsRes = await fetch("/api/site-settings");
+        if (settingsRes.ok) {
+          const settings = await settingsRes.json();
+          setStatsBackgroundUrl(
+            settings?.statsSectionBackgroundImage?.trim() || FALLBACK_STATS_BG
+          );
+        } else {
+          setStatsBackgroundUrl(FALLBACK_STATS_BG);
+        }
+      } catch (error) {
+        console.error("Error fetching site settings:", error);
+        setStatsBackgroundUrl(FALLBACK_STATS_BG);
+      } finally {
+        setSettingsLoading(false);
+      }
+    };
+
     fetchStats();
+    fetchSettings();
   }, []);
 
-  const fetchStats = async () => {
+  const handleSaveBackground = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      setLoading(true);
-      const response = await fetch("/api/statistics");
-      if (!response.ok) throw new Error("Failed to fetch statistics");
-      const data = await response.json();
-      setStats(data);
+      setSavingBackground(true);
+      const response = await fetch("/api/site-settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ statsSectionBackgroundImage: statsBackgroundUrl }),
+      });
+      if (!response.ok) throw new Error("Failed to save background");
+      const updated = await response.json();
+      setStatsBackgroundUrl(
+        updated?.statsSectionBackgroundImage?.trim() || FALLBACK_STATS_BG
+      );
+      alert("Statistics section background updated successfully!");
     } catch (error) {
-      console.error("Error fetching statistics:", error);
-      alert("Failed to load statistics");
+      console.error("Error saving statistics background:", error);
+      alert("Failed to save statistics section background");
     } finally {
-      setLoading(false);
+      setSavingBackground(false);
+    }
+  };
+
+  const handleStatsImageUpload = (res: Array<{ url: string }>) => {
+    if (res?.[0]?.url) {
+      setStatsBackgroundUrl(res[0].url);
     }
   };
 
@@ -147,12 +204,92 @@ export default function StatsManager() {
 
   return (
     <div className="space-y-6">
-      {loading ? (
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      ) : (
-        <>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Statistics section (homepage)
+            </h2>
+            <p className="text-gray-600 mt-1">
+              Change the background photo behind the numbers on the home page.
+            </p>
+          </div>
+
+          <form
+            onSubmit={handleSaveBackground}
+            className="bg-white rounded-lg shadow-md p-6 space-y-5"
+          >
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Background image URL
+              </label>
+              <input
+                type="text"
+                value={statsBackgroundUrl}
+                onChange={(e) => setStatsBackgroundUrl(e.target.value)}
+                disabled={settingsLoading}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-400"
+                placeholder={settingsLoading ? "Loading..." : "https://... or /7.jpg"}
+                required={!settingsLoading}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Or upload image
+              </label>
+              <UploadButton
+                className="ut-primary-upload"
+                endpoint="heroSectionImage"
+                onBeforeUploadBegin={(files) =>
+                  optimizeImagesForUpload(files, { maxDimension: 2200, quality: 0.82 })
+                }
+                onClientUploadComplete={handleStatsImageUpload}
+                onUploadError={(error: Error) => {
+                  alert(`Upload Error: ${error.message}`);
+                }}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Preview
+              </label>
+              <div className="h-40 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 relative flex items-center justify-center">
+                {settingsLoading ? (
+                  <span className="text-gray-500 text-sm">Loading...</span>
+                ) : statsBackgroundUrl.trim() ? (
+                  <>
+                    <div
+                      className="absolute inset-0 bg-cover bg-center"
+                      style={{
+                        backgroundImage: `url(${statsBackgroundUrl})`,
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-white/30" />
+                  </>
+                ) : (
+                  <span className="text-gray-500 text-sm relative z-10">
+                    No image URL
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setStatsBackgroundUrl(FALLBACK_STATS_BG)}
+                disabled={settingsLoading}
+                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Reset to default
+              </button>
+              <button
+                type="submit"
+                disabled={savingBackground || settingsLoading}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {savingBackground ? "Saving..." : "Save background"}
+              </button>
+            </div>
+          </form>
+
           <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800">Statistics Management</h2>
         <button
@@ -166,6 +303,14 @@ export default function StatsManager() {
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Current Statistics Display</h3>
+        {statsLoading ? (
+          <div className="flex justify-center items-center py-16">
+            <div className="flex flex-col items-center gap-3 text-gray-500">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+              <span className="text-sm">Loading...</span>
+            </div>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {stats.map((stat) => (
             <div
@@ -199,10 +344,14 @@ export default function StatsManager() {
             </div>
           ))}
         </div>
+        )}
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Statistics by Category</h3>
+        {statsLoading ? (
+          <div className="flex justify-center py-10 text-gray-500 text-sm">Loading...</div>
+        ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((category) => {
             const count = stats.filter((s) => s.category === category).length;
@@ -214,9 +363,8 @@ export default function StatsManager() {
             );
           })}
         </div>
+        )}
       </div>
-        </>
-      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

@@ -39,7 +39,11 @@ function getIconForLabel(label: string) {
   return <Users className="text-secondary w-10 h-10" />;
 }
 
-export default function StatsSection() {
+type StatsSectionProps = {
+  backgroundImageUrl: string;
+};
+
+export default function StatsSection({ backgroundImageUrl }: StatsSectionProps) {
   const [stats, setStats] = useState<Statistic[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -90,7 +94,17 @@ export default function StatsSection() {
     fetchStats();
   }, []);
 
-  if (loading || stats.length === 0) {
+  if (loading) {
+    return (
+      <section className="relative py-32 bg-gray-100">
+        <div className="relative max-w-7xl mx-auto px-6 flex min-h-[200px] items-center justify-center">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (stats.length === 0) {
     return null;
   }
 
@@ -98,7 +112,7 @@ export default function StatsSection() {
     <section
       className="relative py-32 bg-fixed bg-center bg-cover"
       style={{
-        backgroundImage: "url('/7.jpg')",
+        backgroundImage: `url(${backgroundImageUrl})`,
       }}
     >
       <div className="absolute inset-0 bg-white/30" />

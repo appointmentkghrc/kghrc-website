@@ -18,36 +18,122 @@ type GalleryApiResponse = {
 };
 
 const DEFAULT_TITLE = "Latest Gallery";
-const DEFAULT_BANNER =
-  "https://validthemes.net/site-template/medihub/assets/img/banner/5.jpg";
-const DEFAULT_IMAGES = [
-  "https://validthemes.net/site-template/medihub/assets/img/gallery/1.jpg",
-  "https://validthemes.net/site-template/medihub/assets/img/gallery/2.jpg",
-  "https://validthemes.net/site-template/medihub/assets/img/gallery/3.jpg",
-  "https://validthemes.net/site-template/medihub/assets/img/gallery/4.jpg",
-  "https://validthemes.net/site-template/medihub/assets/img/gallery/5.jpg",
-  "https://validthemes.net/site-template/medihub/assets/img/gallery/6.jpg",
-];
 
-function GalleryHeader({ title, bannerImage }: { title: string; bannerImage: string }) {
+function GalleryHeader({
+  title,
+  bannerImage,
+  isFetching,
+}: {
+  title: string;
+  bannerImage: string | null;
+  isFetching: boolean;
+}) {
+  const [bgLoaded, setBgLoaded] = useState(false);
+  const [bgFailed, setBgFailed] = useState(false);
+
+  useEffect(() => {
+    setBgLoaded(false);
+    setBgFailed(false);
+  }, [bannerImage]);
+
+  const showBannerLoading =
+    !isFetching && Boolean(bannerImage) && !bgLoaded && !bgFailed;
+  const showHeroLoading = isFetching || showBannerLoading;
+  const bannerVisible = Boolean(bannerImage) && bgLoaded && !bgFailed;
+
   return (
-    <section className="relative h-[420px] flex items-center justify-center text-white overflow-hidden">
+    <section className="relative h-[420px] flex items-center justify-center text-white overflow-hidden bg-slate-800">
+      {bannerImage && !bgFailed ? (
+        <img
+          src={bannerImage}
+          alt=""
+          className={`absolute inset-0 h-full w-full object-cover z-0 transition-opacity duration-300 ${
+            bgLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          onLoad={() => setBgLoaded(true)}
+          onError={() => setBgFailed(true)}
+          aria-hidden
+        />
+      ) : null}
+
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-        style={{
-          backgroundImage: `url(${bannerImage || DEFAULT_BANNER})`,
-        }}
+        className={`absolute inset-0 z-1 ${
+          bannerVisible ? "bg-black/60" : "bg-black/45"
+        }`}
       />
 
-      <div className="absolute inset-0 bg-black/60 z-10" />
+      {showHeroLoading ? (
+        <div
+          className="absolute bottom-10 left-0 right-0 z-3 flex justify-center pointer-events-none"
+          aria-live="polite"
+        >
+          <span className="text-white/80 text-sm font-medium">Loading…</span>
+        </div>
+      ) : null}
 
-      <div className="relative z-20 text-center">
+      <div className="relative z-20 text-center px-4">
         <h1 className="text-5xl font-semibold mb-6">{title}</h1>
-        <div className="bg-black/40 px-6 py-3 rounded-md text-sm">
+        <div className="bg-black/40 px-6 py-3 rounded-md text-sm inline-block">
           HOME › GALLERY
         </div>
       </div>
     </section>
+  );
+}
+
+function GalleryGridItem({
+  src,
+  index,
+  onSelectImage,
+}: {
+  src: string;
+  index: number;
+  onSelectImage: (src: string) => void;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelectImage(src)}
+      className="group relative overflow-hidden rounded-2xl shadow-md bg-gray-100 text-left"
+      aria-label={`View gallery image ${index + 1}`}
+    >
+      <div className="relative w-full min-h-72">
+        {!failed && !loaded && (
+          <div
+            className="absolute inset-0 z-10 flex items-center justify-center bg-gray-100 text-gray-500 text-sm"
+            aria-hidden
+          >
+            Loading…
+          </div>
+        )}
+        {failed && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-100 text-gray-500 text-sm px-4 text-center">
+            Image unavailable
+          </div>
+        )}
+        <img
+          src={src}
+          alt={`Gallery image ${index + 1}`}
+          className={`w-full h-72 object-cover transition-all duration-300 group-hover:scale-105 ${
+            loaded && !failed ? "opacity-100" : "opacity-0"
+          }`}
+          loading="lazy"
+          onLoad={() => setLoaded(true)}
+          onError={() => {
+            setFailed(true);
+            setLoaded(true);
+          }}
+        />
+        <div className="pointer-events-none absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <span className="text-white text-sm font-medium tracking-wide">
+            View Photo
+          </span>
+        </div>
+      </div>
+    </button>
   );
 }
 
@@ -57,12 +143,14 @@ function GalleryGrid({
   activeSection,
   onChangeSection,
   onSelectImage,
+  isLoading,
 }: {
   images: string[];
   sections: string[];
   activeSection: string;
   onChangeSection: (section: string) => void;
   onSelectImage: (src: string) => void;
+  isLoading: boolean;
 }) {
   return (
     <section className="bg-white -mt-24 pt-24 pb-28">
@@ -74,7 +162,8 @@ function GalleryGrid({
                   key={label}
                   type="button"
                   onClick={() => onChangeSection(label)}
-                  className={`text-xs md:text-sm font-medium tracking-wide uppercase ${
+                  disabled={isLoading}
+                  className={`text-xs md:text-sm font-medium tracking-wide uppercase disabled:opacity-50 ${
                     activeSection === label
                       ? "text-primary"
                       : "text-gray-700 hover:text-primary"
@@ -86,29 +175,26 @@ function GalleryGrid({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {images.map((src, index) => (
-            <button
-              key={`${src}-${index}`}
-              type="button"
-              onClick={() => onSelectImage(src)}
-              className="group relative overflow-hidden rounded-2xl shadow-md bg-gray-100 text-left"
-              aria-label={`View gallery image ${index + 1}`}
-            >
-              <img
+        {isLoading ? (
+          <div className="flex min-h-[280px] items-center justify-center text-gray-500 text-sm">
+            Loading…
+          </div>
+        ) : images.length === 0 ? (
+          <div className="flex min-h-[280px] items-center justify-center text-gray-500 text-sm">
+            No gallery images yet.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {images.map((src, index) => (
+              <GalleryGridItem
+                key={`${src}-${index}`}
                 src={src}
-                alt={`Gallery image ${index + 1}`}
-                className="w-full h-72 object-cover transition-transform duration-300 group-hover:scale-105"
-                loading="lazy"
+                index={index}
+                onSelectImage={onSelectImage}
               />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <span className="text-white text-sm font-medium tracking-wide">
-                  View Photo
-                </span>
-              </div>
-            </button>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -123,6 +209,14 @@ function PhotoViewer({
   alt: string;
   onClose: () => void;
 }) {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setLoaded(false);
+    setFailed(false);
+  }, [src]);
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -155,11 +249,28 @@ function PhotoViewer({
         >
           Close ✕
         </button>
-        <div className="rounded-2xl overflow-hidden bg-black shadow-2xl">
+        <div className="relative rounded-2xl overflow-hidden bg-black shadow-2xl min-h-[200px] flex items-center justify-center">
+          {!failed && !loaded && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center text-white/80 text-sm">
+              Loading…
+            </div>
+          )}
+          {failed && (
+            <div className="p-8 text-white/80 text-sm text-center">
+              Could not load image.
+            </div>
+          )}
           <img
             src={src}
             alt={alt}
-            className="w-full max-h-[80vh] object-contain bg-black"
+            className={`w-full max-h-[80vh] object-contain bg-black ${
+              loaded && !failed ? "opacity-100" : "opacity-0"
+            }`}
+            onLoad={() => setLoaded(true)}
+            onError={() => {
+              setFailed(true);
+              setLoaded(true);
+            }}
           />
         </div>
       </div>
@@ -169,20 +280,24 @@ function PhotoViewer({
 
 export default function GalleryPage() {
   const [title, setTitle] = useState(DEFAULT_TITLE);
-  const [bannerImage, setBannerImage] = useState(DEFAULT_BANNER);
+  const [bannerImage, setBannerImage] = useState<string | null>(null);
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [sections, setSections] = useState<string[]>([]);
   const [activeSection, setActiveSection] = useState("All");
   const [viewerSrc, setViewerSrc] = useState<string | null>(null);
+  const [galleryLoading, setGalleryLoading] = useState(true);
 
   useEffect(() => {
     const fetchGallery = async () => {
+      setGalleryLoading(true);
       try {
         const response = await fetch("/api/gallery");
         if (!response.ok) throw new Error("Failed to fetch gallery");
         const data: GalleryApiResponse = await response.json();
         setTitle(data?.title || DEFAULT_TITLE);
-        setBannerImage(data?.bannerImage || DEFAULT_BANNER);
+        const rawBanner =
+          typeof data?.bannerImage === "string" ? data.bannerImage.trim() : "";
+        setBannerImage(rawBanner || null);
         setImages(Array.isArray(data?.images) ? data.images : []);
         const fromApi =
           Array.isArray(data?.sections) && data.sections.length > 0
@@ -196,6 +311,8 @@ export default function GalleryPage() {
         setSections(sectionList);
       } catch (error) {
         console.error("Error fetching gallery:", error);
+      } finally {
+        setGalleryLoading(false);
       }
     };
 
@@ -203,7 +320,6 @@ export default function GalleryPage() {
   }, []);
 
   const filteredImages = useMemo(() => {
-    if (images.length === 0) return DEFAULT_IMAGES;
     return images
       .filter(
         (item) =>
@@ -212,17 +328,20 @@ export default function GalleryPage() {
       .map((item) => item.imageUrl);
   }, [activeSection, images]);
 
-  const imageSources = filteredImages.length > 0 ? filteredImages : DEFAULT_IMAGES;
-
   return (
     <div>
-      <GalleryHeader title={title} bannerImage={bannerImage} />
+      <GalleryHeader
+        title={title}
+        bannerImage={bannerImage}
+        isFetching={galleryLoading}
+      />
       <GalleryGrid
-        images={imageSources}
+        images={filteredImages}
         sections={sections}
         activeSection={activeSection}
         onChangeSection={setActiveSection}
         onSelectImage={(src) => setViewerSrc(src)}
+        isLoading={galleryLoading}
       />
       {viewerSrc ? (
         <PhotoViewer
