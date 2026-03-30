@@ -22,7 +22,7 @@ export default function PmjayPatientsTreatedSection({
         <div className="rounded-3xl border border-slate-200 bg-linear-to-r from-[#f8fbff] via-white to-[#f3f9ff] px-6 py-7 md:px-10 md:py-8 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-7">
             <div className="flex items-stretch gap-5 md:gap-7">
-              <div className="h-36 w-36 shrink-0 self-center overflow-hidden sm:h-40 sm:w-40 md:h-48 md:w-48 lg:h-52 lg:w-52 xl:h-56 xl:w-56 rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="h-10 w-10 shrink-0 self-center overflow-hidden sm:h-32 sm:w-32 md:h-32 md:w-32 lg:h-32 lg:w-32 xl:h-32 xl:w-32 rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <img
                   src={resolvedPrimaryLogo}
                   alt="Ayushman Bharat PMJAY"
