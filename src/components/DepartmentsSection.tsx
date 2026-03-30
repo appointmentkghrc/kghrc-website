@@ -26,9 +26,15 @@ const truncateWords = (text: string, maxWords: number) => {
 };
 
 export default function DepartmentsSection({
-  openingHours,
+  openingHours = [],
+  showOpeningHours = true,
+  compactDiagnosticImage = false,
 }: {
-  openingHours: OpeningHoursItem[];
+  openingHours?: OpeningHoursItem[];
+  /** When false, hides the Opening Hours column (e.g. Services page). Home keeps default true. */
+  showOpeningHours?: boolean;
+  /** Smaller max height for the diagnostic preview image (e.g. Services page). */
+  compactDiagnosticImage?: boolean;
 }) {
   const [diagnosticServices, setDiagnosticServices] = useState<DiagnosticService[]>([]);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
@@ -97,7 +103,9 @@ export default function DepartmentsSection({
           </div>
 
           {/* MIDDLE - Image + Content */}
-          <div className="lg:col-span-5">
+          <div
+            className={showOpeningHours ? "lg:col-span-5" : "lg:col-span-9"}
+          >
             {loadingServices && !selectedService ? (
               <div className="bg-white border border-gray-200 rounded-xl p-8 text-gray-500">
                 Loading service details...
@@ -107,7 +115,11 @@ export default function DepartmentsSection({
                 <img
                   src={selectedService.image}
                   alt={selectedService.name}
-                  className="rounded-xl w-full object-cover mb-6"
+                  className={
+                    compactDiagnosticImage
+                      ? "rounded-xl w-full object-cover object-center mb-6 max-h-60 sm:max-h-72 md:max-h-80"
+                      : "rounded-xl w-full object-cover mb-6"
+                  }
                 />
 
                 <h2 className="text-3xl font-semibold mb-4">
@@ -137,49 +149,51 @@ export default function DepartmentsSection({
             )}
           </div>
 
-          {/* RIGHT - Opening Hours */}
-          <div className="lg:col-span-4">
-            <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
-              <h3 className="text-xl font-semibold mb-2">
-                Opening Hours
-              </h3>
+          {/* RIGHT - Opening Hours (home page only when showOpeningHours) */}
+          {showOpeningHours && (
+            <div className="lg:col-span-4">
+              <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
+                <h3 className="text-xl font-semibold mb-2">
+                  Opening Hours
+                </h3>
 
-              <div className="w-10 h-[3px] bg-primary mb-6" />
+                <div className="w-10 h-[3px] bg-primary mb-6" />
 
-              <div className="space-y-3">
-                {openingHours.length === 0 ? (
-                  <div className="px-4 py-3 rounded-lg text-sm bg-gray-100 text-gray-500">
-                    Opening hours are not configured yet.
-                  </div>
-                ) : (
-                  openingHours.map((item, index) => (
-                    <div
-                      key={index}
-                      className={`flex justify-between items-center px-4 py-3 rounded-lg text-sm ${
-                        item.day.toLowerCase() === "monday"
-                          ? "bg-gray-200"
-                          : "bg-gray-100"
-                      }`}
-                    >
-                      <span className="uppercase text-gray-600">
-                        {item.day}
-                      </span>
-
-                      {item.time.trim().toUpperCase() === "CLOSED" ? (
-                        <span className="bg-primary text-white px-4 py-1 rounded-full text-xs">
-                          CLOSED
-                        </span>
-                      ) : (
-                        <span className="text-gray-700">
-                          {item.time}
-                        </span>
-                      )}
+                <div className="space-y-3">
+                  {openingHours.length === 0 ? (
+                    <div className="px-4 py-3 rounded-lg text-sm bg-gray-100 text-gray-500">
+                      Opening hours are not configured yet.
                     </div>
-                  ))
-                )}
+                  ) : (
+                    openingHours.map((item, index) => (
+                      <div
+                        key={index}
+                        className={`flex justify-between items-center px-4 py-3 rounded-lg text-sm ${
+                          item.day.toLowerCase() === "monday"
+                            ? "bg-gray-200"
+                            : "bg-gray-100"
+                        }`}
+                      >
+                        <span className="uppercase text-gray-600">
+                          {item.day}
+                        </span>
+
+                        {item.time.trim().toUpperCase() === "CLOSED" ? (
+                          <span className="bg-primary text-white px-4 py-1 rounded-full text-xs">
+                            CLOSED
+                          </span>
+                        ) : (
+                          <span className="text-gray-700">
+                            {item.time}
+                          </span>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
         </div>
       </div>

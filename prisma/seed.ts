@@ -6,6 +6,7 @@ async function main() {
   console.log('Starting seed...');
 
   // Clear existing data
+  await prisma.servicePageItem.deleteMany();
   await prisma.statistic.deleteMany();
   await prisma.diagnosticService.deleteMany();
   await prisma.testimonial.deleteMany();
@@ -229,6 +230,38 @@ Mental health influences:
           "Conducted under expert supervision, the test supports personalized treatment recommendations.",
         image: "https://validthemes.net/site-template/medihub/assets/img/departments/7.jpg",
         sortOrder: 7,
+        isActive: true,
+      },
+    ],
+  });
+
+  await prisma.servicePageItem.createMany({
+    data: [
+      {
+        icon: "Stethoscope",
+        heading: "Outdoor Checkup",
+        description:
+          "Routine vitals and screening including height, weight, blood pressure, cholesterol, and blood sugar checks.",
+        link: "/contact",
+        sortOrder: 0,
+        isActive: true,
+      },
+      {
+        icon: "Building2",
+        heading: "Operation Theatre",
+        description:
+          "Modern modular theatres with surgical lighting, stretchers, and support equipment for safe procedures.",
+        link: "/contact",
+        sortOrder: 1,
+        isActive: true,
+      },
+      {
+        icon: "Pill",
+        heading: "Pharmacy",
+        description:
+          "Counselling on medicines, dosage guidance, branded and generic options, with in‑house pharmacy support.",
+        link: "/contact",
+        sortOrder: 2,
         isActive: true,
       },
     ],

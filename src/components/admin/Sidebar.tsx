@@ -23,6 +23,7 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen }: SidebarProp
     { id: "tpaInsurancePartners", label: "TPA / Insurance Partners", icon: "fas fa-handshake" },
     { id: "pmjayPatientsTreated", label: "PMJAY Section", icon: "fas fa-hospital" },
     { id: "servicesHighlight", label: "Services highlight", icon: "fas fa-layer-group" },
+    { id: "servicesPage", label: "Services page", icon: "fas fa-th-large" },
   ];
 
   return (

@@ -16,6 +16,7 @@ import AboutUsManager from "@/components/admin/AboutUsManager";
 import TpaInsurancePartnersManager from "@/components/admin/TpaInsurancePartnersManager";
 import PmjayPatientsTreatedManager from "@/components/admin/PmjayPatientsTreatedManager";
 import ServicesHighlightManager from "@/components/admin/ServicesHighlightManager";
+import ServicesPageManager from "@/components/admin/ServicesPageManager";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -35,6 +36,7 @@ export default function AdminDashboard() {
     tpaInsurancePartners: "TPA / Insurance Partners",
     pmjayPatientsTreated: "PMJAY Section",
     servicesHighlight: "Services highlight",
+    servicesPage: "Services page",
   };
 
   const renderContent = () => {
@@ -67,6 +69,8 @@ export default function AdminDashboard() {
         return <PmjayPatientsTreatedManager />;
       case "servicesHighlight":
         return <ServicesHighlightManager />;
+      case "servicesPage":
+        return <ServicesPageManager />;
       default:
         return <DashboardOverview />;
     }
