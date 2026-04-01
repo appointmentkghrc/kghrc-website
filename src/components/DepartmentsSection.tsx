@@ -27,10 +27,13 @@ const truncateWords = (text: string, maxWords: number) => {
 
 export default function DepartmentsSection({
   openingHours = [],
+  openingHoursTitle = "Opening Hours",
   showOpeningHours = true,
   compactDiagnosticImage = false,
 }: {
   openingHours?: OpeningHoursItem[];
+  /** From About settings; shown above the opening hours list on the home page. */
+  openingHoursTitle?: string;
   /** When false, hides the Opening Hours column (e.g. Services page). Home keeps default true. */
   showOpeningHours?: boolean;
   /** Smaller max height for the diagnostic preview image (e.g. Services page). */
@@ -154,7 +157,7 @@ export default function DepartmentsSection({
             <div className="lg:col-span-4">
               <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
                 <h3 className="text-xl font-semibold mb-2">
-                  Opening Hours
+                  {openingHoursTitle}
                 </h3>
 
                 <div className="w-10 h-[3px] bg-primary mb-6" />

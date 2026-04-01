@@ -47,35 +47,41 @@ interface Doctor {
   updatedAt: string;
 }
 
+type TpaInsurancePartnerRow = {
+  id: string;
+  name: string;
+  logoUrl: string;
+};
+
 export default function AboutPage() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loadingDoctors, setLoadingDoctors] = useState(true);
   const [aboutSettings, setAboutSettings] = useState<AboutSettings | null>(null);
   const [loadingAboutSettings, setLoadingAboutSettings] = useState(true);
-  const [siteHeroOpeningHoursRows, setSiteHeroOpeningHoursRows] = useState<
-    string[] | null
-  >(null);
+  const [insurancePartners, setInsurancePartners] = useState<TpaInsurancePartnerRow[]>([]);
+  const [loadingPartners, setLoadingPartners] = useState(true);
 
   useEffect(() => {
     fetchAboutSettings();
     fetchDoctors();
-    fetchSiteHeroOpeningHoursRows();
   }, []);
 
-  const fetchSiteHeroOpeningHoursRows = async () => {
-    try {
-      const response = await fetch("/api/site-settings");
-      if (!response.ok) return;
-      const data = await response.json();
-
-      setSiteHeroOpeningHoursRows(
-        Array.isArray(data?.heroOpeningHoursRows) ? data.heroOpeningHoursRows : []
-      );
-    } catch (error) {
-      console.error("Error fetching hero opening hours:", error);
-      setSiteHeroOpeningHoursRows([]);
-    }
-  };
+  useEffect(() => {
+    const loadPartners = async () => {
+      try {
+        const response = await fetch("/api/tpa-insurance-partners");
+        if (!response.ok) throw new Error("Failed to fetch TPA partners");
+        const data: unknown = await response.json();
+        setInsurancePartners(Array.isArray(data) ? (data as TpaInsurancePartnerRow[]) : []);
+      } catch (error) {
+        console.error("Error fetching TPA partners:", error);
+        setInsurancePartners([]);
+      } finally {
+        setLoadingPartners(false);
+      }
+    };
+    loadPartners();
+  }, []);
 
   const fetchAboutSettings = async () => {
     try {
@@ -125,36 +131,6 @@ export default function AboutPage() {
     }
   };
 
-  const insurancePartners = [
-    { name: "ICICI Lombard", logoSrc: "/ICICI-Lombard.jpeg" },
-    { name: "Mediassist TPA", logoSrc: "/medi-assist.jpg" },
-    { name: "Raksha TPA", logoSrc: "/rakshatpa-logo.png" },
-    { name: "Reliance Health Insurance", logoSrc: "/Reliance Health insurance company.png" },
-    { name: "Bajaj Allianz", logoSrc: "/bajaj-allianz.svg" },
-    { name: "MD India", logoSrc: "/md-india.svg" },
-    { name: "Universal Sompo", logoSrc: "/universal-sompo.svg" },
-    { name: "Religare", logoSrc: "/religare.svg" },
-    { name: "Apollo Munich", logoSrc: null },
-    { name: "FHPL", logoSrc: "/fhpl.png" },
-    { name: "Tata AIG", logoSrc: "/tata-aig.svg" },
-    { name: "Kotak Mahindra", logoSrc: "/kotak.svg" },
-    { name: "Medsafe Health Insurance", logoSrc: "/medsave.jpeg" },
-    { name: "Safeway", logoSrc: "/safeway.jpg" },
-    { name: "Medicare Health Insurance", logoSrc: "/medicare.svg" },
-    { name: "E-Meditek", logoSrc: "/e-meditek.jpeg" },
-    { name: "Max Bupa", logoSrc: "/niva-bupa.svg" },
-    { name: "Vipul Medcorp", logoSrc: "/VipulMedcorp.jpeg" },
-    { name: "Paramount TPA", logoSrc: "/paramount-tpa.png" },
-    { name: "United India Insurance", logoSrc: "/united-india.png" },
-    { name: "Iffco Tokio", logoSrc: "/iffco-tokio.jpg" },
-    { name: "Bharti AXA General Insurance", logoSrc: "/bharti-axa.svg" },
-    { name: "Heritage Health TPA", logoSrc: "/heritage-health.jpeg" },
-    { name: "Ericson TPA", logoSrc: "/ericson.jpg" },
-    { name: "HDFC Ergo Health Insurance", logoSrc: "/hdfc-ergo.png" },
-    { name: "ACKO General Insurance", logoSrc: "/acko.svg" },
-    { name: "Health India Insurance TPA", logoSrc: "/health-india.jpg" },
-  ] as const;
-
   if (loadingAboutSettings || !aboutSettings) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -163,10 +139,7 @@ export default function AboutPage() {
     );
   }
 
-  const openingHoursFromSite = parseOpeningHoursRows(siteHeroOpeningHoursRows);
-  const openingHoursFromAbout = parseOpeningHoursRows(aboutSettings.openingHoursRows);
-  const openingHoursRowsToRender =
-    openingHoursFromSite.length > 0 ? openingHoursFromSite : openingHoursFromAbout;
+  const openingHoursRowsToRender = parseOpeningHoursRows(aboutSettings.openingHoursRows);
 
   return (
     <div>
@@ -335,32 +308,42 @@ export default function AboutPage() {
             <h3 className="text-2xl font-semibold mb-6 text-[#214d80] text-center">
               List of TPA / Insurance Partners
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {insurancePartners.map((partner) => (
-                <div
-                  key={partner.name}
-                  className="bg-[#FAF699] rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col items-center justify-center gap-3 hover:shadow-md transition"
-                >
-                  <div className="w-full h-16 flex items-center justify-center">
-                    {partner.logoSrc ? (
-                      <img
-                        src={partner.logoSrc}
-                        alt={`${partner.name} logo`}
-                        className="max-h-14 max-w-[160px] object-contain"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full border border-gray-200 bg-white flex items-center justify-center">
-                        <i className="fa-regular fa-image text-secondary" aria-hidden />
-                      </div>
-                    )}
+            {loadingPartners ? (
+              <div className="flex justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#214d80]" />
+              </div>
+            ) : insurancePartners.length === 0 ? (
+              <p className="text-center text-gray-500 py-8">
+                No partners listed yet. Add them in Admin → TPA / Insurance Partners.
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {insurancePartners.map((partner) => (
+                  <div
+                    key={partner.id}
+                    className="bg-[#FAF699] rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col items-center justify-center gap-3 hover:shadow-md transition"
+                  >
+                    <div className="w-full h-16 flex items-center justify-center">
+                      {partner.logoUrl ? (
+                        <img
+                          src={partner.logoUrl}
+                          alt={`${partner.name} logo`}
+                          className="max-h-14 max-w-[160px] object-contain"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full border border-gray-200 bg-white flex items-center justify-center">
+                          <i className="fa-regular fa-image text-secondary" aria-hidden />
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-center text-xs sm:text-sm text-gray-700 font-medium leading-snug">
+                      {partner.name}
+                    </div>
                   </div>
-                  <div className="text-center text-xs sm:text-sm text-gray-700 font-medium leading-snug">
-                    {partner.name}
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
             
           </div>
 

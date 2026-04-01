@@ -8,7 +8,6 @@ type HeroContentForm = {
   heroDescription: string;
   heroCtaLabel: string;
   heroCtaHref: string;
-  heroOpeningHoursRows: string[];
 };
 
 const emptyForm: HeroContentForm = {
@@ -17,38 +16,12 @@ const emptyForm: HeroContentForm = {
   heroDescription: "",
   heroCtaLabel: "",
   heroCtaHref: "",
-  heroOpeningHoursRows: [],
 };
-
-type OpeningHoursRow = {
-  day: string;
-  time: string;
-};
-
-const parseOpeningRows = (rows: string[] | undefined): OpeningHoursRow[] => {
-  if (!rows || rows.length === 0) return [];
-
-  const parsed = rows
-    .map((row) => row.split("|"))
-    .map(([day, time]) => ({
-      day: (day ?? "").trim(),
-      time: (time ?? "").trim(),
-    }))
-    .filter((row) => row.day.length > 0);
-
-  return parsed;
-};
-
-const stringifyOpeningRows = (rows: OpeningHoursRow[]): string[] =>
-  rows
-    .map((row) => `${row.day.trim()}|${row.time.trim()}`)
-    .filter((row) => row.includes("|") && row.split("|")[0].trim().length > 0);
 
 export default function HomeHeroContentManager() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<HeroContentForm>(emptyForm);
-  const [openingHoursRows, setOpeningHoursRows] = useState<OpeningHoursRow[]>([]);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -63,11 +36,7 @@ export default function HomeHeroContentManager() {
           heroDescription: data?.heroDescription ?? "",
           heroCtaLabel: data?.heroCtaLabel ?? "",
           heroCtaHref: data?.heroCtaHref ?? "",
-          heroOpeningHoursRows: Array.isArray(data?.heroOpeningHoursRows)
-            ? data.heroOpeningHoursRows
-            : [],
         });
-        setOpeningHoursRows(parseOpeningRows(data?.heroOpeningHoursRows));
       } catch (error) {
         console.error("Error fetching hero content settings:", error);
         alert("Failed to load homepage hero content");
@@ -90,14 +59,10 @@ export default function HomeHeroContentManager() {
     e.preventDefault();
     try {
       setSaving(true);
-      const payload = {
-        ...formData,
-        heroOpeningHoursRows: stringifyOpeningRows(openingHoursRows),
-      };
       const response = await fetch("/api/site-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) throw new Error("Failed to save hero content settings");
@@ -108,11 +73,7 @@ export default function HomeHeroContentManager() {
         heroDescription: updated?.heroDescription ?? "",
         heroCtaLabel: updated?.heroCtaLabel ?? "",
         heroCtaHref: updated?.heroCtaHref ?? "",
-        heroOpeningHoursRows: Array.isArray(updated?.heroOpeningHoursRows)
-          ? updated.heroOpeningHoursRows
-          : [],
       });
-      setOpeningHoursRows(parseOpeningRows(updated?.heroOpeningHoursRows));
       alert("Homepage hero content updated successfully!");
     } catch (error) {
       console.error("Error saving hero content settings:", error);
@@ -135,7 +96,9 @@ export default function HomeHeroContentManager() {
       <div>
         <h2 className="text-2xl font-bold text-gray-800">Homepage Hero Content</h2>
         <p className="text-gray-600 mt-1">
-          Edit the homepage headline, description and the “Contact Us” button link.
+          Edit the homepage headline, description and the “Contact Us” button link. Opening hours
+          for the home page, footer, and About page are managed under{" "}
+          <strong>About Us</strong> (opening hours title and rows).
         </p>
       </div>
 
@@ -169,71 +132,6 @@ export default function HomeHeroContentManager() {
               placeholder="Good health"
               required
             />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Opening Hours
-          </label>
-          <div className="mb-3">
-            <button
-              type="button"
-              onClick={() =>
-                setOpeningHoursRows((prev) => [...prev, { day: "", time: "" }])
-              }
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Add Row
-            </button>
-          </div>
-          {openingHoursRows.length === 0 && (
-            <p className="text-sm text-gray-500 mb-3">
-              No opening hours configured yet. Click "Add Row" to create entries.
-            </p>
-          )}
-          <div className="space-y-3">
-            {openingHoursRows.map((row, index) => (
-              <div key={`${row.day}-${index}`} className="grid grid-cols-1 md:grid-cols-12 gap-3">
-                <input
-                  type="text"
-                  value={row.day}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setOpeningHoursRows((prev) =>
-                      prev.map((item, itemIndex) =>
-                        itemIndex === index ? { ...item, day: value } : item
-                      )
-                    );
-                  }}
-                  className="w-full md:col-span-4 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Day"
-                />
-                <input
-                  type="text"
-                  value={row.time}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setOpeningHoursRows((prev) =>
-                      prev.map((item, itemIndex) =>
-                        itemIndex === index ? { ...item, time: value } : item
-                      )
-                    );
-                  }}
-                  className="w-full md:col-span-6 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder='Time (e.g. "6.00 AM - 10.00 PM" or "CLOSED")'
-                />
-                <button
-                  type="button"
-                  onClick={() =>
-                    setOpeningHoursRows((prev) => prev.filter((_, i) => i !== index))
-                  }
-                  className="md:col-span-2 px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -296,4 +194,3 @@ export default function HomeHeroContentManager() {
     </div>
   );
 }
-

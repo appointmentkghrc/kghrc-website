@@ -10,8 +10,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Medihub - Best Care for Your Good Health",
-  description: "Healthcare services and medical appointments",
+  title: "KGHRC - Kanke General Hospital & Research Centre",
+  description: "Kanke General Hospital & Research Centre is a 100 bedded multi-speciality hospital located in Ranchi. The hospital started as a small OPD in 1990 by Dr. Shambhu Prasad Singh and later developed into a modern healthcare institution. It was registered under the Clinical Establishment Act on 9 March 2009. The hospital is committed to providing high quality and affordable healthcare services with experienced doctors, trained staff and modern medical equipment.",
 };
 
 export default function RootLayout({

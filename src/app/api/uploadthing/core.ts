@@ -100,6 +100,21 @@ export const ourFileRouter = {
       console.log("About image upload complete:", file.ufsUrl);
       return { uploadedBy: metadata.uploadedBy, url: file.ufsUrl };
     }),
+
+  /** TPA / insurance partner logos (client compresses before upload) */
+  tpaPartnerLogo: f({
+    image: {
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      return { uploadedBy: "admin" };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("TPA partner logo upload complete:", file.ufsUrl);
+      return { uploadedBy: metadata.uploadedBy, url: file.ufsUrl };
+    }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

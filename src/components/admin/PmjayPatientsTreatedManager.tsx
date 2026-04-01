@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
 import { DEFAULT_PMJAY_PRIMARY_LOGO } from "@/lib/pmjayDefaults";
@@ -21,16 +21,12 @@ export default function PmjayPatientsTreatedManager() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<PmjayFormData>(emptyForm);
-  const [pmjayStatValue, setPmjayStatValue] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         setLoading(true);
-        const [settingsRes, statsRes] = await Promise.all([
-          fetch("/api/site-settings"),
-          fetch("/api/statistics"),
-        ]);
+        const settingsRes = await fetch("/api/site-settings");
         if (!settingsRes.ok) throw new Error("Failed to fetch site settings");
         const data = await settingsRes.json();
 
@@ -39,13 +35,6 @@ export default function PmjayPatientsTreatedManager() {
           pmjayPrimaryLogoUrl: String(data?.pmjayPrimaryLogoUrl ?? ""),
           pmjaySecondaryLogoUrl: String(data?.pmjaySecondaryLogoUrl ?? ""),
         });
-
-        if (statsRes.ok) {
-          const stats: { category?: string; value?: string }[] = await statsRes.json();
-          const pmjay = stats.find((s) => s.category === "pmjay");
-          const v = pmjay?.value?.trim();
-          setPmjayStatValue(v ? String(v) : null);
-        }
       } catch (error) {
         console.error("Error fetching PMJAY settings:", error);
         alert("Failed to load PMJAY settings");
@@ -61,6 +50,10 @@ export default function PmjayPatientsTreatedManager() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  const pmjayPatientsTreatedDisplay = useMemo(() => {
+    return (formData.pmjayPatientsTreatedValue ?? "").trim() || "0";
+  }, [formData.pmjayPatientsTreatedValue]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -98,30 +91,20 @@ export default function PmjayPatientsTreatedManager() {
   const primaryLogoUrl = formData.pmjayPrimaryLogoUrl.trim();
   const previewPrimaryLogo = primaryLogoUrl || DEFAULT_PMJAY_PRIMARY_LOGO;
   const secondaryLogoUrl = formData.pmjaySecondaryLogoUrl.trim();
-  const value = formData.pmjayPatientsTreatedValue.trim() || "0";
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-800">PMJAY Patients Treated</h2>
         <p className="text-gray-600 mt-1">
-          Configure the homepage mini-section (PMJAY logos and fallback count). The live number
-          prefers a Statistics row with category <code className="text-sm bg-gray-100 px-1 rounded">pmjay</code>{" "}
-          (Admin → Statistics).
+          Configure the homepage mini-section: patients treated number and PMJAY logos.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-5">
-        {pmjayStatValue !== null ? (
-          <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
-            Homepage count is taken from the database (Statistics, category{" "}
-            <strong>pmjay</strong>): <strong>{pmjayStatValue}</strong>. The field below is only
-            used if that statistic is removed.
-          </div>
-        ) : null}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Patients treated value (fallback)
+            Patients treated value
           </label>
           <input
             type="text"
@@ -186,10 +169,10 @@ export default function PmjayPatientsTreatedManager() {
             />
             <div>
               <p className="text-sm font-semibold text-gray-700">
-                Patients treated under Ayushman Bharat Yogna
+                Patients treated under Ayushman Bharat Yojana
               </p>
               <p className="text-3xl font-extrabold text-gray-900 leading-none mt-2">
-                {value}
+                {pmjayPatientsTreatedDisplay}
               </p>
             </div>
           </div>

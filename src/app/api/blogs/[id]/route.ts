@@ -46,6 +46,12 @@ export async function PATCH(
         ...(body.image !== undefined && { image: body.image }),
         ...(body.status && { status: body.status }),
         ...(body.archived !== undefined && { archived: body.archived }),
+        ...(body.publishedDate !== undefined && {
+          publishedDate:
+            body.publishedDate === null || body.publishedDate === ""
+              ? null
+              : new Date(body.publishedDate),
+        }),
       },
     });
     return NextResponse.json(blog);

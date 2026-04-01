@@ -30,7 +30,6 @@ export type SiteContactSettings = {
   heroDescription: string;
   heroCtaLabel: string;
   heroCtaHref: string;
-  heroOpeningHoursRows: string[];
   doctorsSectionDescription: string;
   servicesHighlightTitle: string;
   servicesHighlightItems: ServicesHighlightItem[];
@@ -63,7 +62,6 @@ export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
     "The ourselves suffering the sincerity. Inhabit her manners adapted age certain. Debating offended at branched striking be subjects.",
   heroCtaLabel: "Contact Us",
   heroCtaHref: "/contact",
-  heroOpeningHoursRows: [],
   doctorsSectionDescription:
     "While mirth large of on front. Ye he greater related adapted proceed entered an. Through it examine express promise no.",
   servicesHighlightTitle: DEFAULT_SERVICES_HIGHLIGHT_TITLE,
@@ -87,16 +85,6 @@ const parseServicesHighlightItems = (raw: unknown): ServicesHighlightItem[] => {
   }
 
   return parsed.length > 0 ? parsed : DEFAULT_SERVICES_HIGHLIGHT_ITEMS;
-};
-
-const normalizeOpeningHoursRows = (rows: string[] | null | undefined): string[] => {
-  if (!rows || rows.length === 0) return [];
-
-  const normalizedRows = rows
-    .map((row) => row.trim())
-    .filter((row) => row.length > 0 && row.includes("|"));
-
-  return normalizedRows;
 };
 
 export async function getSiteContactSettings(): Promise<SiteContactSettings> {
@@ -185,7 +173,6 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
       settings.heroCtaLabel?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaLabel,
     heroCtaHref:
       settings.heroCtaHref?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaHref,
-    heroOpeningHoursRows: normalizeOpeningHoursRows(settings.heroOpeningHoursRows),
     doctorsSectionDescription:
       settings.doctorsSectionDescription?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.doctorsSectionDescription,
@@ -202,6 +189,9 @@ export async function upsertSiteContactSettings(
   const prismaClient = prisma as unknown as Record<string, unknown>;
   const siteSettingDelegate = prismaClient.siteSetting as
     | {
+        findUnique: (args: { where: { key: string } }) => Promise<{
+          heroOpeningHoursRows: string[];
+        } | null>;
         upsert: (args: {
           where: { key: string };
           create: {
@@ -228,6 +218,7 @@ export async function upsertSiteContactSettings(
             heroDescription: string;
             heroCtaLabel: string;
             heroCtaHref: string;
+            /** Legacy DB field; preserved but not exposed on SiteContactSettings. */
             heroOpeningHoursRows: string[];
             doctorsSectionDescription: string;
             servicesHighlightTitle: string;
@@ -296,6 +287,11 @@ export async function upsertSiteContactSettings(
     return data;
   }
 
+  const existingSite = await siteSettingDelegate.findUnique({
+    where: { key: SITE_SETTINGS_KEY },
+  });
+  const legacyHeroOpeningHours = existingSite?.heroOpeningHoursRows ?? [];
+
   const settings = await siteSettingDelegate.upsert({
     where: { key: SITE_SETTINGS_KEY },
     create: {
@@ -323,7 +319,7 @@ export async function upsertSiteContactSettings(
       heroDescription: data.heroDescription,
       heroCtaLabel: data.heroCtaLabel,
       heroCtaHref: data.heroCtaHref,
-      heroOpeningHoursRows: data.heroOpeningHoursRows,
+      heroOpeningHoursRows: legacyHeroOpeningHours,
       doctorsSectionDescription: data.doctorsSectionDescription,
       servicesHighlightTitle: data.servicesHighlightTitle,
       servicesHighlightItems: data.servicesHighlightItems,
@@ -352,7 +348,7 @@ export async function upsertSiteContactSettings(
       heroDescription: data.heroDescription,
       heroCtaLabel: data.heroCtaLabel,
       heroCtaHref: data.heroCtaHref,
-      heroOpeningHoursRows: data.heroOpeningHoursRows,
+      heroOpeningHoursRows: legacyHeroOpeningHours,
       doctorsSectionDescription: data.doctorsSectionDescription,
       servicesHighlightTitle: data.servicesHighlightTitle,
       servicesHighlightItems: data.servicesHighlightItems,
@@ -398,7 +394,6 @@ export async function upsertSiteContactSettings(
       settings.heroCtaLabel?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaLabel,
     heroCtaHref:
       settings.heroCtaHref?.trim() || DEFAULT_SITE_CONTACT_SETTINGS.heroCtaHref,
-    heroOpeningHoursRows: normalizeOpeningHoursRows(settings.heroOpeningHoursRows),
     doctorsSectionDescription:
       settings.doctorsSectionDescription?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.doctorsSectionDescription,

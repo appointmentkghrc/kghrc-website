@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
+import { blogDisplayIso } from "@/lib/blogDisplayDate";
 
 interface Blog {
   id: string;
@@ -16,6 +17,7 @@ interface Blog {
   image: string;
   status: string;
   archived: boolean;
+  publishedDate?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -125,7 +127,7 @@ export default function BlogDetailsPage() {
             <div className="text-sm mb-6">
               <span className="text-primary font-semibold mr-4">{blog.author.toUpperCase()}</span>
               <span className="text-gray-500">
-                {new Date(blog.createdAt).toLocaleDateString("en-US", {
+                {new Date(blogDisplayIso(blog)).toLocaleDateString("en-US", {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
@@ -182,7 +184,7 @@ export default function BlogDetailsPage() {
                           {relatedBlog.title}
                         </h5>
                         <div className="text-gray-400 text-xs mt-1">
-                          {new Date(relatedBlog.createdAt).toLocaleDateString("en-US", {
+                          {new Date(blogDisplayIso(relatedBlog)).toLocaleDateString("en-US", {
                             day: "numeric",
                             month: "short",
                             year: "numeric",

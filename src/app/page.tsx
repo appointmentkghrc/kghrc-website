@@ -6,22 +6,18 @@ import StatsSection from "@/components/StatsSection";
 import PatientTestimonialsSection from "@/components/PatientTestimonialsSection";
 import RecentBlogsSection from "@/components/RecentBlogsSection";
 import AppointmentMobileInput from "@/components/AppointmentMobileInput";
-import { resolvePmjayPatientsTreatedValue } from "@/lib/resolvePmjayPatientsTreated";
+import { getAboutSettings, parseOpeningHoursRowsToItems } from "@/lib/aboutSettings";
 import { getSiteContactSettings } from "@/lib/siteSettings";
 import Link from "next/link";
 
 export default async function Home() {
-  const siteSettings = await getSiteContactSettings();
-  const pmjayPatientsTreatedValue = await resolvePmjayPatientsTreatedValue(
-    siteSettings.pmjayPatientsTreatedValue
-  );
-  const openingHours = siteSettings.heroOpeningHoursRows
-    .map((row) => row.split("|"))
-    .map(([day, time]) => ({
-      day: (day ?? "").trim(),
-      time: (time ?? "").trim(),
-    }))
-    .filter((row) => row.day.length > 0);
+  const [siteSettings, aboutSettings] = await Promise.all([
+    getSiteContactSettings(),
+    getAboutSettings(),
+  ]);
+  const pmjayPatientsTreatedValue =
+    siteSettings.pmjayPatientsTreatedValue.trim() || "0";
+  const openingHours = parseOpeningHoursRowsToItems(aboutSettings.openingHoursRows);
 
   return (
     <div className="min-h-screen relative">
@@ -105,7 +101,10 @@ export default async function Home() {
         pmjayPrimaryLogoUrl={siteSettings.pmjayPrimaryLogoUrl}
         pmjaySecondaryLogoUrl={siteSettings.pmjaySecondaryLogoUrl}
       />
-      <DepartmentsSection openingHours={openingHours} />
+      <DepartmentsSection
+        openingHours={openingHours}
+        openingHoursTitle={aboutSettings.openingHoursTitle}
+      />
       <ServicesHighlightSection
         sectionTitle={siteSettings.servicesHighlightTitle}
         items={siteSettings.servicesHighlightItems}

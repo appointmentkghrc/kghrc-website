@@ -16,7 +16,6 @@ type SiteContactSettings = {
   twitterUrl: string;
   youtubeUrl: string;
   linkedinUrl: string;
-  heroOpeningHoursRows: string[];
 };
 
 type DiagnosticServiceFooterItem = {
@@ -36,7 +35,6 @@ const emptyContactSettings: SiteContactSettings = {
   twitterUrl: "",
   youtubeUrl: "",
   linkedinUrl: "",
-  heroOpeningHoursRows: [],
 };
 
 type OpeningHoursRow = {
@@ -83,6 +81,7 @@ export default function Footer() {
   const [openingHoursRows, setOpeningHoursRows] = useState<OpeningHoursRow[]>(
     []
   );
+  const [openingHoursTitle, setOpeningHoursTitle] = useState("OPENING HOURS");
   const [departmentItems, setDepartmentItems] = useState<
     DiagnosticServiceFooterItem[]
   >([]);
@@ -90,51 +89,58 @@ export default function Footer() {
   const [isDepartmentsLoading, setIsDepartmentsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchContactSettings = async () => {
+    const fetchFooterData = async () => {
       try {
-        const response = await fetch("/api/site-settings");
-        if (!response.ok) return;
-        const data = await response.json();
-        setContactSettings({
-          officeAddress:
-            typeof data?.officeAddress === "string" ? data.officeAddress : "",
-          primaryPhone:
-            typeof data?.primaryPhone === "string" ? data.primaryPhone : "",
-          secondaryPhone:
-            typeof data?.secondaryPhone === "string"
-              ? data.secondaryPhone
-              : "",
-          primaryEmail:
-            typeof data?.primaryEmail === "string" ? data.primaryEmail : "",
-          secondaryEmail:
-            typeof data?.secondaryEmail === "string"
-              ? data.secondaryEmail
-              : "",
-          mapEmbedUrl:
-            typeof data?.mapEmbedUrl === "string" ? data.mapEmbedUrl : "",
-          facebookUrl:
-            typeof data?.facebookUrl === "string" ? data.facebookUrl : "",
-          instagramUrl:
-            typeof data?.instagramUrl === "string" ? data.instagramUrl : "",
-          twitterUrl:
-            typeof data?.twitterUrl === "string" ? data.twitterUrl : "",
-          youtubeUrl:
-            typeof data?.youtubeUrl === "string" ? data.youtubeUrl : "",
-          linkedinUrl:
-            typeof data?.linkedinUrl === "string" ? data.linkedinUrl : "",
-          heroOpeningHoursRows: Array.isArray(data?.heroOpeningHoursRows)
-            ? (data.heroOpeningHoursRows as string[])
-            : [],
-        });
-        setOpeningHoursRows(parseOpeningHoursRows(data?.heroOpeningHoursRows));
+        const [siteRes, aboutRes] = await Promise.all([
+          fetch("/api/site-settings"),
+          fetch("/api/about-settings"),
+        ]);
+        if (siteRes.ok) {
+          const data = await siteRes.json();
+          setContactSettings({
+            officeAddress:
+              typeof data?.officeAddress === "string" ? data.officeAddress : "",
+            primaryPhone:
+              typeof data?.primaryPhone === "string" ? data.primaryPhone : "",
+            secondaryPhone:
+              typeof data?.secondaryPhone === "string"
+                ? data.secondaryPhone
+                : "",
+            primaryEmail:
+              typeof data?.primaryEmail === "string" ? data.primaryEmail : "",
+            secondaryEmail:
+              typeof data?.secondaryEmail === "string"
+                ? data.secondaryEmail
+                : "",
+            mapEmbedUrl:
+              typeof data?.mapEmbedUrl === "string" ? data.mapEmbedUrl : "",
+            facebookUrl:
+              typeof data?.facebookUrl === "string" ? data.facebookUrl : "",
+            instagramUrl:
+              typeof data?.instagramUrl === "string" ? data.instagramUrl : "",
+            twitterUrl:
+              typeof data?.twitterUrl === "string" ? data.twitterUrl : "",
+            youtubeUrl:
+              typeof data?.youtubeUrl === "string" ? data.youtubeUrl : "",
+            linkedinUrl:
+              typeof data?.linkedinUrl === "string" ? data.linkedinUrl : "",
+          });
+        }
+        if (aboutRes.ok) {
+          const about = await aboutRes.json();
+          setOpeningHoursRows(parseOpeningHoursRows(about?.openingHoursRows));
+          if (typeof about?.openingHoursTitle === "string" && about.openingHoursTitle.trim()) {
+            setOpeningHoursTitle(about.openingHoursTitle.trim());
+          }
+        }
       } catch (error) {
-        console.error("Failed to fetch contact settings for footer:", error);
+        console.error("Failed to fetch footer settings:", error);
       } finally {
         setIsContactLoading(false);
       }
     };
 
-    fetchContactSettings();
+    fetchFooterData();
   }, []);
 
   useEffect(() => {
@@ -175,7 +181,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Opening Hours */}
           <div>
-            <h4 className="font-semibold mb-4">OPENING HOURS</h4>
+            <h4 className="font-semibold mb-4 uppercase tracking-wide">
+              {openingHoursTitle}
+            </h4>
 
             <div className="space-y-3 text-white/80 text-sm">
               {isContactLoading ? (

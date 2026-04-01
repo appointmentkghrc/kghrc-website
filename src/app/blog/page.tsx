@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
+import { blogDisplayIso } from "@/lib/blogDisplayDate";
 
 interface Blog {
   id: string;
@@ -15,6 +16,7 @@ interface Blog {
   image: string;
   status: string;
   archived: boolean;
+  publishedDate?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -35,9 +37,15 @@ export default function BlogPage() {
       const data = await response.json();
       
       // Filter only published and non-archived blogs
-      const publishedBlogs = data.filter(
-        (blog: Blog) => blog.status === "published" && !blog.archived
-      );
+      const publishedBlogs = data
+        .filter(
+          (blog: Blog) => blog.status === "published" && !blog.archived
+        )
+        .sort(
+          (a: Blog, b: Blog) =>
+            new Date(blogDisplayIso(b)).getTime() -
+            new Date(blogDisplayIso(a)).getTime()
+        );
       setBlogs(publishedBlogs);
     } catch (error) {
       console.error("Error fetching blogs:", error);
@@ -107,7 +115,7 @@ export default function BlogPage() {
                     </span>
                     <span className="text-gray-400">•</span>
                     <span className="text-gray-500 text-sm">
-                      {new Date(blog.createdAt).toLocaleDateString("en-US", {
+                      {new Date(blogDisplayIso(blog)).toLocaleDateString("en-US", {
                         day: "numeric",
                         month: "long",
                         year: "numeric",

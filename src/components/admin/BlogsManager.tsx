@@ -5,6 +5,12 @@ import dynamic from "next/dynamic";
 import ReactMarkdown from "react-markdown";
 import MarkdownGuide from "./MarkdownGuide";
 import { UploadButton } from "@/lib/uploadthing";
+import {
+  blogDisplayIso,
+  dateInputToIso,
+  isoToDateInput,
+  todayDateInputValue,
+} from "@/lib/blogDisplayDate";
 import "easymde/dist/easymde.min.css";
 
 interface Blog {
@@ -18,6 +24,7 @@ interface Blog {
   image: string;
   status: "published" | "draft";
   archived: boolean;
+  publishedDate?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -43,6 +50,7 @@ export default function BlogsManager() {
     category: "",
     image: "",
     status: "draft" as "published" | "draft",
+    publishedDate: todayDateInputValue(),
   });
 
   const slugify = (value: string) =>
@@ -109,6 +117,7 @@ export default function BlogsManager() {
       category: "",
       image: "",
       status: "draft",
+      publishedDate: todayDateInputValue(),
     });
     setIsModalOpen(true);
   };
@@ -124,6 +133,9 @@ export default function BlogsManager() {
       category: blog.category,
       image: blog.image,
       status: blog.status,
+      publishedDate: isoToDateInput(
+        blog.publishedDate ?? blog.createdAt
+      ),
     });
     setIsModalOpen(true);
   };
@@ -178,7 +190,10 @@ export default function BlogsManager() {
         const response = await fetch(`/api/blogs/${editingBlog.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            publishedDate: dateInputToIso(formData.publishedDate),
+          }),
         });
 
         if (!response.ok) throw new Error("Failed to update blog");
@@ -190,7 +205,10 @@ export default function BlogsManager() {
         const response = await fetch("/api/blogs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            publishedDate: dateInputToIso(formData.publishedDate),
+          }),
         });
 
         if (!response.ok) throw new Error("Failed to create blog");
@@ -301,7 +319,7 @@ export default function BlogsManager() {
               </div>
               <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                 <span><i className="fas fa-user mr-2"></i>{blog.author}</span>
-                <span><i className="fas fa-calendar mr-2"></i>{new Date(blog.createdAt).toLocaleDateString()}</span>
+                <span><i className="fas fa-calendar mr-2"></i>{new Date(blogDisplayIso(blog)).toLocaleDateString()}</span>
               </div>
               <div className="flex justify-end gap-2 pt-4 border-t border-gray-100">
                 <button
@@ -429,6 +447,23 @@ export default function BlogsManager() {
                   />
                 )}
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Post date
+                </label>
+                <input
+                  type="date"
+                  value={formData.publishedDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, publishedDate: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Shown on the blog; order in lists uses this date.
+                </p>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Author</label>
@@ -531,7 +566,7 @@ export default function BlogsManager() {
                 <div className="bg-white rounded-lg shadow-md p-8">
                   <div className="text-sm mb-6">
                     <span className="text-primary font-semibold mr-4">{previewBlog.author.toUpperCase()}</span>
-                    <span className="text-gray-500">{new Date(previewBlog.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()}</span>
+                    <span className="text-gray-500">{new Date(blogDisplayIso(previewBlog)).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()}</span>
                   </div>
 
                   <h2 className="text-4xl font-semibold mb-6 text-gray-800">

@@ -506,7 +506,8 @@ export default function AboutUsManager() {
             </div>
           </div>
           <p className="mt-1 text-xs text-gray-500">
-            Structured input prevents formatting mistakes and keeps display consistent.
+            These rows appear on the home page (departments section), site footer, and this About
+            page. Use Label | Value (saved as label|value). The title above applies everywhere.
           </p>
         </div>
       </SectionCard>

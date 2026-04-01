@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { blogDisplayIso } from "@/lib/blogDisplayDate";
 
 interface Blog {
   id: string;
@@ -14,6 +15,7 @@ interface Blog {
   image?: string;
   status: string;
   archived: boolean;
+  publishedDate?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -34,8 +36,8 @@ export default function RecentBlogsSection() {
           .filter((blog) => blog.status === "published" && !blog.archived)
           .sort(
             (a, b) =>
-              new Date(b.createdAt).getTime() -
-              new Date(a.createdAt).getTime()
+              new Date(blogDisplayIso(b)).getTime() -
+              new Date(blogDisplayIso(a)).getTime()
           )
           .slice(0, 3);
 
@@ -87,7 +89,7 @@ export default function RecentBlogsSection() {
                     {blog.author}
                   </span>
                   <span>
-                    {new Date(blog.createdAt).toLocaleDateString("en-US", {
+                    {new Date(blogDisplayIso(blog)).toLocaleDateString("en-US", {
                       day: "numeric",
                       month: "long",
                       year: "numeric",

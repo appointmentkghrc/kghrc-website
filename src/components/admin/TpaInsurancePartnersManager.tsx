@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { UploadButton } from "@/lib/uploadthing";
+import { compressImageForUpload } from "@/lib/compressImageForUpload";
 
 interface Partner {
   id: string;
@@ -89,7 +90,8 @@ export default function TpaInsurancePartnersManager() {
       <div>
         <h2 className="text-2xl font-bold text-gray-800">TPA / Insurance Partners</h2>
         <p className="text-gray-600 mt-1">
-          Add partner name and logo, or remove existing partners.
+          Partners shown on the About page come from this list. Add a name and logo URL, or upload a
+          logo (compressed in the browser before UploadThing).
         </p>
       </div>
 
@@ -119,9 +121,15 @@ export default function TpaInsurancePartnersManager() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Or Upload Logo</label>
+          <p className="text-xs text-gray-500 mb-2">
+            Images are compressed in the browser before upload to UploadThing.
+          </p>
           <UploadButton
             className="ut-primary-upload"
-            endpoint="galleryImage"
+            endpoint="tpaPartnerLogo"
+            onBeforeUploadBegin={async (files) =>
+              Promise.all(files.map((f) => compressImageForUpload(f)))
+            }
             onClientUploadComplete={handleLogoUpload}
             onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
           />

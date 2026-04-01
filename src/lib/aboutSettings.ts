@@ -1,5 +1,25 @@
 import prisma from "@/lib/prisma";
 
+/** Parsed row for home departments section, footer, etc. (`label|value` from About settings). */
+export type OpeningHoursItem = {
+  day: string;
+  time: string;
+};
+
+/** Converts About `openingHoursRows` strings (`Label|Value`) into display items. */
+export function parseOpeningHoursRowsToItems(rows: string[]): OpeningHoursItem[] {
+  if (!rows || rows.length === 0) return [];
+
+  return rows
+    .filter((row) => typeof row === "string" && row.includes("|"))
+    .map((row) => row.split("|"))
+    .map(([day, time]) => ({
+      day: (day ?? "").trim(),
+      time: (time ?? "").trim(),
+    }))
+    .filter((row) => row.day.length > 0);
+}
+
 export type AboutSettings = {
   heroTitle: string;
   heroBreadcrumb: string;

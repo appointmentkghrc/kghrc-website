@@ -17,9 +17,11 @@ model Blog {
   category    String
   image       String?
   status      String   @default("draft")
-  archived    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  archived       Boolean   @default(false)
+  /// Shown on the site; falls back to createdAt when unset (older posts).
+  publishedDate  DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@map("blogs")
 }
