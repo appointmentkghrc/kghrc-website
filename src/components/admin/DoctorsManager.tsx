@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
+import { DEFAULT_SITE_CONTACT_SETTINGS } from "@/lib/siteSettings";
+
 interface Doctor {
   id: string;
   name: string;
@@ -33,6 +35,11 @@ export default function DoctorsManager() {
   const [savingOrderId, setSavingOrderId] = useState<string | null>(null);
   const [doctorsSectionDescription, setDoctorsSectionDescription] = useState("");
   const [savingSectionDescription, setSavingSectionDescription] = useState(false);
+  const [doctorsPageHeroImage, setDoctorsPageHeroImage] = useState(
+    DEFAULT_SITE_CONTACT_SETTINGS.doctorsPageHeroImage
+  );
+  const [heroSettingsLoading, setHeroSettingsLoading] = useState(true);
+  const [savingDoctorsHero, setSavingDoctorsHero] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     designation: "",
@@ -69,14 +76,22 @@ export default function DoctorsManager() {
 
   const fetchDoctorsSectionDescription = async () => {
     try {
+      setHeroSettingsLoading(true);
       const res = await apiFetch("/api/site-settings");
       if (!res.ok) return;
       const data = await res.json();
       if (typeof data?.doctorsSectionDescription === "string") {
         setDoctorsSectionDescription(data.doctorsSectionDescription);
       }
+      if (typeof data?.doctorsPageHeroImage === "string" && data.doctorsPageHeroImage.trim()) {
+        setDoctorsPageHeroImage(data.doctorsPageHeroImage.trim());
+      } else {
+        setDoctorsPageHeroImage(DEFAULT_SITE_CONTACT_SETTINGS.doctorsPageHeroImage);
+      }
     } catch (error) {
       console.error("Error fetching doctors section description:", error);
+    } finally {
+      setHeroSettingsLoading(false);
     }
   };
 
@@ -99,6 +114,36 @@ export default function DoctorsManager() {
     } finally {
       setSavingSectionDescription(false);
     }
+  };
+
+  const handleSaveDoctorsPageHero = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSavingDoctorsHero(true);
+      const res = await apiFetch("/api/site-settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ doctorsPageHeroImage }),
+      });
+      if (!res.ok) throw new Error("Failed to save doctors page hero");
+      const data = await res.json();
+      if (typeof data?.doctorsPageHeroImage === "string") {
+        setDoctorsPageHeroImage(
+          data.doctorsPageHeroImage.trim() || DEFAULT_SITE_CONTACT_SETTINGS.doctorsPageHeroImage
+        );
+      }
+      router.refresh();
+      alert("Doctors page header image saved!");
+    } catch (error) {
+      console.error("Error saving doctors page hero:", error);
+      alert("Failed to save doctors page header image");
+    } finally {
+      setSavingDoctorsHero(false);
+    }
+  };
+
+  const handleDoctorsHeroImageUpload = (res: Array<{ url: string }>) => {
+    if (res?.[0]?.url) setDoctorsPageHeroImage(res[0].url);
   };
 
   const handleAdd = () => {
@@ -251,13 +296,7 @@ export default function DoctorsManager() {
 
   return (
     <div className="space-y-6">
-      {loading ? (
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      ) : (
-        <>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h2 className="text-2xl font-bold text-gray-800">Doctors Management</h2>
         <button
           onClick={handleAdd}
@@ -268,29 +307,118 @@ export default function DoctorsManager() {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-5 space-y-3">
-        <h3 className="text-lg font-semibold text-gray-800">
-          Doctors Section Description (Home + Doctors page)
-        </h3>
-        <textarea
-          value={doctorsSectionDescription}
-          onChange={(e) => setDoctorsSectionDescription(e.target.value)}
-          rows={3}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Short description shown above the doctors grid..."
-        />
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={handleSaveDoctorsSectionDescription}
-            disabled={savingSectionDescription}
-            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {savingSectionDescription ? "Saving..." : "Save Description"}
-          </button>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div className="bg-white rounded-lg shadow-md p-5 space-y-3">
+          <h3 className="text-lg font-semibold text-gray-800">
+            Doctors Section Description (Home + Doctors page)
+          </h3>
+          <p className="text-sm text-gray-600">
+            Short text above the doctors grid on the home page and doctors listing.
+          </p>
+          <textarea
+            value={doctorsSectionDescription}
+            onChange={(e) => setDoctorsSectionDescription(e.target.value)}
+            rows={5}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Short description shown above the doctors grid..."
+          />
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleSaveDoctorsSectionDescription}
+              disabled={savingSectionDescription}
+              className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {savingSectionDescription ? "Saving..." : "Save Description"}
+            </button>
+          </div>
         </div>
+
+        <form
+          onSubmit={handleSaveDoctorsPageHero}
+          className="bg-white rounded-lg shadow-md p-5 space-y-4"
+        >
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800">
+              Doctors page header image
+            </h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Banner behind the title on <strong>/doctors</strong> and each doctor profile page.
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Image URL
+            </label>
+            <input
+              type="text"
+              value={doctorsPageHeroImage}
+              onChange={(e) => setDoctorsPageHeroImage(e.target.value)}
+              disabled={heroSettingsLoading}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-400"
+              placeholder={heroSettingsLoading ? "Loading..." : "https://... or /path.jpg"}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Or upload image
+            </label>
+            <UploadButton
+              className="ut-primary-upload"
+              endpoint="heroSectionImage"
+              onBeforeUploadBegin={(files) =>
+                optimizeImagesForUpload(files, { maxDimension: 2200, quality: 0.82 })
+              }
+              onClientUploadComplete={handleDoctorsHeroImageUpload}
+              onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Preview</label>
+            <div className="h-40 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 relative flex items-center justify-center">
+              {heroSettingsLoading ? (
+                <span className="text-gray-500 text-sm">Loading...</span>
+              ) : doctorsPageHeroImage.trim() ? (
+                <>
+                  <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${doctorsPageHeroImage})` }}
+                  />
+                  <div className="absolute inset-0 bg-black/35" />
+                </>
+              ) : (
+                <span className="text-gray-500 text-sm relative z-10">No image URL</span>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between gap-3 flex-wrap">
+            <button
+              type="button"
+              onClick={() =>
+                setDoctorsPageHeroImage(DEFAULT_SITE_CONTACT_SETTINGS.doctorsPageHeroImage)
+              }
+              disabled={heroSettingsLoading}
+              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Reset to default
+            </button>
+            <button
+              type="submit"
+              disabled={savingDoctorsHero || heroSettingsLoading}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {savingDoctorsHero ? "Saving..." : "Save header image"}
+            </button>
+          </div>
+        </form>
       </div>
 
+      {loading ? (
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      ) : (
+        <>
       <div className="bg-white rounded-lg shadow-md p-4">
         <input
           type="text"

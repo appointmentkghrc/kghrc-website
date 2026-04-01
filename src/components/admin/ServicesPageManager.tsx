@@ -7,6 +7,9 @@ import {
   SERVICE_PAGE_ICON_KEYS,
   ServicePageIcon,
 } from "@/lib/servicePageIcons";
+import { UploadButton } from "@/lib/uploadthing";
+import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
+import { DEFAULT_SITE_CONTACT_SETTINGS } from "@/lib/siteSettings";
 
 interface ServicePageItemRow {
   id: string;
@@ -34,28 +37,79 @@ export default function ServicesPageManager() {
   const [items, setItems] = useState<ServicePageItemRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [servicesPageHeroImage, setServicesPageHeroImage] = useState(
+    DEFAULT_SITE_CONTACT_SETTINGS.servicesPageHeroImage
+  );
+  const [heroSettingsLoading, setHeroSettingsLoading] = useState(true);
+  const [savingServicesHero, setSavingServicesHero] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editing, setEditing] = useState<ServicePageItemRow | null>(null);
   const [formData, setFormData] = useState(defaultForm);
 
-  const fetchItems = async () => {
-    try {
+  useEffect(() => {
+    const load = async () => {
       setLoading(true);
-      const response = await apiFetch("/api/service-page-items");
-      if (!response.ok) throw new Error("Failed to fetch");
-      const data = (await response.json()) as ServicePageItemRow[];
-      setItems(data);
-    } catch (error) {
-      console.error("Error fetching service page items:", error);
-      alert("Failed to load services");
-    } finally {
-      setLoading(false);
-    }
+      setHeroSettingsLoading(true);
+      try {
+        const [itemsRes, settingsRes] = await Promise.all([
+          apiFetch("/api/service-page-items"),
+          apiFetch("/api/site-settings"),
+        ]);
+        if (itemsRes.ok) {
+          const data = (await itemsRes.json()) as ServicePageItemRow[];
+          setItems(data);
+        } else {
+          alert("Failed to load services");
+        }
+        if (settingsRes.ok) {
+          const s = await settingsRes.json();
+          if (typeof s.servicesPageHeroImage === "string" && s.servicesPageHeroImage.trim()) {
+            setServicesPageHeroImage(s.servicesPageHeroImage.trim());
+          } else {
+            setServicesPageHeroImage(DEFAULT_SITE_CONTACT_SETTINGS.servicesPageHeroImage);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching services page:", error);
+        alert("Failed to load services");
+      } finally {
+        setLoading(false);
+        setHeroSettingsLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const handleServicesHeroUpload = (res: Array<{ url: string }>) => {
+    if (res?.[0]?.url) setServicesPageHeroImage(res[0].url);
   };
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
+  const handleSaveServicesPageHero = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSavingServicesHero(true);
+      const res = await apiFetch("/api/site-settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ servicesPageHeroImage }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      const data = await res.json();
+      if (typeof data.servicesPageHeroImage === "string") {
+        setServicesPageHeroImage(
+          data.servicesPageHeroImage.trim() ||
+            DEFAULT_SITE_CONTACT_SETTINGS.servicesPageHeroImage
+        );
+      }
+      router.refresh();
+      alert("Services page header image saved!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save services page header image");
+    } finally {
+      setSavingServicesHero(false);
+    }
+  };
 
   const handleAdd = () => {
     setEditing(null);
@@ -130,14 +184,6 @@ export default function ServicesPageManager() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-start gap-4 flex-wrap">
@@ -158,6 +204,94 @@ export default function ServicesPageManager() {
         </button>
       </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div className="bg-white rounded-lg shadow-md p-5 border border-gray-100 space-y-2">
+          <h3 className="text-lg font-semibold text-gray-800">Services page cards</h3>
+          <p className="text-sm text-gray-600">
+            Each card appears on <strong>/services</strong> below the page header. Use{" "}
+            <strong>Add card</strong> to create entries, or edit cards in the grid below.
+          </p>
+        </div>
+
+        <form
+          onSubmit={handleSaveServicesPageHero}
+          className="bg-white rounded-lg shadow-md p-5 space-y-4 border border-gray-100"
+        >
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800">Services page header image</h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Top banner on the public <strong>/services</strong> page.
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+            <input
+              type="text"
+              value={servicesPageHeroImage}
+              onChange={(e) => setServicesPageHeroImage(e.target.value)}
+              disabled={heroSettingsLoading}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+              placeholder={heroSettingsLoading ? "Loading..." : "https://... or /path.jpg"}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Or upload image</label>
+            <UploadButton
+              className="ut-primary-upload"
+              endpoint="heroSectionImage"
+              onBeforeUploadBegin={(files) =>
+                optimizeImagesForUpload(files, { maxDimension: 2200, quality: 0.82 })
+              }
+              onClientUploadComplete={handleServicesHeroUpload}
+              onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Preview</label>
+            <div className="h-40 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 relative flex items-center justify-center">
+              {heroSettingsLoading ? (
+                <span className="text-gray-500 text-sm">Loading...</span>
+              ) : servicesPageHeroImage.trim() ? (
+                <>
+                  <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${servicesPageHeroImage})` }}
+                  />
+                  <div className="absolute inset-0 bg-black/35" />
+                </>
+              ) : (
+                <span className="text-gray-500 text-sm relative z-10">No image URL</span>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between gap-3 flex-wrap">
+            <button
+              type="button"
+              onClick={() =>
+                setServicesPageHeroImage(DEFAULT_SITE_CONTACT_SETTINGS.servicesPageHeroImage)
+              }
+              disabled={heroSettingsLoading}
+              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            >
+              Reset to default
+            </button>
+            <button
+              type="submit"
+              disabled={savingServicesHero || heroSettingsLoading}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            >
+              {savingServicesHero ? "Saving..." : "Save header image"}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        </div>
+      ) : (
+        <>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {items.map((item) => (
           <div
@@ -214,6 +348,8 @@ export default function ServicesPageManager() {
         <p className="text-gray-500 text-center py-8">
           No cards yet. Add one to show on the Services page.
         </p>
+      )}
+        </>
       )}
 
       {isModalOpen && (

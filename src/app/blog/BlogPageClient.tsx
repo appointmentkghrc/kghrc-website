@@ -1,5 +1,6 @@
 "use client";
 
+import PageHeroHeader from "@/components/PageHeroHeader";
 import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -60,24 +61,20 @@ export default function BlogPageClient({
 
   return (
     <div className="relative">
-      <section className="relative h-[500px] flex items-center justify-center text-white">
-        <div
-          className="fixed top-0 left-0 w-full h-[500px] bg-cover bg-center bg-no-repeat -z-10"
-          style={{
-            backgroundImage: `url(${heroBackgroundImage})`,
-          }}
-        />
-
-        <div className="absolute inset-0 bg-black/50" />
-
-        <div className="relative z-10 text-center">
+      <PageHeroHeader
+        imageUrl={heroBackgroundImage}
+        className="h-[500px]"
+        fixedHeightClass="h-[500px]"
+        overlayClassName="bg-black/50"
+      >
+        <div className="text-center">
           <h1 className="text-5xl font-semibold mb-6">Latest Blog</h1>
 
-          <div className="bg-black/40 px-6 py-3 rounded-md text-sm tracking-wide">
+          <div className="bg-black/40 px-6 py-3 rounded-md text-sm tracking-wide inline-block">
             HOME › BLOG
           </div>
         </div>
-      </section>
+      </PageHeroHeader>
 
       <section className="relative z-20 bg-white -mt-24 pt-24 pb-32">
         <div className="max-w-[1200px] mx-auto px-6">

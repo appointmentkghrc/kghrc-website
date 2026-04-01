@@ -15,6 +15,7 @@ import {
   todayDateInputValue,
 } from "@/lib/blogDisplayDate";
 import "easymde/dist/easymde.min.css";
+import { DEFAULT_SITE_CONTACT_SETTINGS } from "@/lib/siteSettings";
 
 interface Blog {
   id: string;
@@ -45,6 +46,11 @@ export default function BlogsManager() {
   const [showPreview, setShowPreview] = useState(false);
   const [previewBlog, setPreviewBlog] = useState<Blog | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [blogPageHeroImage, setBlogPageHeroImage] = useState(
+    DEFAULT_SITE_CONTACT_SETTINGS.blogPageHeroImage
+  );
+  const [heroSettingsLoading, setHeroSettingsLoading] = useState(true);
+  const [savingBlogHero, setSavingBlogHero] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -67,6 +73,24 @@ export default function BlogsManager() {
 
   useEffect(() => {
     fetchBlogs();
+    const loadBlogHero = async () => {
+      try {
+        setHeroSettingsLoading(true);
+        const res = await apiFetch("/api/site-settings");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (typeof data.blogPageHeroImage === "string" && data.blogPageHeroImage.trim()) {
+          setBlogPageHeroImage(data.blogPageHeroImage.trim());
+        } else {
+          setBlogPageHeroImage(DEFAULT_SITE_CONTACT_SETTINGS.blogPageHeroImage);
+        }
+      } catch (e) {
+        console.error("Error loading blog page hero:", e);
+      } finally {
+        setHeroSettingsLoading(false);
+      }
+    };
+    loadBlogHero();
   }, []);
 
   const fetchBlogs = async () => {
@@ -240,6 +264,36 @@ export default function BlogsManager() {
     }
   };
 
+  const handleBlogHeroImageUpload = (res: Array<{ url: string }>) => {
+    if (res?.[0]?.url) setBlogPageHeroImage(res[0].url);
+  };
+
+  const handleSaveBlogPageHero = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSavingBlogHero(true);
+      const res = await apiFetch("/api/site-settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blogPageHeroImage }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      const data = await res.json();
+      if (typeof data.blogPageHeroImage === "string") {
+        setBlogPageHeroImage(
+          data.blogPageHeroImage.trim() || DEFAULT_SITE_CONTACT_SETTINGS.blogPageHeroImage
+        );
+      }
+      router.refresh();
+      alert("Blog listing header image saved!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save blog listing header image");
+    } finally {
+      setSavingBlogHero(false);
+    }
+  };
+
   const filteredBlogs = blogs.filter((blog) => {
     const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          blog.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
@@ -252,13 +306,7 @@ export default function BlogsManager() {
 
   return (
     <div className="space-y-6">
-      {loading ? (
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      ) : (
-        <>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h2 className="text-2xl font-bold text-gray-800">Blogs Management</h2>
         <button
           onClick={handleAdd}
@@ -269,28 +317,117 @@ export default function BlogsManager() {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-4 flex flex-col md:flex-row gap-4">
-        <div className="flex-1">
-          <input
-            type="text"
-            placeholder="Search blogs..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div className="bg-white rounded-lg shadow-md p-5 space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800">Blog listing page</h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Published posts appear on <strong>/blog</strong>. Use search and filters to manage
+              posts below.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              placeholder="Search blogs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 min-w-0 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <select
+              value={filterStatus}
+              onChange={(e) =>
+                setFilterStatus(e.target.value as "all" | "published" | "draft" | "archived")
+              }
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent shrink-0"
+            >
+              <option value="all">All Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
         </div>
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value as "all" | "published" | "draft" | "archived")}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+
+        <form
+          onSubmit={handleSaveBlogPageHero}
+          className="bg-white rounded-lg shadow-md p-5 space-y-4"
         >
-          <option value="all">All Status</option>
-          <option value="published">Published</option>
-          <option value="draft">Draft</option>
-          <option value="archived">Archived</option>
-        </select>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800">Blog listing header image</h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Top banner on the public <strong>/blog</strong> page (not individual post images).
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+            <input
+              type="text"
+              value={blogPageHeroImage}
+              onChange={(e) => setBlogPageHeroImage(e.target.value)}
+              disabled={heroSettingsLoading}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50"
+              placeholder={heroSettingsLoading ? "Loading..." : "https://... or /path.jpg"}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Or upload image</label>
+            <UploadButton
+              className="ut-primary-upload"
+              endpoint="heroSectionImage"
+              onBeforeUploadBegin={(files) =>
+                optimizeImagesForUpload(files, { maxDimension: 2200, quality: 0.82 })
+              }
+              onClientUploadComplete={handleBlogHeroImageUpload}
+              onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Preview</label>
+            <div className="h-40 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 relative flex items-center justify-center">
+              {heroSettingsLoading ? (
+                <span className="text-gray-500 text-sm">Loading...</span>
+              ) : blogPageHeroImage.trim() ? (
+                <>
+                  <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${blogPageHeroImage})` }}
+                  />
+                  <div className="absolute inset-0 bg-black/35" />
+                </>
+              ) : (
+                <span className="text-gray-500 text-sm relative z-10">No image URL</span>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between gap-3 flex-wrap">
+            <button
+              type="button"
+              onClick={() =>
+                setBlogPageHeroImage(DEFAULT_SITE_CONTACT_SETTINGS.blogPageHeroImage)
+              }
+              disabled={heroSettingsLoading}
+              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            >
+              Reset to default
+            </button>
+            <button
+              type="submit"
+              disabled={savingBlogHero || heroSettingsLoading}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            >
+              {savingBlogHero ? "Saving..." : "Save header image"}
+            </button>
+          </div>
+        </form>
       </div>
 
+      {loading ? (
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      ) : (
+        <>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredBlogs.map((blog) => (
           <div key={blog.id} className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow ${blog.archived ? 'opacity-60' : ''}`}>

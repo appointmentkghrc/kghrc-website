@@ -7,7 +7,7 @@ export const revalidate = 0;
 
 export default async function BlogPage() {
   const site = await getSiteContactSettings();
-  return (
-    <BlogPageClient heroBackgroundImage={cacheBustUrl(site.blogPageHeroImage)} />
-  );
+  const raw = site.blogPageHeroImage.trim();
+  const hero = raw ? cacheBustUrl(raw) : "";
+  return <BlogPageClient heroBackgroundImage={hero} />;
 }

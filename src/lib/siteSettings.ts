@@ -57,14 +57,10 @@ export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
   statsSectionBackgroundImage: "/7.jpg",
   diagnosticServicesDefaultHeaderImage:
     "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg",
-  doctorsPageHeroImage:
-    "https://validthemes.net/site-template/medihub/assets/img/banner/5.jpg",
-  servicesPageHeroImage:
-    "https://validthemes.net/site-template/medihub/assets/img/banner/5.jpg",
-  blogPageHeroImage:
-    "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg",
-  contactPageHeroImage:
-    "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg",
+  doctorsPageHeroImage: "",
+  servicesPageHeroImage: "",
+  blogPageHeroImage: "",
+  contactPageHeroImage: "",
   pmjayPatientsTreatedValue: "0",
   pmjayPrimaryLogoUrl: "",
   pmjaySecondaryLogoUrl: "",
@@ -170,18 +166,10 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
     diagnosticServicesDefaultHeaderImage:
       settings.diagnosticServicesDefaultHeaderImage?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.diagnosticServicesDefaultHeaderImage,
-    doctorsPageHeroImage:
-      settings.doctorsPageHeroImage?.trim() ||
-      DEFAULT_SITE_CONTACT_SETTINGS.doctorsPageHeroImage,
-    servicesPageHeroImage:
-      settings.servicesPageHeroImage?.trim() ||
-      DEFAULT_SITE_CONTACT_SETTINGS.servicesPageHeroImage,
-    blogPageHeroImage:
-      settings.blogPageHeroImage?.trim() ||
-      DEFAULT_SITE_CONTACT_SETTINGS.blogPageHeroImage,
-    contactPageHeroImage:
-      settings.contactPageHeroImage?.trim() ||
-      DEFAULT_SITE_CONTACT_SETTINGS.contactPageHeroImage,
+    doctorsPageHeroImage: settings.doctorsPageHeroImage?.trim() ?? "",
+    servicesPageHeroImage: settings.servicesPageHeroImage?.trim() ?? "",
+    blogPageHeroImage: settings.blogPageHeroImage?.trim() ?? "",
+    contactPageHeroImage: settings.contactPageHeroImage?.trim() ?? "",
     pmjayPatientsTreatedValue:
       settings.pmjayPatientsTreatedValue?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.pmjayPatientsTreatedValue,
@@ -423,18 +411,10 @@ export async function upsertSiteContactSettings(
     diagnosticServicesDefaultHeaderImage:
       settings.diagnosticServicesDefaultHeaderImage?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.diagnosticServicesDefaultHeaderImage,
-    doctorsPageHeroImage:
-      settings.doctorsPageHeroImage?.trim() ||
-      DEFAULT_SITE_CONTACT_SETTINGS.doctorsPageHeroImage,
-    servicesPageHeroImage:
-      settings.servicesPageHeroImage?.trim() ||
-      DEFAULT_SITE_CONTACT_SETTINGS.servicesPageHeroImage,
-    blogPageHeroImage:
-      settings.blogPageHeroImage?.trim() ||
-      DEFAULT_SITE_CONTACT_SETTINGS.blogPageHeroImage,
-    contactPageHeroImage:
-      settings.contactPageHeroImage?.trim() ||
-      DEFAULT_SITE_CONTACT_SETTINGS.contactPageHeroImage,
+    doctorsPageHeroImage: settings.doctorsPageHeroImage?.trim() ?? "",
+    servicesPageHeroImage: settings.servicesPageHeroImage?.trim() ?? "",
+    blogPageHeroImage: settings.blogPageHeroImage?.trim() ?? "",
+    contactPageHeroImage: settings.contactPageHeroImage?.trim() ?? "",
     pmjayPatientsTreatedValue:
       settings.pmjayPatientsTreatedValue?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.pmjayPatientsTreatedValue,

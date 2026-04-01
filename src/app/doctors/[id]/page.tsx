@@ -1,3 +1,4 @@
+import PageHeroHeader from "@/components/PageHeroHeader";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
@@ -23,22 +24,21 @@ export default async function DoctorDetailsPage({ params }: DoctorPageProps) {
     notFound();
   }
 
-  const hero = cacheBustUrl(site.doctorsPageHeroImage);
+  const rawHero = site.doctorsPageHeroImage.trim();
+  const hero = rawHero ? cacheBustUrl(rawHero) : "";
   const portrait = cacheBustUrl(doctor.image ?? "/placeholder-doctor.jpg");
 
   return (
     <div className="bg-gray-50 min-h-screen pb-16">
-      <section className="relative h-[340px] flex items-center justify-center text-white">
-        <div
-          className="fixed top-0 left-0 w-full h-[340px] bg-cover bg-center -z-10"
-          style={{
-            backgroundImage: `url(${hero})`,
-          }}
-        />
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative z-10 text-center px-6">
+      <PageHeroHeader
+        imageUrl={hero}
+        className="h-[340px]"
+        fixedHeightClass="h-[340px]"
+        overlayClassName="bg-black/60"
+      >
+        <div className="text-center px-6">
           <h1 className="text-4xl md:text-5xl font-semibold mb-4">{doctor.name}</h1>
-          <div className="bg-black/40 px-5 py-2 rounded-md text-sm uppercase tracking-wide">
+          <div className="bg-black/40 px-5 py-2 rounded-md text-sm uppercase tracking-wide inline-block">
             <Link href="/" className="hover:text-primary transition-colors">
               Home
             </Link>{" "}
@@ -49,7 +49,7 @@ export default async function DoctorDetailsPage({ params }: DoctorPageProps) {
             {"›"} {doctor.designation}
           </div>
         </div>
-      </section>
+      </PageHeroHeader>
 
       <section className="max-w-6xl mx-auto px-6 -mt-20 relative z-10">
         <div className="bg-white rounded-3xl shadow-lg overflow-hidden">

@@ -79,23 +79,19 @@ export async function PATCH(request: NextRequest) {
           ? body.diagnosticServicesDefaultHeaderImage.trim()
           : currentSettings.diagnosticServicesDefaultHeaderImage,
       doctorsPageHeroImage:
-        typeof body.doctorsPageHeroImage === "string" &&
-        body.doctorsPageHeroImage.trim().length > 0
+        typeof body.doctorsPageHeroImage === "string"
           ? body.doctorsPageHeroImage.trim()
           : currentSettings.doctorsPageHeroImage,
       servicesPageHeroImage:
-        typeof body.servicesPageHeroImage === "string" &&
-        body.servicesPageHeroImage.trim().length > 0
+        typeof body.servicesPageHeroImage === "string"
           ? body.servicesPageHeroImage.trim()
           : currentSettings.servicesPageHeroImage,
       blogPageHeroImage:
-        typeof body.blogPageHeroImage === "string" &&
-        body.blogPageHeroImage.trim().length > 0
+        typeof body.blogPageHeroImage === "string"
           ? body.blogPageHeroImage.trim()
           : currentSettings.blogPageHeroImage,
       contactPageHeroImage:
-        typeof body.contactPageHeroImage === "string" &&
-        body.contactPageHeroImage.trim().length > 0
+        typeof body.contactPageHeroImage === "string"
           ? body.contactPageHeroImage.trim()
           : currentSettings.contactPageHeroImage,
       heroTitleLine1:
