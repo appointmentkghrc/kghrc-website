@@ -5,8 +5,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
-import { DEFAULT_SITE_CONTACT_SETTINGS } from "@/lib/siteSettings";
-
 interface Doctor {
   id: string;
   name: string;
@@ -35,10 +33,6 @@ export default function DoctorsManager() {
   const [savingOrderId, setSavingOrderId] = useState<string | null>(null);
   const [doctorsSectionDescription, setDoctorsSectionDescription] = useState("");
   const [savingSectionDescription, setSavingSectionDescription] = useState(false);
-  const [doctorsPageHeroImage, setDoctorsPageHeroImage] = useState(
-    DEFAULT_SITE_CONTACT_SETTINGS.doctorsPageHeroImage
-  );
-  const [savingDoctorsHero, setSavingDoctorsHero] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     designation: "",
@@ -81,9 +75,6 @@ export default function DoctorsManager() {
       if (typeof data?.doctorsSectionDescription === "string") {
         setDoctorsSectionDescription(data.doctorsSectionDescription);
       }
-      if (typeof data?.doctorsPageHeroImage === "string" && data.doctorsPageHeroImage.trim()) {
-        setDoctorsPageHeroImage(data.doctorsPageHeroImage.trim());
-      }
     } catch (error) {
       console.error("Error fetching doctors section description:", error);
     }
@@ -107,30 +98,6 @@ export default function DoctorsManager() {
       alert("Failed to save doctors section description");
     } finally {
       setSavingSectionDescription(false);
-    }
-  };
-
-  const handleSaveDoctorsPageHero = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setSavingDoctorsHero(true);
-      const res = await apiFetch("/api/site-settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ doctorsPageHeroImage }),
-      });
-      if (!res.ok) throw new Error("Failed to save doctors page hero");
-      const data = await res.json();
-      if (typeof data?.doctorsPageHeroImage === "string") {
-        setDoctorsPageHeroImage(data.doctorsPageHeroImage);
-      }
-      router.refresh();
-      alert("Doctors page hero image saved!");
-    } catch (error) {
-      console.error("Error saving doctors page hero:", error);
-      alert("Failed to save doctors page hero image");
-    } finally {
-      setSavingDoctorsHero(false);
     }
   };
 
@@ -300,65 +267,6 @@ export default function DoctorsManager() {
           Add Doctor
         </button>
       </div>
-
-      <form
-        onSubmit={handleSaveDoctorsPageHero}
-        className="bg-white rounded-lg shadow-md p-5 space-y-3"
-      >
-        <h3 className="text-lg font-semibold text-gray-800">
-          Doctors page hero (header banner)
-        </h3>
-        <p className="text-sm text-gray-600">
-          Shown on the Doctors list and each doctor profile page.
-        </p>
-        <input
-          type="text"
-          value={doctorsPageHeroImage}
-          onChange={(e) => setDoctorsPageHeroImage(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Image URL"
-        />
-        <div>
-          <label className="block text-sm text-gray-600 mb-1">Or upload</label>
-          <UploadButton
-            className="ut-primary-upload"
-            endpoint="heroSectionImage"
-            onBeforeUploadBegin={(files) =>
-              optimizeImagesForUpload(files, { maxDimension: 2200, quality: 0.82 })
-            }
-            onClientUploadComplete={(res) => {
-              if (res?.[0]?.url) setDoctorsPageHeroImage(res[0].url);
-            }}
-            onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
-          />
-        </div>
-        <div className="h-px bg-gray-100" />
-        <div className="h-40 rounded-lg overflow-hidden border border-gray-200">
-          <img
-            src={doctorsPageHeroImage}
-            alt=""
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="flex justify-between gap-2">
-          <button
-            type="button"
-            onClick={() =>
-              setDoctorsPageHeroImage(DEFAULT_SITE_CONTACT_SETTINGS.doctorsPageHeroImage)
-            }
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
-          >
-            Reset to default
-          </button>
-          <button
-            type="submit"
-            disabled={savingDoctorsHero}
-            className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-          >
-            {savingDoctorsHero ? "Saving..." : "Save hero image"}
-          </button>
-        </div>
-      </form>
 
       <div className="bg-white rounded-lg shadow-md p-5 space-y-3">
         <h3 className="text-lg font-semibold text-gray-800">

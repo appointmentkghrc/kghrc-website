@@ -3,10 +3,6 @@
 import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { UploadButton } from "@/lib/uploadthing";
-import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
-import { DEFAULT_SITE_CONTACT_SETTINGS } from "@/lib/siteSettings";
-
 type ContactSettingsForm = {
   officeAddress: string;
   primaryPhone: string;
@@ -14,7 +10,6 @@ type ContactSettingsForm = {
   primaryEmail: string;
   secondaryEmail: string;
   mapEmbedUrl: string;
-  contactPageHeroImage: string;
 };
 
 const emptyForm: ContactSettingsForm = {
@@ -24,7 +19,6 @@ const emptyForm: ContactSettingsForm = {
   primaryEmail: "",
   secondaryEmail: "",
   mapEmbedUrl: "",
-  contactPageHeroImage: DEFAULT_SITE_CONTACT_SETTINGS.contactPageHeroImage,
 };
 
 export default function ContactSettingsManager() {
@@ -47,10 +41,6 @@ export default function ContactSettingsManager() {
           primaryEmail: data.primaryEmail ?? emptyForm.primaryEmail,
           secondaryEmail: data.secondaryEmail ?? emptyForm.secondaryEmail,
           mapEmbedUrl: data.mapEmbedUrl ?? emptyForm.mapEmbedUrl,
-          contactPageHeroImage:
-            typeof data.contactPageHeroImage === "string" && data.contactPageHeroImage.trim()
-              ? data.contactPageHeroImage.trim()
-              : DEFAULT_SITE_CONTACT_SETTINGS.contactPageHeroImage,
         });
       } catch (error) {
         console.error("Error fetching contact settings:", error);
@@ -89,10 +79,6 @@ export default function ContactSettingsManager() {
         primaryEmail: updated.primaryEmail ?? formData.primaryEmail,
         secondaryEmail: updated.secondaryEmail ?? formData.secondaryEmail,
         mapEmbedUrl: updated.mapEmbedUrl ?? formData.mapEmbedUrl,
-        contactPageHeroImage:
-          typeof updated.contactPageHeroImage === "string" && updated.contactPageHeroImage.trim()
-            ? updated.contactPageHeroImage.trim()
-            : DEFAULT_SITE_CONTACT_SETTINGS.contactPageHeroImage,
       });
       router.refresh();
       alert("Contact details updated successfully!");
@@ -125,58 +111,6 @@ export default function ContactSettingsManager() {
         onSubmit={handleSubmit}
         className="bg-white rounded-lg shadow-md p-6 space-y-5"
       >
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Contact page hero (header banner)
-          </label>
-          <p className="text-sm text-gray-500 mb-2">
-            Background image at the top of the public Contact page.
-          </p>
-          <input
-            type="text"
-            name="contactPageHeroImage"
-            value={formData.contactPageHeroImage}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Image URL"
-          />
-          <div className="mt-2">
-            <label className="block text-sm text-gray-600 mb-1">Or upload</label>
-            <UploadButton
-              className="ut-primary-upload"
-              endpoint="heroSectionImage"
-              onBeforeUploadBegin={(files) =>
-                optimizeImagesForUpload(files, { maxDimension: 2200, quality: 0.82 })
-              }
-              onClientUploadComplete={(res) => {
-                if (res?.[0]?.url) {
-                  setFormData((prev) => ({ ...prev, contactPageHeroImage: res[0].url }));
-                }
-              }}
-              onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
-            />
-          </div>
-          <div className="mt-3 h-36 rounded-lg overflow-hidden border border-gray-200">
-            <img
-              src={formData.contactPageHeroImage}
-              alt=""
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={() =>
-              setFormData((prev) => ({
-                ...prev,
-                contactPageHeroImage: DEFAULT_SITE_CONTACT_SETTINGS.contactPageHeroImage,
-              }))
-            }
-            className="mt-2 text-sm text-gray-600 underline hover:text-gray-900"
-          >
-            Reset hero to default
-          </button>
-        </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Office Address

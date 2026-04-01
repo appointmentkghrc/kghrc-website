@@ -7,9 +7,6 @@ import {
   SERVICE_PAGE_ICON_KEYS,
   ServicePageIcon,
 } from "@/lib/servicePageIcons";
-import { UploadButton } from "@/lib/uploadthing";
-import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
-import { DEFAULT_SITE_CONTACT_SETTINGS } from "@/lib/siteSettings";
 
 interface ServicePageItemRow {
   id: string;
@@ -37,10 +34,6 @@ export default function ServicesPageManager() {
   const [items, setItems] = useState<ServicePageItemRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [servicesPageHeroImage, setServicesPageHeroImage] = useState(
-    DEFAULT_SITE_CONTACT_SETTINGS.servicesPageHeroImage
-  );
-  const [savingServicesHero, setSavingServicesHero] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editing, setEditing] = useState<ServicePageItemRow | null>(null);
   const [formData, setFormData] = useState(defaultForm);
@@ -62,44 +55,7 @@ export default function ServicesPageManager() {
 
   useEffect(() => {
     fetchItems();
-    const loadHero = async () => {
-      try {
-        const res = await apiFetch("/api/site-settings");
-        if (!res.ok) return;
-        const data = await res.json();
-        if (typeof data.servicesPageHeroImage === "string" && data.servicesPageHeroImage.trim()) {
-          setServicesPageHeroImage(data.servicesPageHeroImage.trim());
-        }
-      } catch (e) {
-        console.error("Error loading services page hero:", e);
-      }
-    };
-    loadHero();
   }, []);
-
-  const handleSaveServicesHero = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setSavingServicesHero(true);
-      const res = await apiFetch("/api/site-settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ servicesPageHeroImage }),
-      });
-      if (!res.ok) throw new Error("Failed to save");
-      const data = await res.json();
-      if (typeof data.servicesPageHeroImage === "string") {
-        setServicesPageHeroImage(data.servicesPageHeroImage);
-      }
-      router.refresh();
-      alert("Services page hero image saved!");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to save services page hero image");
-    } finally {
-      setSavingServicesHero(false);
-    }
-  };
 
   const handleAdd = () => {
     setEditing(null);
@@ -184,58 +140,6 @@ export default function ServicesPageManager() {
 
   return (
     <div className="space-y-6">
-      <form
-        onSubmit={handleSaveServicesHero}
-        className="bg-white rounded-lg shadow-md p-5 space-y-3 border border-gray-100"
-      >
-        <h3 className="text-lg font-semibold text-gray-800">Services page hero</h3>
-        <p className="text-sm text-gray-600">
-          Header background on the public <code className="text-xs bg-gray-100 px-1 rounded">/services</code> page.
-        </p>
-        <input
-          type="text"
-          value={servicesPageHeroImage}
-          onChange={(e) => setServicesPageHeroImage(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Image URL"
-        />
-        <div>
-          <span className="block text-sm text-gray-600 mb-1">Or upload</span>
-          <UploadButton
-            className="ut-primary-upload"
-            endpoint="heroSectionImage"
-            onBeforeUploadBegin={(files) =>
-              optimizeImagesForUpload(files, { maxDimension: 2200, quality: 0.82 })
-            }
-            onClientUploadComplete={(res) => {
-              if (res?.[0]?.url) setServicesPageHeroImage(res[0].url);
-            }}
-            onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
-          />
-        </div>
-        <div className="h-36 rounded-lg overflow-hidden border border-gray-200">
-          <img src={servicesPageHeroImage} alt="" className="w-full h-full object-cover" />
-        </div>
-        <div className="flex justify-between gap-2">
-          <button
-            type="button"
-            onClick={() =>
-              setServicesPageHeroImage(DEFAULT_SITE_CONTACT_SETTINGS.servicesPageHeroImage)
-            }
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
-          >
-            Reset to default
-          </button>
-          <button
-            type="submit"
-            disabled={savingServicesHero}
-            className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-          >
-            {savingServicesHero ? "Saving..." : "Save hero image"}
-          </button>
-        </div>
-      </form>
-
       <div className="flex justify-between items-start gap-4 flex-wrap">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Services page</h2>
