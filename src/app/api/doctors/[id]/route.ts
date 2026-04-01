@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 export async function GET(
@@ -13,13 +14,13 @@ export async function GET(
     });
 
     if (!doctor) {
-      return NextResponse.json({ error: "Doctor not found" }, { status: 404 });
+      return jsonNoStore({ error: "Doctor not found" }, { status: 404 });
     }
 
-    return NextResponse.json(doctor);
+    return jsonNoStore(doctor);
   } catch (error) {
     console.error("Error fetching doctor:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to fetch doctor" },
       { status: 500 }
     );
@@ -66,10 +67,10 @@ export async function PATCH(
         }),
       },
     });
-    return NextResponse.json(doctor);
+    return jsonNoStore(doctor);
   } catch (error) {
     console.error("Error updating doctor:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to update doctor" },
       { status: 500 }
     );
@@ -86,10 +87,10 @@ export async function DELETE(
     await prisma.doctor.delete({
       where: { id },
     });
-    return NextResponse.json({ message: "Doctor deleted successfully" });
+    return jsonNoStore({ message: "Doctor deleted successfully" });
   } catch (error) {
     console.error("Error deleting doctor:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to delete doctor" },
       { status: 500 }
     );

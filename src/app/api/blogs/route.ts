@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 function displayTime(b: {
@@ -12,10 +13,10 @@ export async function GET() {
   try {
     const blogs = await prisma.blog.findMany();
     blogs.sort((a, b) => displayTime(b) - displayTime(a));
-    return NextResponse.json(blogs);
+    return jsonNoStore(blogs);
   } catch (error) {
     console.error("Error fetching blogs:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to fetch blogs" },
       { status: 500 }
     );
@@ -44,10 +45,10 @@ export async function POST(request: NextRequest) {
         publishedDate,
       },
     });
-    return NextResponse.json(blog, { status: 201 });
+    return jsonNoStore(blog, { status: 201 });
   } catch (error) {
     console.error("Error creating blog:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to create blog" },
       { status: 500 }
     );

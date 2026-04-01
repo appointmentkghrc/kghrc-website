@@ -1,6 +1,7 @@
 // components/Footer.tsx
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -92,8 +93,8 @@ export default function Footer() {
     const fetchFooterData = async () => {
       try {
         const [siteRes, aboutRes] = await Promise.all([
-          fetch("/api/site-settings"),
-          fetch("/api/about-settings"),
+          apiFetch("/api/site-settings"),
+          apiFetch("/api/about-settings"),
         ]);
         if (siteRes.ok) {
           const data = await siteRes.json();
@@ -146,7 +147,7 @@ export default function Footer() {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await fetch("/api/diagnostic-services");
+        const response = await apiFetch("/api/diagnostic-services");
         if (!response.ok) return;
         const data = (await response.json()) as Array<{
           id: string;

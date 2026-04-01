@@ -89,6 +89,14 @@ model SiteSetting {
   heroBackgroundImage String?
   statsSectionBackgroundImage String?
   diagnosticServicesDefaultHeaderImage String?
+  /// Top banner on /doctors and /doctors/[id]
+  doctorsPageHeroImage String?
+  /// Top banner on /services
+  servicesPageHeroImage String?
+  /// Top banner on /blog listing
+  blogPageHeroImage String?
+  /// Top banner on /contact
+  contactPageHeroImage String?
   heroTitleLine1 String?
   heroTitleLine2 String?
   heroDescription String?

@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
 import PatientTestimonialsSection from "@/components/PatientTestimonialsSection";
 import Link from "next/link";
@@ -69,7 +70,7 @@ export default function AboutPage() {
   useEffect(() => {
     const loadPartners = async () => {
       try {
-        const response = await fetch("/api/tpa-insurance-partners");
+        const response = await apiFetch("/api/tpa-insurance-partners");
         if (!response.ok) throw new Error("Failed to fetch TPA partners");
         const data: unknown = await response.json();
         setInsurancePartners(Array.isArray(data) ? (data as TpaInsurancePartnerRow[]) : []);
@@ -86,7 +87,7 @@ export default function AboutPage() {
   const fetchAboutSettings = async () => {
     try {
       setLoadingAboutSettings(true);
-      const response = await fetch("/api/about-settings");
+      const response = await apiFetch("/api/about-settings");
       if (!response.ok) throw new Error("Failed to fetch about settings");
       const data: AboutSettings = await response.json();
 
@@ -120,7 +121,7 @@ export default function AboutPage() {
   const fetchDoctors = async () => {
     try {
       setLoadingDoctors(true);
-      const response = await fetch("/api/doctors");
+      const response = await apiFetch("/api/doctors");
       if (!response.ok) throw new Error("Failed to fetch doctors");
       const data = await response.json();
       setDoctors(data);

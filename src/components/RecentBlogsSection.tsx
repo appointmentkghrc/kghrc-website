@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { blogDisplayIso } from "@/lib/blogDisplayDate";
@@ -28,7 +29,7 @@ export default function RecentBlogsSection() {
     const fetchRecentBlogs = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/blogs");
+        const response = await apiFetch("/api/blogs");
         if (!response.ok) throw new Error("Failed to fetch blogs");
         const data: Blog[] = await response.json();
 

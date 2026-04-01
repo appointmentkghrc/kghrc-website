@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 const GALLERY_SECTION_KEY = "latest_gallery";
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
     const galleryImageDelegate = getGalleryImageDelegate();
 
     if (!gallerySectionDelegate || !galleryImageDelegate) {
-      return NextResponse.json(
+      return jsonNoStore(
         {
           title: DEFAULT_GALLERY_TITLE,
           bannerImage: DEFAULT_GALLERY_BANNER,
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
       item.category?.trim() || "General"
     );
 
-    return NextResponse.json({
+    return jsonNoStore({
       title: section?.title || DEFAULT_GALLERY_TITLE,
       bannerImage:
         (section?.bannerImage && section.bannerImage.trim()) ||
@@ -99,7 +100,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching gallery settings:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to fetch gallery settings" },
       { status: 500 }
     );
@@ -112,7 +113,7 @@ export async function PATCH(request: NextRequest) {
     const gallerySectionDelegate = getGallerySectionDelegate();
 
     if (!gallerySectionDelegate) {
-      return NextResponse.json(
+      return jsonNoStore(
         {
           error:
             "Gallery model is not available. Restart dev server after running prisma generate.",
@@ -150,10 +151,10 @@ export async function PATCH(request: NextRequest) {
       update: { title, bannerImage, ...(sections ? { sections } : {}) },
     });
 
-    return NextResponse.json({ title, bannerImage, ...(sections ? { sections } : {}) });
+    return jsonNoStore({ title, bannerImage, ...(sections ? { sections } : {}) });
   } catch (error) {
     console.error("Error updating gallery settings:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to update gallery settings" },
       { status: 500 }
     );
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
     const galleryImageDelegate = getGalleryImageDelegate();
 
     if (!galleryImageDelegate) {
-      return NextResponse.json(
+      return jsonNoStore(
         {
           error:
             "Gallery model is not available. Restart dev server after running prisma generate.",
@@ -196,7 +197,7 @@ export async function POST(request: NextRequest) {
     const uniqueImageUrls: string[] = Array.from(new Set(imageUrls));
 
     if (uniqueImageUrls.length === 0) {
-      return NextResponse.json(
+      return jsonNoStore(
         { error: "imageUrl or imageUrls is required" },
         { status: 400 }
       );
@@ -214,13 +215,13 @@ export async function POST(request: NextRequest) {
     );
 
     if (createdImages.length === 1) {
-      return NextResponse.json(createdImages[0], { status: 201 });
+      return jsonNoStore(createdImages[0], { status: 201 });
     }
 
-    return NextResponse.json({ createdCount: createdImages.length, images: createdImages }, { status: 201 });
+    return jsonNoStore({ createdCount: createdImages.length, images: createdImages }, { status: 201 });
   } catch (error) {
     console.error("Error creating gallery image:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to create gallery image" },
       { status: 500 }
     );

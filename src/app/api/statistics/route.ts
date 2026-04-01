@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 export async function GET() {
@@ -8,10 +9,10 @@ export async function GET() {
         createdAt: "desc",
       },
     });
-    return NextResponse.json(statistics);
+    return jsonNoStore(statistics);
   } catch (error) {
     console.error("Error fetching statistics:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to fetch statistics" },
       { status: 500 }
     );
@@ -29,10 +30,10 @@ export async function POST(request: NextRequest) {
         category: body.category,
       },
     });
-    return NextResponse.json(statistic, { status: 201 });
+    return jsonNoStore(statistic, { status: 201 });
   } catch (error) {
     console.error("Error creating statistic:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to create statistic" },
       { status: 500 }
     );

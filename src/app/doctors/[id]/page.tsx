@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { cacheBustUrl } from "@/lib/cacheBustUrl";
+import { getSiteContactSettings } from "@/lib/siteSettings";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface DoctorPageProps {
   params: Promise<{ id: string }>;
@@ -9,13 +14,17 @@ interface DoctorPageProps {
 export default async function DoctorDetailsPage({ params }: DoctorPageProps) {
   const { id } = await params;
 
-  const doctor = await prisma.doctor.findUnique({
-    where: { id },
-  });
+  const [doctor, site] = await Promise.all([
+    prisma.doctor.findUnique({ where: { id } }),
+    getSiteContactSettings(),
+  ]);
 
   if (!doctor) {
     notFound();
   }
+
+  const hero = cacheBustUrl(site.doctorsPageHeroImage);
+  const portrait = cacheBustUrl(doctor.image ?? "/placeholder-doctor.jpg");
 
   return (
     <div className="bg-gray-50 min-h-screen pb-16">
@@ -23,8 +32,7 @@ export default async function DoctorDetailsPage({ params }: DoctorPageProps) {
         <div
           className="fixed top-0 left-0 w-full h-[340px] bg-cover bg-center -z-10"
           style={{
-            backgroundImage:
-              "url(https://validthemes.net/site-template/medihub/assets/img/banner/5.jpg)",
+            backgroundImage: `url(${hero})`,
           }}
         />
         <div className="absolute inset-0 bg-black/60" />
@@ -48,7 +56,7 @@ export default async function DoctorDetailsPage({ params }: DoctorPageProps) {
           <div className="grid grid-cols-1 md:grid-cols-3">
             <div className="md:col-span-1">
               <img
-                src={doctor.image ?? "/placeholder-doctor.jpg"}
+                src={portrait}
                 alt={doctor.name}
                 className="w-full h-full min-h-[360px] object-cover"
               />

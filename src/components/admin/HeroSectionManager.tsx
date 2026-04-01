@@ -1,12 +1,15 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
 
 const FALLBACK_HERO_IMAGE = "/image7.jpeg";
 
 export default function HeroSectionManager() {
+  const router = useRouter();
   const [heroBackgroundImage, setHeroBackgroundImage] = useState(FALLBACK_HERO_IMAGE);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -15,7 +18,7 @@ export default function HeroSectionManager() {
     const fetchSettings = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/site-settings");
+        const response = await apiFetch("/api/site-settings");
         if (!response.ok) throw new Error("Failed to fetch hero settings");
         const data = await response.json();
         setHeroBackgroundImage(data?.heroBackgroundImage || FALLBACK_HERO_IMAGE);
@@ -34,7 +37,7 @@ export default function HeroSectionManager() {
     e.preventDefault();
     try {
       setSaving(true);
-      const response = await fetch("/api/site-settings", {
+      const response = await apiFetch("/api/site-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ heroBackgroundImage }),
@@ -43,6 +46,7 @@ export default function HeroSectionManager() {
       if (!response.ok) throw new Error("Failed to save hero image");
       const updated = await response.json();
       setHeroBackgroundImage(updated?.heroBackgroundImage || FALLBACK_HERO_IMAGE);
+      router.refresh();
       alert("Hero section image updated successfully!");
     } catch (error) {
       console.error("Error saving hero section image:", error);

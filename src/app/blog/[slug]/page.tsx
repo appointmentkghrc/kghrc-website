@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -39,7 +40,7 @@ export default function BlogDetailsPage() {
   const fetchBlogBySlug = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/blogs");
+      const response = await apiFetch("/api/blogs");
       if (!response.ok) throw new Error("Failed to fetch blogs");
       const data = await response.json();
       

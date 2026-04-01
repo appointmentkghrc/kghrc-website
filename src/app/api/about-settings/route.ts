@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import {
   DEFAULT_ABOUT_SETTINGS,
   getAboutSettings,
@@ -24,10 +25,10 @@ const normalizeStringList = (value: unknown, fallback: string[]): string[] => {
 export async function GET() {
   try {
     const settings = await getAboutSettings();
-    return NextResponse.json(settings);
+    return jsonNoStore(settings);
   } catch (error) {
     console.error("Error fetching about settings:", error);
-    return NextResponse.json({ error: "Failed to fetch about settings" }, { status: 500 });
+    return jsonNoStore({ error: "Failed to fetch about settings" }, { status: 500 });
   }
 }
 
@@ -68,9 +69,9 @@ export async function PATCH(request: NextRequest) {
     };
 
     const updated = await upsertAboutSettings(nextSettings);
-    return NextResponse.json(updated);
+    return jsonNoStore(updated);
   } catch (error) {
     console.error("Error updating about settings:", error);
-    return NextResponse.json({ error: "Failed to update about settings" }, { status: 500 });
+    return jsonNoStore({ error: "Failed to update about settings" }, { status: 500 });
   }
 }

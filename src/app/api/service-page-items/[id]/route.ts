@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 import { isValidServicePageIcon } from "@/lib/servicePageIcons";
 
@@ -22,7 +23,7 @@ export async function PATCH(
     if (body.icon !== undefined) {
       const icon = typeof body.icon === "string" ? body.icon.trim() : "";
       if (!isValidServicePageIcon(icon)) {
-        return NextResponse.json({ error: "Invalid icon" }, { status: 400 });
+        return jsonNoStore({ error: "Invalid icon" }, { status: 400 });
       }
       data.icon = icon;
     }
@@ -50,10 +51,10 @@ export async function PATCH(
       where: { id },
       data,
     });
-    return NextResponse.json(item);
+    return jsonNoStore(item);
   } catch (error) {
     console.error("Error updating service page item:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to update service page item" },
       { status: 500 }
     );
@@ -70,10 +71,10 @@ export async function DELETE(
     await prisma.servicePageItem.delete({
       where: { id },
     });
-    return NextResponse.json({ message: "Deleted successfully" });
+    return jsonNoStore({ message: "Deleted successfully" });
   } catch (error) {
     console.error("Error deleting service page item:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to delete service page item" },
       { status: 500 }
     );

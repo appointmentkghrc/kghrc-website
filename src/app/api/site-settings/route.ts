@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import {
   DEFAULT_SITE_CONTACT_SETTINGS,
   getSiteContactSettings,
@@ -8,10 +9,10 @@ import {
 export async function GET() {
   try {
     const settings = await getSiteContactSettings();
-    return NextResponse.json(settings);
+    return jsonNoStore(settings);
   } catch (error) {
     console.error("Error fetching site settings:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to fetch site settings" },
       { status: 500 }
     );
@@ -77,6 +78,26 @@ export async function PATCH(request: NextRequest) {
         body.diagnosticServicesDefaultHeaderImage.trim().length > 0
           ? body.diagnosticServicesDefaultHeaderImage.trim()
           : currentSettings.diagnosticServicesDefaultHeaderImage,
+      doctorsPageHeroImage:
+        typeof body.doctorsPageHeroImage === "string" &&
+        body.doctorsPageHeroImage.trim().length > 0
+          ? body.doctorsPageHeroImage.trim()
+          : currentSettings.doctorsPageHeroImage,
+      servicesPageHeroImage:
+        typeof body.servicesPageHeroImage === "string" &&
+        body.servicesPageHeroImage.trim().length > 0
+          ? body.servicesPageHeroImage.trim()
+          : currentSettings.servicesPageHeroImage,
+      blogPageHeroImage:
+        typeof body.blogPageHeroImage === "string" &&
+        body.blogPageHeroImage.trim().length > 0
+          ? body.blogPageHeroImage.trim()
+          : currentSettings.blogPageHeroImage,
+      contactPageHeroImage:
+        typeof body.contactPageHeroImage === "string" &&
+        body.contactPageHeroImage.trim().length > 0
+          ? body.contactPageHeroImage.trim()
+          : currentSettings.contactPageHeroImage,
       heroTitleLine1:
         typeof body.heroTitleLine1 === "string" && body.heroTitleLine1.trim().length > 0
           ? body.heroTitleLine1.trim()
@@ -126,10 +147,10 @@ export async function PATCH(request: NextRequest) {
     };
 
     const updatedSettings = await upsertSiteContactSettings(nextSettings);
-    return NextResponse.json(updatedSettings);
+    return jsonNoStore(updatedSettings);
   } catch (error) {
     console.error("Error updating site settings:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to update site settings" },
       { status: 500 }
     );

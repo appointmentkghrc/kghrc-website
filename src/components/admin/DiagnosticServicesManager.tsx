@@ -1,6 +1,8 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
 
@@ -33,6 +35,7 @@ const FALLBACK_DIAGNOSTIC_HEADER_IMAGE =
   "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg";
 
 export default function DiagnosticServicesManager() {
+  const router = useRouter();
   const [services, setServices] = useState<DiagnosticService[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,7 +67,7 @@ export default function DiagnosticServicesManager() {
   const fetchServices = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/diagnostic-services?includeInactive=true");
+      const response = await apiFetch("/api/diagnostic-services?includeInactive=true");
       if (!response.ok) throw new Error("Failed to fetch diagnostic services");
       const data = await response.json();
       setServices(data);
@@ -78,7 +81,7 @@ export default function DiagnosticServicesManager() {
 
   const fetchDiagnosticDefaultHeader = async () => {
     try {
-      const response = await fetch("/api/site-settings");
+      const response = await apiFetch("/api/site-settings");
       if (!response.ok) throw new Error("Failed to fetch diagnostic header default");
       const data = await response.json();
       setDiagnosticDefaultHeaderImage(
@@ -105,7 +108,7 @@ export default function DiagnosticServicesManager() {
     e.preventDefault();
     try {
       setSavingDefault(true);
-      const response = await fetch("/api/site-settings", {
+      const response = await apiFetch("/api/site-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -119,6 +122,7 @@ export default function DiagnosticServicesManager() {
         updated?.diagnosticServicesDefaultHeaderImage ||
           FALLBACK_DIAGNOSTIC_HEADER_IMAGE
       );
+      router.refresh();
       alert("Diagnostic default header image updated successfully!");
     } catch (error) {
       console.error("Error saving default header image:", error);
@@ -155,12 +159,13 @@ export default function DiagnosticServicesManager() {
     }
 
     try {
-      const response = await fetch(`/api/diagnostic-services/${id}`, {
+      const response = await apiFetch(`/api/diagnostic-services/${id}`, {
         method: "DELETE",
       });
 
       if (!response.ok) throw new Error("Failed to delete diagnostic service");
       setServices((prev) => prev.filter((service) => service.id !== id));
+      router.refresh();
       alert("Diagnostic service deleted successfully!");
     } catch (error) {
       console.error("Error deleting diagnostic service:", error);
@@ -174,14 +179,14 @@ export default function DiagnosticServicesManager() {
 
     try {
       if (editingService) {
-        const response = await fetch(`/api/diagnostic-services/${editingService.id}`, {
+        const response = await apiFetch(`/api/diagnostic-services/${editingService.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
         if (!response.ok) throw new Error("Failed to update diagnostic service");
       } else {
-        const response = await fetch("/api/diagnostic-services", {
+        const response = await apiFetch("/api/diagnostic-services", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -191,6 +196,7 @@ export default function DiagnosticServicesManager() {
 
       setIsModalOpen(false);
       await fetchServices();
+      router.refresh();
       alert(
         editingService
           ? "Diagnostic service updated successfully!"

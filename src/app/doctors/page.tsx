@@ -1,16 +1,21 @@
-"use client";
-
 import SpecialistsSection from "@/components/SpecialistsSection";
+import { cacheBustUrl } from "@/lib/cacheBustUrl";
+import { getSiteContactSettings } from "@/lib/siteSettings";
 
-export default function DoctorsPage() {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export default async function DoctorsPage() {
+  const site = await getSiteContactSettings();
+  const hero = cacheBustUrl(site.doctorsPageHeroImage);
+
   return (
     <div>
       <section className="relative h-[420px] flex items-center justify-center text-white">
         <div
           className="fixed top-0 left-0 w-full h-[420px] bg-cover bg-center -z-10"
           style={{
-            backgroundImage:
-              "url(https://validthemes.net/site-template/medihub/assets/img/banner/5.jpg)",
+            backgroundImage: `url(${hero})`,
           }}
         />
 

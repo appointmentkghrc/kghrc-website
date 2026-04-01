@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 type GalleryImageDelegate = {
@@ -25,7 +26,7 @@ export async function PATCH(
     const galleryImageDelegate = getGalleryImageDelegate();
 
     if (!galleryImageDelegate) {
-      return NextResponse.json(
+      return jsonNoStore(
         {
           error:
             "Gallery model is not available. Restart dev server after running prisma generate.",
@@ -44,10 +45,10 @@ export async function PATCH(
       },
     });
 
-    return NextResponse.json(image);
+    return jsonNoStore(image);
   } catch (error) {
     console.error("Error updating gallery image:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to update gallery image" },
       { status: 500 }
     );
@@ -64,7 +65,7 @@ export async function DELETE(
     const galleryImageDelegate = getGalleryImageDelegate();
 
     if (!galleryImageDelegate) {
-      return NextResponse.json(
+      return jsonNoStore(
         {
           error:
             "Gallery model is not available. Restart dev server after running prisma generate.",
@@ -77,10 +78,10 @@ export async function DELETE(
       where: { id },
     });
 
-    return NextResponse.json({ message: "Gallery image deleted successfully" });
+    return jsonNoStore({ message: "Gallery image deleted successfully" });
   } catch (error) {
     console.error("Error deleting gallery image:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to delete gallery image" },
       { status: 500 }
     );

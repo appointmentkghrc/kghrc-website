@@ -1,6 +1,8 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 
 import {
@@ -85,6 +87,7 @@ function ScrollableIconSelect({
 }
 
 export default function ServicesHighlightManager() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [items, setItems] = useState<ServicesHighlightItem[]>(DEFAULT_SERVICES_HIGHLIGHT_ITEMS);
@@ -93,7 +96,7 @@ export default function ServicesHighlightManager() {
     const fetchSettings = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/site-settings");
+        const response = await apiFetch("/api/site-settings");
         if (!response.ok) throw new Error("Failed to fetch site settings");
         const data = await response.json();
 
@@ -167,7 +170,7 @@ export default function ServicesHighlightManager() {
 
     try {
       setSaving(true);
-      const response = await fetch("/api/site-settings", {
+      const response = await apiFetch("/api/site-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -183,6 +186,7 @@ export default function ServicesHighlightManager() {
         setItems(data.servicesHighlightItems);
       }
 
+      router.refresh();
       alert("Services highlight section updated successfully!");
     } catch (error) {
       console.error("Error saving services highlight settings:", error);

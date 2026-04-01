@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 type TpaInsurancePartnerDelegate = {
@@ -19,7 +19,7 @@ export async function DELETE(
   try {
     const partnerDelegate = getTpaInsurancePartnerDelegate();
     if (!partnerDelegate) {
-      return NextResponse.json(
+      return jsonNoStore(
         {
           error:
             "TPA/Insurance partner model is not available. Restart dev server after running prisma generate.",
@@ -30,10 +30,10 @@ export async function DELETE(
 
     await partnerDelegate.delete({ where: { id } });
 
-    return NextResponse.json({ message: "Partner removed successfully" });
+    return jsonNoStore({ message: "Partner removed successfully" });
   } catch (error) {
     console.error("Error deleting TPA/Insurance partner:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to delete TPA/Insurance partner" },
       { status: 500 }
     );

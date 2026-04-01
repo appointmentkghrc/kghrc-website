@@ -1,6 +1,8 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type SocialLinksForm = {
   facebookUrl: string;
@@ -19,6 +21,7 @@ const emptyForm: SocialLinksForm = {
 };
 
 export default function SocialLinksManager() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<SocialLinksForm>(emptyForm);
@@ -27,7 +30,7 @@ export default function SocialLinksManager() {
     const fetchSettings = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/site-settings");
+        const response = await apiFetch("/api/site-settings");
         if (!response.ok) throw new Error("Failed to fetch social links");
         const data = await response.json();
         setFormData({
@@ -57,7 +60,7 @@ export default function SocialLinksManager() {
     e.preventDefault();
     try {
       setSaving(true);
-      const response = await fetch("/api/site-settings", {
+      const response = await apiFetch("/api/site-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -71,6 +74,7 @@ export default function SocialLinksManager() {
         youtubeUrl: updated?.youtubeUrl ?? "",
         linkedinUrl: updated?.linkedinUrl ?? "",
       });
+      router.refresh();
       alert("Social links updated successfully!");
     } catch (error) {
       console.error("Error saving social links:", error);

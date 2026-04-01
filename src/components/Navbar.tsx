@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -48,7 +49,7 @@ export default function Navbar() {
   useEffect(() => {
     const fetchContactSettings = async () => {
       try {
-        const response = await fetch("/api/site-settings");
+        const response = await apiFetch("/api/site-settings");
         if (!response.ok) return;
         const data = await response.json();
         setEmergencyPhone(data?.secondaryPhone || "");

@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
@@ -47,7 +48,7 @@ export default function DepartmentsSection({
     const fetchServices = async () => {
       try {
         setLoadingServices(true);
-        const response = await fetch("/api/diagnostic-services");
+        const response = await apiFetch("/api/diagnostic-services");
         if (!response.ok) throw new Error("Failed to fetch diagnostic services");
         const services: DiagnosticService[] = await response.json();
         setDiagnosticServices(services);

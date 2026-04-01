@@ -1,6 +1,8 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { memo, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
 
@@ -117,6 +119,7 @@ const GalleryImageCard = memo(function GalleryImageCard({
 });
 
 export default function LatestGalleryManager() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [savingSection, setSavingSection] = useState(false);
   const [savingCategories, setSavingCategories] = useState(false);
@@ -139,7 +142,7 @@ export default function LatestGalleryManager() {
   const fetchGallery = async (includeInactive = showInactive) => {
     try {
       setLoading(true);
-      const response = await fetch(
+      const response = await apiFetch(
         `/api/gallery?includeInactive=${includeInactive ? "true" : "false"}`
       );
       if (!response.ok) throw new Error("Failed to fetch gallery");
@@ -174,7 +177,7 @@ export default function LatestGalleryManager() {
     e.preventDefault();
     try {
       setSavingSection(true);
-      const response = await fetch("/api/gallery", {
+      const response = await apiFetch("/api/gallery", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, bannerImage }),
@@ -183,6 +186,7 @@ export default function LatestGalleryManager() {
       const updated = await response.json();
       setTitle(updated.title || DEFAULT_TITLE);
       setBannerImage(updated.bannerImage || DEFAULT_BANNER);
+      router.refresh();
       alert("Gallery title and banner updated successfully!");
     } catch (error) {
       console.error("Error saving gallery section:", error);
@@ -210,13 +214,14 @@ export default function LatestGalleryManager() {
   const handleSaveCategories = async () => {
     try {
       setSavingCategories(true);
-      const response = await fetch("/api/gallery", {
+      const response = await apiFetch("/api/gallery", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, bannerImage, sections }),
       });
       if (!response.ok) throw new Error("Failed to save categories");
       await fetchGallery(true);
+      router.refresh();
       alert("Gallery categories updated successfully!");
     } catch (error) {
       console.error("Error saving gallery categories:", error);
@@ -233,7 +238,7 @@ export default function LatestGalleryManager() {
       const cleanedUploadedUrls = Array.from(
         new Set(newImageUrls.map((url) => url.trim()).filter((url) => url.length > 0))
       );
-      const response = await fetch("/api/gallery", {
+      const response = await apiFetch("/api/gallery", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -251,6 +256,7 @@ export default function LatestGalleryManager() {
       setNewSortOrder(0);
       setNewIsActive(true);
       await fetchGallery();
+      router.refresh();
       alert(
         cleanedUploadedUrls.length > 1
           ? `${cleanedUploadedUrls.length} gallery images added successfully!`
@@ -286,13 +292,14 @@ export default function LatestGalleryManager() {
     updates: Partial<Pick<GalleryImage, "sortOrder" | "isActive" | "imageUrl" | "category">>
   ) => {
     try {
-      const response = await fetch(`/api/gallery/${id}`, {
+      const response = await apiFetch(`/api/gallery/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
       });
       if (!response.ok) throw new Error("Failed to update image");
       await fetchGallery();
+      router.refresh();
     } catch (error) {
       console.error("Error updating gallery image:", error);
       alert("Failed to update image");
@@ -305,11 +312,12 @@ export default function LatestGalleryManager() {
     }
 
     try {
-      const response = await fetch(`/api/gallery/${id}`, {
+      const response = await apiFetch(`/api/gallery/${id}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete image");
       await fetchGallery();
+      router.refresh();
       alert("Gallery image deleted successfully!");
     } catch (error) {
       console.error("Error deleting gallery image:", error);

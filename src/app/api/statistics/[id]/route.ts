@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 export async function GET(
@@ -13,16 +14,16 @@ export async function GET(
     });
 
     if (!statistic) {
-      return NextResponse.json(
+      return jsonNoStore(
         { error: "Statistic not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(statistic);
+    return jsonNoStore(statistic);
   } catch (error) {
     console.error("Error fetching statistic:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to fetch statistic" },
       { status: 500 }
     );
@@ -46,10 +47,10 @@ export async function PATCH(
         ...(body.category && { category: body.category }),
       },
     });
-    return NextResponse.json(statistic);
+    return jsonNoStore(statistic);
   } catch (error) {
     console.error("Error updating statistic:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to update statistic" },
       { status: 500 }
     );
@@ -66,10 +67,10 @@ export async function DELETE(
     await prisma.statistic.delete({
       where: { id },
     });
-    return NextResponse.json({ message: "Statistic deleted successfully" });
+    return jsonNoStore({ message: "Statistic deleted successfully" });
   } catch (error) {
     console.error("Error deleting statistic:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to delete statistic" },
       { status: 500 }
     );

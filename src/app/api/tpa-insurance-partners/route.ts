@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 type TpaInsurancePartnerDelegate = {
@@ -15,17 +16,17 @@ export async function GET() {
   try {
     const partnerDelegate = getTpaInsurancePartnerDelegate();
     if (!partnerDelegate) {
-      return NextResponse.json([]);
+      return jsonNoStore([]);
     }
 
     const partners = await partnerDelegate.findMany({
       orderBy: [{ createdAt: "asc" }],
     });
 
-    return NextResponse.json(partners);
+    return jsonNoStore(partners);
   } catch (error) {
     console.error("Error fetching TPA/Insurance partners:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to fetch TPA/Insurance partners" },
       { status: 500 }
     );
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
   try {
     const partnerDelegate = getTpaInsurancePartnerDelegate();
     if (!partnerDelegate) {
-      return NextResponse.json(
+      return jsonNoStore(
         {
           error:
             "TPA/Insurance partner model is not available. Restart dev server after running prisma generate.",
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
     const logoUrl = typeof body.logoUrl === "string" ? body.logoUrl.trim() : "";
 
     if (!name || !logoUrl) {
-      return NextResponse.json(
+      return jsonNoStore(
         { error: "Both name and logoUrl are required" },
         { status: 400 }
       );
@@ -60,10 +61,10 @@ export async function POST(request: NextRequest) {
       data: { name, logoUrl },
     });
 
-    return NextResponse.json(partner, { status: 201 });
+    return jsonNoStore(partner, { status: 201 });
   } catch (error) {
     console.error("Error creating TPA/Insurance partner:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to create TPA/Insurance partner" },
       { status: 500 }
     );

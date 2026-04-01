@@ -1,7 +1,12 @@
+import { cacheBustUrl } from "@/lib/cacheBustUrl";
 import { getSiteContactSettings } from "@/lib/siteSettings";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function ContactPage() {
   const contactSettings = await getSiteContactSettings();
+  const hero = cacheBustUrl(contactSettings.contactPageHeroImage);
 
   return (
     <div>
@@ -13,8 +18,7 @@ export default async function ContactPage() {
         <div
           className="fixed top-0 left-0 w-full h-[420px] bg-cover bg-center -z-10"
           style={{
-            backgroundImage:
-              "url(https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg)",
+            backgroundImage: `url(${hero})`,
           }}
         />
 

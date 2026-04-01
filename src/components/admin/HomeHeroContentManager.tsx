@@ -1,6 +1,8 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type HeroContentForm = {
   heroTitleLine1: string;
@@ -19,6 +21,7 @@ const emptyForm: HeroContentForm = {
 };
 
 export default function HomeHeroContentManager() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<HeroContentForm>(emptyForm);
@@ -27,7 +30,7 @@ export default function HomeHeroContentManager() {
     const fetchSettings = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/site-settings");
+        const response = await apiFetch("/api/site-settings");
         if (!response.ok) throw new Error("Failed to fetch hero content settings");
         const data = await response.json();
         setFormData({
@@ -59,7 +62,7 @@ export default function HomeHeroContentManager() {
     e.preventDefault();
     try {
       setSaving(true);
-      const response = await fetch("/api/site-settings", {
+      const response = await apiFetch("/api/site-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -74,6 +77,7 @@ export default function HomeHeroContentManager() {
         heroCtaLabel: updated?.heroCtaLabel ?? "",
         heroCtaHref: updated?.heroCtaHref ?? "",
       });
+      router.refresh();
       alert("Homepage hero content updated successfully!");
     } catch (error) {
       console.error("Error saving hero content settings:", error);

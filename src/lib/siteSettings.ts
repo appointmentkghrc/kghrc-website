@@ -22,6 +22,10 @@ export type SiteContactSettings = {
   heroBackgroundImage: string;
   statsSectionBackgroundImage: string;
   diagnosticServicesDefaultHeaderImage: string;
+  doctorsPageHeroImage: string;
+  servicesPageHeroImage: string;
+  blogPageHeroImage: string;
+  contactPageHeroImage: string;
   pmjayPatientsTreatedValue: string;
   pmjayPrimaryLogoUrl: string;
   pmjaySecondaryLogoUrl: string;
@@ -52,6 +56,14 @@ export const DEFAULT_SITE_CONTACT_SETTINGS: SiteContactSettings = {
   heroBackgroundImage: "/image7.jpeg",
   statsSectionBackgroundImage: "/7.jpg",
   diagnosticServicesDefaultHeaderImage:
+    "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg",
+  doctorsPageHeroImage:
+    "https://validthemes.net/site-template/medihub/assets/img/banner/5.jpg",
+  servicesPageHeroImage:
+    "https://validthemes.net/site-template/medihub/assets/img/banner/5.jpg",
+  blogPageHeroImage:
+    "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg",
+  contactPageHeroImage:
     "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg",
   pmjayPatientsTreatedValue: "0",
   pmjayPrimaryLogoUrl: "",
@@ -106,6 +118,10 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
           heroBackgroundImage: string | null;
           statsSectionBackgroundImage: string | null;
           diagnosticServicesDefaultHeaderImage: string | null;
+          doctorsPageHeroImage: string | null;
+          servicesPageHeroImage: string | null;
+          blogPageHeroImage: string | null;
+          contactPageHeroImage: string | null;
           pmjayPatientsTreatedValue: string | null;
           pmjayPrimaryLogoUrl: string | null;
           pmjaySecondaryLogoUrl: string | null;
@@ -154,6 +170,18 @@ export async function getSiteContactSettings(): Promise<SiteContactSettings> {
     diagnosticServicesDefaultHeaderImage:
       settings.diagnosticServicesDefaultHeaderImage?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.diagnosticServicesDefaultHeaderImage,
+    doctorsPageHeroImage:
+      settings.doctorsPageHeroImage?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.doctorsPageHeroImage,
+    servicesPageHeroImage:
+      settings.servicesPageHeroImage?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.servicesPageHeroImage,
+    blogPageHeroImage:
+      settings.blogPageHeroImage?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.blogPageHeroImage,
+    contactPageHeroImage:
+      settings.contactPageHeroImage?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.contactPageHeroImage,
     pmjayPatientsTreatedValue:
       settings.pmjayPatientsTreatedValue?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.pmjayPatientsTreatedValue,
@@ -210,6 +238,10 @@ export async function upsertSiteContactSettings(
             heroBackgroundImage: string;
             statsSectionBackgroundImage: string;
             diagnosticServicesDefaultHeaderImage: string;
+            doctorsPageHeroImage: string;
+            servicesPageHeroImage: string;
+            blogPageHeroImage: string;
+            contactPageHeroImage: string;
             pmjayPatientsTreatedValue: string;
             pmjayPrimaryLogoUrl: string;
             pmjaySecondaryLogoUrl: string;
@@ -239,6 +271,10 @@ export async function upsertSiteContactSettings(
             heroBackgroundImage: string;
             statsSectionBackgroundImage: string;
             diagnosticServicesDefaultHeaderImage: string;
+            doctorsPageHeroImage: string;
+            servicesPageHeroImage: string;
+            blogPageHeroImage: string;
+            contactPageHeroImage: string;
             pmjayPatientsTreatedValue: string;
             pmjayPrimaryLogoUrl: string;
             pmjaySecondaryLogoUrl: string;
@@ -267,6 +303,10 @@ export async function upsertSiteContactSettings(
           heroBackgroundImage: string | null;
           statsSectionBackgroundImage: string | null;
           diagnosticServicesDefaultHeaderImage: string | null;
+          doctorsPageHeroImage: string | null;
+          servicesPageHeroImage: string | null;
+          blogPageHeroImage: string | null;
+          contactPageHeroImage: string | null;
           pmjayPatientsTreatedValue: string | null;
           pmjayPrimaryLogoUrl: string | null;
           pmjaySecondaryLogoUrl: string | null;
@@ -311,6 +351,10 @@ export async function upsertSiteContactSettings(
       statsSectionBackgroundImage: data.statsSectionBackgroundImage,
       diagnosticServicesDefaultHeaderImage:
         data.diagnosticServicesDefaultHeaderImage,
+      doctorsPageHeroImage: data.doctorsPageHeroImage,
+      servicesPageHeroImage: data.servicesPageHeroImage,
+      blogPageHeroImage: data.blogPageHeroImage,
+      contactPageHeroImage: data.contactPageHeroImage,
       pmjayPatientsTreatedValue: data.pmjayPatientsTreatedValue,
       pmjayPrimaryLogoUrl: data.pmjayPrimaryLogoUrl,
       pmjaySecondaryLogoUrl: data.pmjaySecondaryLogoUrl,
@@ -340,6 +384,10 @@ export async function upsertSiteContactSettings(
       statsSectionBackgroundImage: data.statsSectionBackgroundImage,
       diagnosticServicesDefaultHeaderImage:
         data.diagnosticServicesDefaultHeaderImage,
+      doctorsPageHeroImage: data.doctorsPageHeroImage,
+      servicesPageHeroImage: data.servicesPageHeroImage,
+      blogPageHeroImage: data.blogPageHeroImage,
+      contactPageHeroImage: data.contactPageHeroImage,
       pmjayPatientsTreatedValue: data.pmjayPatientsTreatedValue,
       pmjayPrimaryLogoUrl: data.pmjayPrimaryLogoUrl,
       pmjaySecondaryLogoUrl: data.pmjaySecondaryLogoUrl,
@@ -375,6 +423,18 @@ export async function upsertSiteContactSettings(
     diagnosticServicesDefaultHeaderImage:
       settings.diagnosticServicesDefaultHeaderImage?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.diagnosticServicesDefaultHeaderImage,
+    doctorsPageHeroImage:
+      settings.doctorsPageHeroImage?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.doctorsPageHeroImage,
+    servicesPageHeroImage:
+      settings.servicesPageHeroImage?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.servicesPageHeroImage,
+    blogPageHeroImage:
+      settings.blogPageHeroImage?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.blogPageHeroImage,
+    contactPageHeroImage:
+      settings.contactPageHeroImage?.trim() ||
+      DEFAULT_SITE_CONTACT_SETTINGS.contactPageHeroImage,
     pmjayPatientsTreatedValue:
       settings.pmjayPatientsTreatedValue?.trim() ||
       DEFAULT_SITE_CONTACT_SETTINGS.pmjayPatientsTreatedValue,

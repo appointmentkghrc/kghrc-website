@@ -1,7 +1,9 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 import { DEFAULT_PMJAY_PRIMARY_LOGO } from "@/lib/pmjayDefaults";
 
@@ -18,6 +20,7 @@ const emptyForm: PmjayFormData = {
 };
 
 export default function PmjayPatientsTreatedManager() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<PmjayFormData>(emptyForm);
@@ -26,7 +29,7 @@ export default function PmjayPatientsTreatedManager() {
     const fetchSettings = async () => {
       try {
         setLoading(true);
-        const settingsRes = await fetch("/api/site-settings");
+        const settingsRes = await apiFetch("/api/site-settings");
         if (!settingsRes.ok) throw new Error("Failed to fetch site settings");
         const data = await settingsRes.json();
 
@@ -59,7 +62,7 @@ export default function PmjayPatientsTreatedManager() {
     e.preventDefault();
     try {
       setSaving(true);
-      const response = await fetch("/api/site-settings", {
+      const response = await apiFetch("/api/site-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -71,6 +74,7 @@ export default function PmjayPatientsTreatedManager() {
 
       if (!response.ok) throw new Error("Failed to save PMJAY settings");
 
+      router.refresh();
       alert("PMJAY homepage section updated successfully!");
     } catch (error) {
       console.error("Error saving PMJAY settings:", error);

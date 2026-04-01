@@ -1,6 +1,11 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { UploadButton } from "@/lib/uploadthing";
+import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
+import { DEFAULT_SITE_CONTACT_SETTINGS } from "@/lib/siteSettings";
 
 type ContactSettingsForm = {
   officeAddress: string;
@@ -9,6 +14,7 @@ type ContactSettingsForm = {
   primaryEmail: string;
   secondaryEmail: string;
   mapEmbedUrl: string;
+  contactPageHeroImage: string;
 };
 
 const emptyForm: ContactSettingsForm = {
@@ -18,9 +24,11 @@ const emptyForm: ContactSettingsForm = {
   primaryEmail: "",
   secondaryEmail: "",
   mapEmbedUrl: "",
+  contactPageHeroImage: DEFAULT_SITE_CONTACT_SETTINGS.contactPageHeroImage,
 };
 
 export default function ContactSettingsManager() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<ContactSettingsForm>(emptyForm);
@@ -29,10 +37,21 @@ export default function ContactSettingsManager() {
     const fetchSettings = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/site-settings");
+        const response = await apiFetch("/api/site-settings");
         if (!response.ok) throw new Error("Failed to fetch contact settings");
         const data = await response.json();
-        setFormData(data);
+        setFormData({
+          officeAddress: data.officeAddress ?? emptyForm.officeAddress,
+          primaryPhone: data.primaryPhone ?? emptyForm.primaryPhone,
+          secondaryPhone: data.secondaryPhone ?? emptyForm.secondaryPhone,
+          primaryEmail: data.primaryEmail ?? emptyForm.primaryEmail,
+          secondaryEmail: data.secondaryEmail ?? emptyForm.secondaryEmail,
+          mapEmbedUrl: data.mapEmbedUrl ?? emptyForm.mapEmbedUrl,
+          contactPageHeroImage:
+            typeof data.contactPageHeroImage === "string" && data.contactPageHeroImage.trim()
+              ? data.contactPageHeroImage.trim()
+              : DEFAULT_SITE_CONTACT_SETTINGS.contactPageHeroImage,
+        });
       } catch (error) {
         console.error("Error fetching contact settings:", error);
         alert("Failed to load contact settings");
@@ -55,7 +74,7 @@ export default function ContactSettingsManager() {
     e.preventDefault();
     try {
       setSaving(true);
-      const response = await fetch("/api/site-settings", {
+      const response = await apiFetch("/api/site-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -63,7 +82,19 @@ export default function ContactSettingsManager() {
 
       if (!response.ok) throw new Error("Failed to save contact settings");
       const updated = await response.json();
-      setFormData(updated);
+      setFormData({
+        officeAddress: updated.officeAddress ?? formData.officeAddress,
+        primaryPhone: updated.primaryPhone ?? formData.primaryPhone,
+        secondaryPhone: updated.secondaryPhone ?? formData.secondaryPhone,
+        primaryEmail: updated.primaryEmail ?? formData.primaryEmail,
+        secondaryEmail: updated.secondaryEmail ?? formData.secondaryEmail,
+        mapEmbedUrl: updated.mapEmbedUrl ?? formData.mapEmbedUrl,
+        contactPageHeroImage:
+          typeof updated.contactPageHeroImage === "string" && updated.contactPageHeroImage.trim()
+            ? updated.contactPageHeroImage.trim()
+            : DEFAULT_SITE_CONTACT_SETTINGS.contactPageHeroImage,
+      });
+      router.refresh();
       alert("Contact details updated successfully!");
     } catch (error) {
       console.error("Error saving contact settings:", error);
@@ -94,6 +125,58 @@ export default function ContactSettingsManager() {
         onSubmit={handleSubmit}
         className="bg-white rounded-lg shadow-md p-6 space-y-5"
       >
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Contact page hero (header banner)
+          </label>
+          <p className="text-sm text-gray-500 mb-2">
+            Background image at the top of the public Contact page.
+          </p>
+          <input
+            type="text"
+            name="contactPageHeroImage"
+            value={formData.contactPageHeroImage}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Image URL"
+          />
+          <div className="mt-2">
+            <label className="block text-sm text-gray-600 mb-1">Or upload</label>
+            <UploadButton
+              className="ut-primary-upload"
+              endpoint="heroSectionImage"
+              onBeforeUploadBegin={(files) =>
+                optimizeImagesForUpload(files, { maxDimension: 2200, quality: 0.82 })
+              }
+              onClientUploadComplete={(res) => {
+                if (res?.[0]?.url) {
+                  setFormData((prev) => ({ ...prev, contactPageHeroImage: res[0].url }));
+                }
+              }}
+              onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
+            />
+          </div>
+          <div className="mt-3 h-36 rounded-lg overflow-hidden border border-gray-200">
+            <img
+              src={formData.contactPageHeroImage}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() =>
+              setFormData((prev) => ({
+                ...prev,
+                contactPageHeroImage: DEFAULT_SITE_CONTACT_SETTINGS.contactPageHeroImage,
+              }))
+            }
+            className="mt-2 text-sm text-gray-600 underline hover:text-gray-900"
+          >
+            Reset hero to default
+          </button>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Office Address

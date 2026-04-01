@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 type DiagnosticServiceDelegate = {
@@ -32,17 +33,17 @@ export async function GET(request: NextRequest) {
     const diagnosticServiceDelegate = getDiagnosticServiceDelegate();
 
     if (!diagnosticServiceDelegate) {
-      return NextResponse.json([]);
+      return jsonNoStore([]);
     }
 
     const services = await diagnosticServiceDelegate.findMany({
       where: includeInactive ? {} : { isActive: true },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     });
-    return NextResponse.json(services);
+    return jsonNoStore(services);
   } catch (error) {
     console.error("Error fetching diagnostic services:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to fetch diagnostic services" },
       { status: 500 }
     );
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
     const diagnosticServiceDelegate = getDiagnosticServiceDelegate();
 
     if (!diagnosticServiceDelegate) {
-      return NextResponse.json(
+      return jsonNoStore(
         {
           error:
             "Diagnostic services model is not available. Restart dev server after running prisma generate.",
@@ -76,10 +77,10 @@ export async function POST(request: NextRequest) {
         isActive: body.isActive ?? true,
       },
     });
-    return NextResponse.json(service, { status: 201 });
+    return jsonNoStore(service, { status: 201 });
   } catch (error) {
     console.error("Error creating diagnostic service:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to create diagnostic service" },
       { status: 500 }
     );

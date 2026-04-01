@@ -1,5 +1,6 @@
- "use client";
+"use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -24,7 +25,7 @@ export default function SpecialistsSection() {
     const fetchDoctors = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/api/doctors");
+        const res = await apiFetch("/api/doctors");
         if (!res.ok) throw new Error("Failed to fetch doctors");
         const data: Doctor[] = await res.json();
         setDoctors(data);
@@ -41,7 +42,7 @@ export default function SpecialistsSection() {
   useEffect(() => {
     const fetchSectionDescription = async () => {
       try {
-        const res = await fetch("/api/site-settings");
+        const res = await apiFetch("/api/site-settings");
         if (!res.ok) return;
         const data = await res.json();
         if (typeof data?.doctorsSectionDescription === "string") {

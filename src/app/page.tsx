@@ -7,8 +7,12 @@ import PatientTestimonialsSection from "@/components/PatientTestimonialsSection"
 import RecentBlogsSection from "@/components/RecentBlogsSection";
 import AppointmentMobileInput from "@/components/AppointmentMobileInput";
 import { getAboutSettings, parseOpeningHoursRowsToItems } from "@/lib/aboutSettings";
+import { cacheBustUrl } from "@/lib/cacheBustUrl";
 import { getSiteContactSettings } from "@/lib/siteSettings";
 import Link from "next/link";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function Home() {
   const [siteSettings, aboutSettings] = await Promise.all([
@@ -18,6 +22,8 @@ export default async function Home() {
   const pmjayPatientsTreatedValue =
     siteSettings.pmjayPatientsTreatedValue.trim() || "0";
   const openingHours = parseOpeningHoursRowsToItems(aboutSettings.openingHoursRows);
+  const heroBg = cacheBustUrl(siteSettings.heroBackgroundImage);
+  const statsBg = cacheBustUrl(siteSettings.statsSectionBackgroundImage);
 
   return (
     <div className="min-h-screen relative">
@@ -25,7 +31,7 @@ export default async function Home() {
       <div
         className="fixed inset-0 -z-10 bg-cover bg-center"
         style={{
-          backgroundImage: `url(${siteSettings.heroBackgroundImage})`,
+          backgroundImage: `url(${heroBg})`,
           // no zoom out, use default cover (no backgroundSize override)
         }}
       />
@@ -110,9 +116,7 @@ export default async function Home() {
         items={siteSettings.servicesHighlightItems}
       />
       <SpecialistsSection />
-      <StatsSection
-        backgroundImageUrl={siteSettings.statsSectionBackgroundImage}
-      />
+      <StatsSection backgroundImageUrl={statsBg} />
       <PatientTestimonialsSection />
       <RecentBlogsSection />
     </div>

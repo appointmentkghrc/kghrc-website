@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 export async function GET(
@@ -13,13 +14,13 @@ export async function GET(
     });
 
     if (!blog) {
-      return NextResponse.json({ error: "Blog not found" }, { status: 404 });
+      return jsonNoStore({ error: "Blog not found" }, { status: 404 });
     }
 
-    return NextResponse.json(blog);
+    return jsonNoStore(blog);
   } catch (error) {
     console.error("Error fetching blog:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to fetch blog" },
       { status: 500 }
     );
@@ -54,10 +55,10 @@ export async function PATCH(
         }),
       },
     });
-    return NextResponse.json(blog);
+    return jsonNoStore(blog);
   } catch (error) {
     console.error("Error updating blog:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to update blog" },
       { status: 500 }
     );
@@ -74,10 +75,10 @@ export async function DELETE(
     await prisma.blog.delete({
       where: { id },
     });
-    return NextResponse.json({ message: "Blog deleted successfully" });
+    return jsonNoStore({ message: "Blog deleted successfully" });
   } catch (error) {
     console.error("Error deleting blog:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to delete blog" },
       { status: 500 }
     );

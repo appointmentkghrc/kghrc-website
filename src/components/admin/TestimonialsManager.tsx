@@ -1,6 +1,8 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 
 interface Testimonial {
@@ -15,6 +17,7 @@ interface Testimonial {
 }
 
 export default function TestimonialsManager() {
+  const router = useRouter();
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,7 +38,7 @@ export default function TestimonialsManager() {
   const fetchTestimonials = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/testimonials");
+      const response = await apiFetch("/api/testimonials");
       if (!response.ok) throw new Error("Failed to fetch testimonials");
       const data = await response.json();
       setTestimonials(data);
@@ -71,13 +74,14 @@ export default function TestimonialsManager() {
     }
     
     try {
-      const response = await fetch(`/api/testimonials/${id}`, {
+      const response = await apiFetch(`/api/testimonials/${id}`, {
         method: "DELETE",
       });
       
       if (!response.ok) throw new Error("Failed to delete testimonial");
       
       setTestimonials(testimonials.filter((t) => t.id !== id));
+      router.refresh();
       alert("Testimonial deleted successfully!");
     } catch (error) {
       console.error("Error deleting testimonial:", error);
@@ -91,7 +95,7 @@ export default function TestimonialsManager() {
 
     try {
       if (editingTestimonial) {
-        const response = await fetch(`/api/testimonials/${editingTestimonial.id}`, {
+        const response = await apiFetch(`/api/testimonials/${editingTestimonial.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -101,9 +105,10 @@ export default function TestimonialsManager() {
         
         const updatedTestimonial = await response.json();
         setTestimonials(testimonials.map((t) => (t.id === editingTestimonial.id ? updatedTestimonial : t)));
+        router.refresh();
         alert("Testimonial updated successfully!");
       } else {
-        const response = await fetch("/api/testimonials", {
+        const response = await apiFetch("/api/testimonials", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -113,6 +118,7 @@ export default function TestimonialsManager() {
         
         const newTestimonial = await response.json();
         setTestimonials([newTestimonial, ...testimonials]);
+        router.refresh();
         alert("Testimonial created successfully!");
       }
       setIsModalOpen(false);

@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
 
 interface Statistic {
@@ -21,7 +22,7 @@ export default function StatisticsSection() {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/statistics");
+      const response = await apiFetch("/api/statistics");
       if (!response.ok) throw new Error("Failed to fetch statistics");
       const data = await response.json();
       setStats(data);

@@ -1,6 +1,8 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 import { compressImageForUpload } from "@/lib/compressImageForUpload";
 
@@ -12,6 +14,7 @@ interface Partner {
 }
 
 export default function TpaInsurancePartnersManager() {
+  const router = useRouter();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -21,7 +24,7 @@ export default function TpaInsurancePartnersManager() {
   const fetchPartners = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/tpa-insurance-partners");
+      const response = await apiFetch("/api/tpa-insurance-partners");
       if (!response.ok) throw new Error("Failed to fetch partners");
       const data = (await response.json()) as Partner[];
       setPartners(data);
@@ -41,7 +44,7 @@ export default function TpaInsurancePartnersManager() {
     event.preventDefault();
     try {
       setSubmitting(true);
-      const response = await fetch("/api/tpa-insurance-partners", {
+      const response = await apiFetch("/api/tpa-insurance-partners", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, logoUrl }),
@@ -51,6 +54,7 @@ export default function TpaInsurancePartnersManager() {
       setName("");
       setLogoUrl("");
       await fetchPartners();
+      router.refresh();
       alert("Partner added successfully!");
     } catch (error) {
       console.error("Error adding TPA/Insurance partner:", error);
@@ -66,12 +70,13 @@ export default function TpaInsurancePartnersManager() {
     }
 
     try {
-      const response = await fetch(`/api/tpa-insurance-partners/${id}`, {
+      const response = await apiFetch(`/api/tpa-insurance-partners/${id}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete partner");
 
       await fetchPartners();
+      router.refresh();
       alert("Partner removed successfully!");
     } catch (error) {
       console.error("Error deleting TPA/Insurance partner:", error);

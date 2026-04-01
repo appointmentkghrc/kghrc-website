@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { cacheBustUrl } from "@/lib/cacheBustUrl";
 import { getSiteContactSettings } from "@/lib/siteSettings";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface DiagnosticServicePageProps {
   params: Promise<{ id: string }>;
@@ -49,17 +53,20 @@ export default async function DiagnosticServicePage({
     notFound();
   }
 
+  const headerBg = cacheBustUrl(
+    service.headerBackgroundImage ||
+      siteSettings.diagnosticServicesDefaultHeaderImage ||
+      "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg"
+  );
+  const bodyImage = cacheBustUrl(service.image);
+
   return (
     <div className="bg-gray-50 min-h-screen pb-16">
       <section className="relative h-[320px] flex items-center justify-center text-white overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url(${
-              service.headerBackgroundImage ||
-              siteSettings.diagnosticServicesDefaultHeaderImage ||
-              "https://validthemes.net/site-template/medihub/assets/img/banner/4.jpg"
-            })`,
+            backgroundImage: `url(${headerBg})`,
           }}
         />
         <div className="absolute inset-0 bg-black/60" />
@@ -78,7 +85,7 @@ export default async function DiagnosticServicePage({
       <section className="max-w-5xl mx-auto px-6 -mt-20 relative z-10">
         <article className="bg-white rounded-3xl shadow-lg overflow-hidden">
           <img
-            src={service.image}
+            src={bodyImage}
             alt={service.name}
             className="w-full h-[320px] md:h-[420px] object-cover"
           />

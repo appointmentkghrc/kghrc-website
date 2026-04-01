@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 export async function GET(
@@ -13,16 +14,16 @@ export async function GET(
     });
 
     if (!testimonial) {
-      return NextResponse.json(
+      return jsonNoStore(
         { error: "Testimonial not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(testimonial);
+    return jsonNoStore(testimonial);
   } catch (error) {
     console.error("Error fetching testimonial:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to fetch testimonial" },
       { status: 500 }
     );
@@ -47,10 +48,10 @@ export async function PATCH(
         ...(body.image !== undefined && { image: body.image || null }),
       },
     });
-    return NextResponse.json(testimonial);
+    return jsonNoStore(testimonial);
   } catch (error) {
     console.error("Error updating testimonial:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to update testimonial" },
       { status: 500 }
     );
@@ -67,10 +68,10 @@ export async function DELETE(
     await prisma.testimonial.delete({
       where: { id },
     });
-    return NextResponse.json({ message: "Testimonial deleted successfully" });
+    return jsonNoStore({ message: "Testimonial deleted successfully" });
   } catch (error) {
     console.error("Error deleting testimonial:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to delete testimonial" },
       { status: 500 }
     );

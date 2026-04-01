@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 interface Testimonial {
@@ -30,7 +31,7 @@ export default function PatientTestimonialsSection() {
     const load = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/api/testimonials");
+        const res = await apiFetch("/api/testimonials");
         if (!res.ok) throw new Error("Failed to fetch testimonials");
         const data: Testimonial[] = await res.json();
         setTestimonials(Array.isArray(data) ? data : []);

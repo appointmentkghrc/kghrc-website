@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 type DiagnosticServiceDelegate = {
@@ -25,7 +26,7 @@ export async function GET(
     const diagnosticServiceDelegate = getDiagnosticServiceDelegate();
 
     if (!diagnosticServiceDelegate) {
-      return NextResponse.json(
+      return jsonNoStore(
         {
           error:
             "Diagnostic services model is not available. Restart dev server after running prisma generate.",
@@ -39,16 +40,16 @@ export async function GET(
     });
 
     if (!service) {
-      return NextResponse.json(
+      return jsonNoStore(
         { error: "Diagnostic service not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(service);
+    return jsonNoStore(service);
   } catch (error) {
     console.error("Error fetching diagnostic service:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to fetch diagnostic service" },
       { status: 500 }
     );
@@ -66,7 +67,7 @@ export async function PATCH(
     const diagnosticServiceDelegate = getDiagnosticServiceDelegate();
 
     if (!diagnosticServiceDelegate) {
-      return NextResponse.json(
+      return jsonNoStore(
         {
           error:
             "Diagnostic services model is not available. Restart dev server after running prisma generate.",
@@ -90,10 +91,10 @@ export async function PATCH(
         ...(body.isActive !== undefined && { isActive: Boolean(body.isActive) }),
       },
     });
-    return NextResponse.json(service);
+    return jsonNoStore(service);
   } catch (error) {
     console.error("Error updating diagnostic service:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to update diagnostic service" },
       { status: 500 }
     );
@@ -110,7 +111,7 @@ export async function DELETE(
     const diagnosticServiceDelegate = getDiagnosticServiceDelegate();
 
     if (!diagnosticServiceDelegate) {
-      return NextResponse.json(
+      return jsonNoStore(
         {
           error:
             "Diagnostic services model is not available. Restart dev server after running prisma generate.",
@@ -122,12 +123,12 @@ export async function DELETE(
     await diagnosticServiceDelegate.delete({
       where: { id },
     });
-    return NextResponse.json({
+    return jsonNoStore({
       message: "Diagnostic service deleted successfully",
     });
   } catch (error) {
     console.error("Error deleting diagnostic service:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to delete diagnostic service" },
       { status: 500 }
     );

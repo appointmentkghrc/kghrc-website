@@ -1,6 +1,8 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
 
@@ -17,6 +19,7 @@ interface Stat {
 }
 
 export default function StatsManager() {
+  const router = useRouter();
   const [stats, setStats] = useState<Stat[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
   const [settingsLoading, setSettingsLoading] = useState(true);
@@ -36,7 +39,7 @@ export default function StatsManager() {
     const fetchStats = async () => {
       try {
         setStatsLoading(true);
-        const statsRes = await fetch("/api/statistics");
+        const statsRes = await apiFetch("/api/statistics");
         if (!statsRes.ok) throw new Error("Failed to fetch statistics");
         const data = await statsRes.json();
         setStats(data);
@@ -51,7 +54,7 @@ export default function StatsManager() {
     const fetchSettings = async () => {
       try {
         setSettingsLoading(true);
-        const settingsRes = await fetch("/api/site-settings");
+        const settingsRes = await apiFetch("/api/site-settings");
         if (settingsRes.ok) {
           const settings = await settingsRes.json();
           setStatsBackgroundUrl(
@@ -76,7 +79,7 @@ export default function StatsManager() {
     e.preventDefault();
     try {
       setSavingBackground(true);
-      const response = await fetch("/api/site-settings", {
+      const response = await apiFetch("/api/site-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ statsSectionBackgroundImage: statsBackgroundUrl }),
@@ -86,6 +89,7 @@ export default function StatsManager() {
       setStatsBackgroundUrl(
         updated?.statsSectionBackgroundImage?.trim() || FALLBACK_STATS_BG
       );
+      router.refresh();
       alert("Statistics section background updated successfully!");
     } catch (error) {
       console.error("Error saving statistics background:", error);
@@ -149,13 +153,14 @@ export default function StatsManager() {
     }
     
     try {
-      const response = await fetch(`/api/statistics/${id}`, {
+      const response = await apiFetch(`/api/statistics/${id}`, {
         method: "DELETE",
       });
       
       if (!response.ok) throw new Error("Failed to delete statistic");
       
       setStats(stats.filter((s) => s.id !== id));
+      router.refresh();
       alert("Statistic deleted successfully!");
     } catch (error) {
       console.error("Error deleting statistic:", error);
@@ -169,7 +174,7 @@ export default function StatsManager() {
 
     try {
       if (editingStat) {
-        const response = await fetch(`/api/statistics/${editingStat.id}`, {
+        const response = await apiFetch(`/api/statistics/${editingStat.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -179,9 +184,10 @@ export default function StatsManager() {
         
         const updatedStat = await response.json();
         setStats(stats.map((s) => (s.id === editingStat.id ? updatedStat : s)));
+        router.refresh();
         alert("Statistic updated successfully!");
       } else {
-        const response = await fetch("/api/statistics", {
+        const response = await apiFetch("/api/statistics", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -191,6 +197,7 @@ export default function StatsManager() {
         
         const newStat = await response.json();
         setStats([newStat, ...stats]);
+        router.refresh();
         alert("Statistic created successfully!");
       }
       setIsModalOpen(false);

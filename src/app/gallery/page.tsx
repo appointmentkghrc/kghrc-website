@@ -1,5 +1,6 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useMemo, useState } from "react";
 
 type GalleryImage = {
@@ -291,7 +292,7 @@ export default function GalleryPage() {
     const fetchGallery = async () => {
       setGalleryLoading(true);
       try {
-        const response = await fetch("/api/gallery");
+        const response = await apiFetch("/api/gallery");
         if (!response.ok) throw new Error("Failed to fetch gallery");
         const data: GalleryApiResponse = await response.json();
         setTitle(data?.title || DEFAULT_TITLE);

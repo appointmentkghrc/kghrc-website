@@ -1,16 +1,20 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import MarkdownGuide from "./MarkdownGuide";
 import { UploadButton } from "@/lib/uploadthing";
+import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
 import {
   blogDisplayIso,
   dateInputToIso,
   isoToDateInput,
   todayDateInputValue,
 } from "@/lib/blogDisplayDate";
+import { DEFAULT_SITE_CONTACT_SETTINGS } from "@/lib/siteSettings";
 import "easymde/dist/easymde.min.css";
 
 interface Blog {
@@ -32,6 +36,7 @@ interface Blog {
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), { ssr: false });
 
 export default function BlogsManager() {
+  const router = useRouter();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,6 +46,10 @@ export default function BlogsManager() {
   const [showPreview, setShowPreview] = useState(false);
   const [previewBlog, setPreviewBlog] = useState<Blog | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [blogPageHeroImage, setBlogPageHeroImage] = useState(
+    DEFAULT_SITE_CONTACT_SETTINGS.blogPageHeroImage
+  );
+  const [savingBlogHero, setSavingBlogHero] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -63,12 +72,25 @@ export default function BlogsManager() {
 
   useEffect(() => {
     fetchBlogs();
+    const loadBlogHero = async () => {
+      try {
+        const res = await apiFetch("/api/site-settings");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (typeof data.blogPageHeroImage === "string" && data.blogPageHeroImage.trim()) {
+          setBlogPageHeroImage(data.blogPageHeroImage.trim());
+        }
+      } catch (e) {
+        console.error("Error loading blog page hero:", e);
+      }
+    };
+    loadBlogHero();
   }, []);
 
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/blogs");
+      const response = await apiFetch("/api/blogs");
       if (!response.ok) throw new Error("Failed to fetch blogs");
       const data = await response.json();
       setBlogs(data);
@@ -146,13 +168,14 @@ export default function BlogsManager() {
     }
     
     try {
-      const response = await fetch(`/api/blogs/${id}`, {
+      const response = await apiFetch(`/api/blogs/${id}`, {
         method: "DELETE",
       });
       
       if (!response.ok) throw new Error("Failed to delete blog");
       
       setBlogs(blogs.filter((b) => b.id !== id));
+      router.refresh();
       alert("Blog deleted successfully!");
     } catch (error) {
       console.error("Error deleting blog:", error);
@@ -165,7 +188,7 @@ export default function BlogsManager() {
     if (!blog) return;
 
     try {
-      const response = await fetch(`/api/blogs/${id}`, {
+      const response = await apiFetch(`/api/blogs/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ archived: !blog.archived }),
@@ -175,6 +198,7 @@ export default function BlogsManager() {
       
       const updatedBlog = await response.json();
       setBlogs(blogs.map((b) => (b.id === id ? updatedBlog : b)));
+      router.refresh();
     } catch (error) {
       console.error("Error archiving blog:", error);
       alert("Failed to archive blog");
@@ -187,7 +211,7 @@ export default function BlogsManager() {
 
     try {
       if (editingBlog) {
-        const response = await fetch(`/api/blogs/${editingBlog.id}`, {
+        const response = await apiFetch(`/api/blogs/${editingBlog.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -200,9 +224,10 @@ export default function BlogsManager() {
         
         const updatedBlog = await response.json();
         setBlogs(blogs.map((b) => (b.id === editingBlog.id ? updatedBlog : b)));
+        router.refresh();
         alert("Blog updated successfully!");
       } else {
-        const response = await fetch("/api/blogs", {
+        const response = await apiFetch("/api/blogs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -215,6 +240,7 @@ export default function BlogsManager() {
         
         const newBlog = await response.json();
         setBlogs([newBlog, ...blogs]);
+        router.refresh();
         alert("Blog created successfully!");
       }
       setIsModalOpen(false);
@@ -232,6 +258,30 @@ export default function BlogsManager() {
     }
   };
 
+  const handleSaveBlogHero = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSavingBlogHero(true);
+      const res = await apiFetch("/api/site-settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blogPageHeroImage }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      const data = await res.json();
+      if (typeof data.blogPageHeroImage === "string") {
+        setBlogPageHeroImage(data.blogPageHeroImage);
+      }
+      router.refresh();
+      alert("Blog listing page hero image saved!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save blog page hero image");
+    } finally {
+      setSavingBlogHero(false);
+    }
+  };
+
   const filteredBlogs = blogs.filter((blog) => {
     const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          blog.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
@@ -244,6 +294,58 @@ export default function BlogsManager() {
 
   return (
     <div className="space-y-6">
+      <form
+        onSubmit={handleSaveBlogHero}
+        className="bg-white rounded-lg shadow-md p-5 space-y-3 border border-gray-100"
+      >
+        <h3 className="text-lg font-semibold text-gray-800">Blog listing page hero</h3>
+        <p className="text-sm text-gray-600">
+          Header background on the public <code className="text-xs bg-gray-100 px-1 rounded">/blog</code> page.
+        </p>
+        <input
+          type="text"
+          value={blogPageHeroImage}
+          onChange={(e) => setBlogPageHeroImage(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Image URL"
+        />
+        <div>
+          <span className="block text-sm text-gray-600 mb-1">Or upload</span>
+          <UploadButton
+            className="ut-primary-upload"
+            endpoint="heroSectionImage"
+            onBeforeUploadBegin={(files) =>
+              optimizeImagesForUpload(files, { maxDimension: 2200, quality: 0.82 })
+            }
+            onClientUploadComplete={(res) => {
+              if (res?.[0]?.url) setBlogPageHeroImage(res[0].url);
+            }}
+            onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
+          />
+        </div>
+        <div className="h-36 rounded-lg overflow-hidden border border-gray-200">
+          <img src={blogPageHeroImage} alt="" className="w-full h-full object-cover" />
+        </div>
+        <div className="flex justify-between gap-2">
+          <button
+            type="button"
+            onClick={() =>
+              setBlogPageHeroImage(DEFAULT_SITE_CONTACT_SETTINGS.blogPageHeroImage)
+            }
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
+          >
+            Reset to default
+          </button>
+          <button
+            type="submit"
+            disabled={savingBlogHero}
+            className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            {savingBlogHero ? "Saving..." : "Save hero image"}
+          </button>
+        </div>
+      </form>
+
       {loading ? (
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

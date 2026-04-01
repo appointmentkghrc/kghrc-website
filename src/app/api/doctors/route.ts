@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { jsonNoStore } from "@/lib/jsonNoStore";
 import prisma from "@/lib/prisma";
 
 export async function GET() {
@@ -6,10 +7,10 @@ export async function GET() {
     const doctors = await prisma.doctor.findMany({
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     });
-    return NextResponse.json(doctors);
+    return jsonNoStore(doctors);
   } catch (error) {
     console.error("Error fetching doctors:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to fetch doctors" },
       { status: 500 }
     );
@@ -38,10 +39,10 @@ export async function POST(request: NextRequest) {
           : 0,
       },
     });
-    return NextResponse.json(doctor, { status: 201 });
+    return jsonNoStore(doctor, { status: 201 });
   } catch (error) {
     console.error("Error creating doctor:", error);
-    return NextResponse.json(
+    return jsonNoStore(
       { error: "Failed to create doctor" },
       { status: 500 }
     );

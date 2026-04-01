@@ -1,6 +1,8 @@
 "use client";
 
+import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 import { DEFAULT_ABOUT_SETTINGS, type AboutSettings } from "@/lib/aboutSettings";
 
@@ -76,6 +78,7 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default function AboutUsManager() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<AboutSettings>(DEFAULT_ABOUT_SETTINGS);
@@ -103,7 +106,7 @@ export default function AboutUsManager() {
     const fetchSettings = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/about-settings");
+        const response = await apiFetch("/api/about-settings");
         if (!response.ok) throw new Error("Failed to fetch about settings");
         const data: AboutSettings = await response.json();
         setFormData(data);
@@ -150,7 +153,7 @@ export default function AboutUsManager() {
         servicesItems: stringifyPointRows(servicesItemsRows),
       };
 
-      const response = await fetch("/api/about-settings", {
+      const response = await apiFetch("/api/about-settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -165,6 +168,7 @@ export default function AboutUsManager() {
       setDiagnosticItemsRows(parsePointRows(updated.diagnosticItems));
       setFacilitiesItemsRows(parsePointRows(updated.facilitiesItems));
       setServicesItemsRows(parsePointRows(updated.servicesItems));
+      router.refresh();
       alert("About Us settings updated successfully!");
     } catch (error) {
       console.error("Error saving about settings:", error);
