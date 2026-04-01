@@ -4,10 +4,8 @@ import { useEffect, useState } from "react";
 
 type PageHeroHeaderProps = {
   imageUrl: string;
-  /** Section + content area height, e.g. h-[420px] */
+  /** Sets the hero block height, e.g. h-[420px]. Background layers use absolute inset-0 so the image always fills this box (no grey gap). */
   className?: string;
-  /** Must match fixed layers (doctors list 420, doctor detail 340, blog 500) */
-  fixedHeightClass?: string;
   overlayClassName?: string;
   children: React.ReactNode;
 };
@@ -15,11 +13,13 @@ type PageHeroHeaderProps = {
 /**
  * Public page top banner: neutral base (no hardcoded photo), optional image from CMS,
  * and "Loading…" until the image finishes loading (or errors).
+ *
+ * Backgrounds are `absolute inset-0` inside the section — not `fixed` — so the image
+ * aligns with the hero area below the navbar (viewport-fixed backgrounds caused bottom cut-off / grey band).
  */
 export default function PageHeroHeader({
   imageUrl,
   className = "h-[420px]",
-  fixedHeightClass = "h-[420px]",
   overlayClassName = "bg-black/60",
   children,
 }: PageHeroHeaderProps) {
@@ -35,10 +35,10 @@ export default function PageHeroHeader({
 
   return (
     <section
-      className={`relative flex items-center justify-center text-white overflow-hidden ${className}`}
+      className={`relative flex min-h-0 items-center justify-center text-white overflow-hidden ${className}`}
     >
       <div
-        className={`fixed top-0 left-0 w-full ${fixedHeightClass} -z-10 bg-slate-800 bg-gradient-to-br from-slate-800 to-slate-900`}
+        className="absolute inset-0 z-0 bg-slate-800 bg-gradient-to-br from-slate-800 to-slate-900"
         aria-hidden
       />
 
@@ -46,7 +46,7 @@ export default function PageHeroHeader({
         <img
           src={trimmed}
           alt=""
-          className={`fixed top-0 left-0 w-full ${fixedHeightClass} object-cover object-center -z-10 transition-opacity duration-300 ${
+          className={`absolute inset-0 z-0 h-full w-full object-cover object-center transition-opacity duration-300 ${
             bgLoaded ? "opacity-100" : "opacity-0"
           }`}
           onLoad={() => setBgLoaded(true)}

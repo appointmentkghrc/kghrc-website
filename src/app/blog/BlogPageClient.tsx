@@ -64,7 +64,6 @@ export default function BlogPageClient({
       <PageHeroHeader
         imageUrl={heroBackgroundImage}
         className="h-[500px]"
-        fixedHeightClass="h-[500px]"
         overlayClassName="bg-black/50"
       >
         <div className="text-center">

@@ -15,7 +15,6 @@ export default async function ContactPage() {
       <PageHeroHeader
         imageUrl={hero}
         className="h-[420px]"
-        fixedHeightClass="h-[420px]"
         overlayClassName="bg-black/60"
       >
         <div className="text-center">

@@ -22,7 +22,6 @@ export default async function ServicesPage() {
       <PageHeroHeader
         imageUrl={hero}
         className="h-[420px]"
-        fixedHeightClass="h-[420px]"
         overlayClassName="bg-black/60"
       >
         <div className="text-center">

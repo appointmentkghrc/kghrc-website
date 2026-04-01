@@ -33,7 +33,6 @@ export default async function DoctorDetailsPage({ params }: DoctorPageProps) {
       <PageHeroHeader
         imageUrl={hero}
         className="h-[340px]"
-        fixedHeightClass="h-[340px]"
         overlayClassName="bg-black/60"
       >
         <div className="text-center px-6">
