@@ -44,7 +44,7 @@ export default async function ContactPage() {
             <h3 className="text-xl font-semibold mb-4">Contact</h3>
             <div className="w-10 h-[2px] bg-white mx-auto mb-6"></div>
             <p className="text-2xl font-bold mb-2">{contactSettings.primaryPhone}</p>
-            <p className="text-lg">No. {contactSettings.secondaryPhone}</p>
+            <p className="text-lg"> {contactSettings.secondaryPhone}</p>
           </div>
 
           {/* Email */}
