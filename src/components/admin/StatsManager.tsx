@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
+import FaServiceIconPicker from "@/components/admin/FaServiceIconPicker";
+import { StatisticIcon } from "@/lib/statisticIcon";
 
 const FALLBACK_STATS_BG = "/7.jpg";
 
@@ -31,7 +33,7 @@ export default function StatsManager() {
   const [formData, setFormData] = useState({
     label: "",
     value: "",
-    icon: "fas fa-chart-line",
+    icon: "FaChartLine",
     category: "general",
   });
 
@@ -105,21 +107,6 @@ export default function StatsManager() {
     }
   };
 
-  const iconOptions = [
-    "fas fa-users",
-    "fas fa-user-doctor",
-    "fas fa-hospital",
-    "fas fa-calendar-check",
-    "fas fa-heartbeat",
-    "fas fa-trophy",
-    "fas fa-chart-line",
-    "fas fa-star",
-    "fas fa-check-circle",
-    "fas fa-ambulance",
-    "fas fa-stethoscope",
-    "fas fa-pills",
-  ];
-
   const categories = [
     "general",
     "patients",
@@ -132,7 +119,7 @@ export default function StatsManager() {
 
   const handleAdd = () => {
     setEditingStat(null);
-    setFormData({ label: "", value: "", icon: "fas fa-chart-line", category: "general" });
+    setFormData({ label: "", value: "", icon: "FaChartLine", category: "general" });
     setIsModalOpen(true);
   };
 
@@ -325,8 +312,8 @@ export default function StatsManager() {
               className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                  <i className={`${stat.icon} text-white text-xl`}></i>
+                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center [&_svg]:text-white [&_i]:text-white">
+                  <StatisticIcon icon={stat.icon} className="text-white text-xl w-7 h-7" />
                 </div>
                 <span className="px-2 py-1 bg-white text-blue-600 text-xs rounded-full font-medium">
                   {stat.category}
@@ -425,30 +412,28 @@ export default function StatsManager() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Icon</label>
-                <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
-                  {iconOptions.map((icon) => (
-                    <button
-                      key={icon}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, icon })}
-                      className={`p-3 rounded-lg border transition-colors ${
-                        formData.icon === icon
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                      }`}
-                    >
-                      <i className={`${icon} text-xl`}></i>
-                    </button>
-                  ))}
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Icon (Font Awesome via react-icons)
+                </label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Existing entries that use classic classes like{" "}
+                  <code className="bg-gray-100 px-1 rounded">fas fa-users</code> still work on
+                  the site.
+                </p>
+                <FaServiceIconPicker
+                  value={formData.icon}
+                  onChange={(icon) => setFormData({ ...formData, icon })}
+                />
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-sm font-medium text-gray-700 mb-3">Preview:</p>
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                      <i className={`${formData.icon} text-white text-xl`}></i>
+                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center [&_svg]:text-white [&_i]:text-white">
+                      <StatisticIcon
+                        icon={formData.icon}
+                        className="text-white text-xl w-7 h-7"
+                      />
                     </div>
                     <span className="px-2 py-1 bg-white text-blue-600 text-xs rounded-full font-medium">
                       {formData.category}

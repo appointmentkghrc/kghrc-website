@@ -2,7 +2,7 @@
 
 import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
-import { Users, Stethoscope, Building2, UserCheck } from "lucide-react";
+import { StatisticIcon } from "@/lib/statisticIcon";
 
 interface Statistic {
   id: string;
@@ -20,25 +20,6 @@ const LABEL_KEYWORDS: Record<(typeof CATEGORY_ORDER)[number], string[]> = {
   departments: ["DEPARTMENT", "EXPERIENCE"],
   staff: ["STAFF", "BED", "SERVANT"],
 };
-
-function getIconForLabel(label: string) {
-  const upper = label.toUpperCase();
-
-  if (upper.includes("PATIENT")) {
-    return <Users className="text-secondary w-10 h-10" />;
-  }
-  if (upper.includes("DOCTOR")) {
-    return <Stethoscope className="text-secondary w-10 h-10" />;
-  }
-  if (upper.includes("DEPARTMENT")) {
-    return <Building2 className="text-secondary w-10 h-10" />;
-  }
-  if (upper.includes("SERVANT")) {
-    return <UserCheck className="text-secondary w-10 h-10" />;
-  }
-
-  return <Users className="text-secondary w-10 h-10" />;
-}
 
 type StatsSectionProps = {
   backgroundImageUrl: string;
@@ -126,7 +107,7 @@ export default function StatsSection({ backgroundImageUrl }: StatsSectionProps) 
               className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-10 text-center hover:scale-105 transition-transform"
             >
               <div className="flex justify-center mb-4">
-                {getIconForLabel(item.label)}
+                <StatisticIcon icon={item.icon} className="text-secondary w-10 h-10" />
               </div>
               <h2 className="text-4xl font-bold">{item.value}</h2>
               <p className="text-gray-500 mt-2 text-sm tracking-wide">

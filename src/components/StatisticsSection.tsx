@@ -2,6 +2,7 @@
 
 import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
+import { StatisticIcon } from "@/lib/statisticIcon";
 
 interface Statistic {
   id: string;
@@ -57,8 +58,8 @@ export default function StatisticsSection() {
               className="text-center group hover:scale-105 transition-transform duration-300"
             >
               <div className="flex flex-col items-center">
-                <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mb-4 group-hover:bg-[#00c2c0] transition-colors">
-                  <i className={`${stat.icon} text-white text-3xl`}></i>
+                <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mb-4 group-hover:bg-[#00c2c0] transition-colors [&_svg]:text-white [&_i]:text-white">
+                  <StatisticIcon icon={stat.icon} className="text-white text-3xl w-10 h-10" />
                 </div>
                 <h3 className="text-5xl font-bold text-gray-800 mb-2">
                   {stat.value}

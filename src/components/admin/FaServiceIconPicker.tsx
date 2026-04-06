@@ -3,7 +3,7 @@
 import type { ComponentType } from "react";
 import * as FaIcons from "react-icons/fa";
 import { useMemo, useState } from "react";
-import { ServicePageIcon } from "@/lib/servicePageIcons";
+import { StatisticIcon } from "@/lib/statisticIcon";
 
 const FA_ICON_NAMES = Object.keys(FaIcons).filter(
   (key) =>
@@ -40,7 +40,7 @@ export default function FaServiceIconPicker({
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-gray-50/80 px-3 py-2">
         <span className="text-sm text-gray-500 shrink-0">Selected:</span>
         <div className="flex items-center gap-2 min-w-0">
-          <ServicePageIcon name={value} className="w-7 h-7 text-blue-700 shrink-0" />
+          <StatisticIcon icon={value} className="w-7 h-7 text-blue-700 shrink-0" />
           <code className="text-xs font-mono text-gray-800 truncate max-w-[min(100%,14rem)]">
             {value || "—"}
           </code>
