@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ServicePageItem } from "@prisma/client";
 import { ServicePageIcon } from "@/lib/servicePageIcons";
+import { getServicePageItemCardHref } from "@/lib/servicePageItemDetail";
 
 function isExternalHref(href: string) {
   return /^https?:\/\//i.test(href);
@@ -20,7 +21,7 @@ export default function ServicesPageCardsSection({
       <div className="relative max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {items.map((item) => {
-            const href = item.link.trim();
+            const href = getServicePageItemCardHref(item);
             const cardInner = (
               <>
                 <div className="flex justify-center mb-4">

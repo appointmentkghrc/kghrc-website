@@ -5,7 +5,7 @@ import SpecialistsSection from "@/components/SpecialistsSection";
 import StatsSection from "@/components/StatsSection";
 import PatientTestimonialsSection from "@/components/PatientTestimonialsSection";
 import RecentBlogsSection from "@/components/RecentBlogsSection";
-import AppointmentMobileInput from "@/components/AppointmentMobileInput";
+import AppointmentHeroForm from "@/components/AppointmentHeroForm";
 import { getAboutSettings, parseOpeningHoursRowsToItems } from "@/lib/aboutSettings";
 import { cacheBustUrl } from "@/lib/cacheBustUrl";
 import { getSiteContactSettings } from "@/lib/siteSettings";
@@ -71,30 +71,7 @@ export default async function Home() {
                 </h2>
                 <div className="h-px w-12 bg-white/40 mb-6" />
 
-                <form className="space-y-4">
-                  <input
-                    type="text"
-                    placeholder="Name"
-                    className="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/70 border border-white/30 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-
-                  <AppointmentMobileInput />
-
-                  <textarea
-                    name="query"
-                    placeholder="Write your query/problem"
-                    rows={3}
-                    className="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/70 border border-white/30 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                    required
-                  />
-
-                  <button
-                    type="submit"
-                    className="w-full py-3 mt-2 rounded-full bg-primary text-white font-semibold hover:bg-[#00c2c0] transition"
-                  >
-                    Submit Query
-                  </button>
-                </form>
+                <AppointmentHeroForm />
               </div>
             </div>
           </div>

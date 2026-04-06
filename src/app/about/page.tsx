@@ -322,7 +322,7 @@ export default function AboutPage() {
                 {insurancePartners.map((partner) => (
                   <div
                     key={partner.id}
-                    className="bg-[#FAF699] rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col items-center justify-center gap-3 hover:shadow-md transition"
+                    className="bg-[#ececbd] rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col items-center justify-center gap-3 hover:shadow-md transition"
                   >
                     <div className="w-full h-16 flex items-center justify-center">
                       {partner.logoUrl ? (

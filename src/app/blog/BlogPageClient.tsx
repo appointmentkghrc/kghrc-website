@@ -4,8 +4,9 @@ import PageHeroHeader from "@/components/PageHeroHeader";
 import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
 import { blogDisplayIso } from "@/lib/blogDisplayDate";
+import { blogHeroSlides } from "@/lib/blogImages";
+import BlogImageCarousel from "@/components/BlogImageCarousel";
 
 interface Blog {
   id: string;
@@ -16,6 +17,7 @@ interface Blog {
   author: string;
   category: string;
   image: string;
+  galleryImages?: string[];
   status: string;
   archived: boolean;
   publishedDate?: string | null;
@@ -87,19 +89,19 @@ export default function BlogPageClient({
             </div>
           ) : (
             <div className="space-y-16">
-              {blogs.map((blog) => (
+              {blogs.map((blog) => {
+                const slides = blogHeroSlides(blog);
+                return (
                 <article
                   key={blog.id}
                   className="bg-white rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 p-8"
                 >
-                  {blog.image && (
-                    <div className="mb-8 overflow-hidden rounded-lg group">
-                      <img
-                        src={blog.image}
-                        alt={blog.title}
-                        className="w-full h-[400px] object-cover transition-all duration-700 ease-out scale-105 group-hover:scale-110 group-hover:translate-x-4"
-                      />
-                    </div>
+                  {slides.length > 0 && (
+                    <BlogImageCarousel
+                      images={slides}
+                      title={blog.title}
+                      variant="listing"
+                    />
                   )}
 
                   <div className="flex items-center gap-4 mb-4">
@@ -134,7 +136,8 @@ export default function BlogPageClient({
                     </button>
                   </Link>
                 </article>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

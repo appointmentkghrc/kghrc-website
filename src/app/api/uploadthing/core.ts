@@ -17,6 +17,21 @@ export const ourFileRouter = {
       return { uploadedBy: metadata.uploadedBy, url: file.ufsUrl };
     }),
 
+  /** Additional blog post images (batch upload for carousel on /blog/[slug]). */
+  blogGalleryImages: f({
+    image: {
+      maxFileSize: "8MB",
+      maxFileCount: 12,
+    },
+  })
+    .middleware(async () => {
+      return { uploadedBy: "admin" };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Blog gallery image upload complete:", file.ufsUrl);
+      return { uploadedBy: metadata.uploadedBy, url: file.ufsUrl };
+    }),
+
   doctorImage: f({
     image: {
       maxFileSize: "8MB",

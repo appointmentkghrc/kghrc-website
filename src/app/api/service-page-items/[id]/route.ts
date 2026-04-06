@@ -10,12 +10,20 @@ export async function PATCH(
   const { id } = await params;
 
   try {
+    const existing = await prisma.servicePageItem.findUnique({ where: { id } });
+    if (!existing) {
+      return jsonNoStore({ error: "Not found" }, { status: 404 });
+    }
+
     const body = await request.json();
     const data: {
       icon?: string;
       heading?: string;
       description?: string;
       link?: string;
+      detailPageContent?: string;
+      detailPageImage?: string | null;
+      detailPageHeaderImage?: string | null;
       sortOrder?: number;
       isActive?: boolean;
     } = {};
@@ -38,6 +46,22 @@ export async function PATCH(
     if (body.link !== undefined) {
       data.link = typeof body.link === "string" ? body.link.trim() : "";
     }
+    if (body.detailPageContent !== undefined) {
+      data.detailPageContent =
+        typeof body.detailPageContent === "string"
+          ? body.detailPageContent.trim()
+          : "";
+    }
+    if (body.detailPageImage !== undefined) {
+      const v = body.detailPageImage;
+      data.detailPageImage =
+        typeof v === "string" && v.trim() ? v.trim() : null;
+    }
+    if (body.detailPageHeaderImage !== undefined) {
+      const v = body.detailPageHeaderImage;
+      data.detailPageHeaderImage =
+        typeof v === "string" && v.trim() ? v.trim() : null;
+    }
     if (body.sortOrder !== undefined) {
       const n = body.sortOrder;
       data.sortOrder =
@@ -45,6 +69,25 @@ export async function PATCH(
     }
     if (body.isActive !== undefined) {
       data.isActive = Boolean(body.isActive);
+    }
+
+    const merged = { ...existing, ...data };
+    const detail = merged.detailPageContent.trim();
+    const link = merged.link.trim();
+    if (!merged.heading.trim() || !merged.description.trim()) {
+      return jsonNoStore(
+        { error: "Heading and description cannot be empty" },
+        { status: 400 }
+      );
+    }
+    if (!detail && !link) {
+      return jsonNoStore(
+        {
+          error:
+            "Either add a link, or fill the detail page content so the card opens a custom page",
+        },
+        { status: 400 }
+      );
     }
 
     const item = await prisma.servicePageItem.update({

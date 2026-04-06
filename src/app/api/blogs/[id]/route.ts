@@ -45,6 +45,9 @@ export async function PATCH(
         ...(body.author && { author: body.author }),
         ...(body.category && { category: body.category }),
         ...(body.image !== undefined && { image: body.image }),
+        ...(body.galleryImages !== undefined && {
+          galleryImages: Array.isArray(body.galleryImages) ? body.galleryImages : [],
+        }),
         ...(body.status && { status: body.status }),
         ...(body.archived !== undefined && { archived: body.archived }),
         ...(body.publishedDate !== undefined && {

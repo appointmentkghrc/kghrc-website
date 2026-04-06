@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
         author: body.author,
         category: body.category,
         image: body.image,
+        galleryImages: Array.isArray(body.galleryImages) ? body.galleryImages : [],
         status: body.status || "draft",
         archived: false,
         publishedDate,

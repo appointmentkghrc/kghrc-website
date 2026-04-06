@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 import { blogDisplayIso } from "@/lib/blogDisplayDate";
+import { blogCardImage, blogHeroSlides } from "@/lib/blogImages";
+import BlogImageCarousel from "@/components/BlogImageCarousel";
 
 interface Blog {
   id: string;
@@ -16,6 +18,7 @@ interface Blog {
   author: string;
   category: string;
   image: string;
+  galleryImages?: string[];
   status: string;
   archived: boolean;
   publishedDate?: string | null;
@@ -115,15 +118,7 @@ export default function BlogDetailsPage() {
       <section className="bg-[#f7f7f7] py-24">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-8">
-            {blog.image && (
-              <div className="overflow-hidden rounded-lg mb-8 group">
-                <img
-                  src={blog.image}
-                  alt={blog.title}
-                  className="w-full transition-all duration-700 scale-105 group-hover:scale-110 group-hover:-translate-x-4"
-                />
-              </div>
-            )}
+            <BlogImageCarousel images={blogHeroSlides(blog)} title={blog.title} />
 
             <div className="text-sm mb-6">
               <span className="text-primary font-semibold mr-4">{blog.author.toUpperCase()}</span>
@@ -173,9 +168,9 @@ export default function BlogDetailsPage() {
                       href={`/blog/${relatedBlog.slug}`}
                       className="flex gap-3 group cursor-pointer"
                     >
-                      {relatedBlog.image && (
+                      {blogCardImage(relatedBlog) && (
                         <img
-                          src={relatedBlog.image}
+                          src={blogCardImage(relatedBlog)}
                           alt={relatedBlog.title}
                           className="w-20 h-20 object-cover rounded"
                         />

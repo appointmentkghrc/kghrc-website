@@ -1,4 +1,5 @@
 import PageHeroHeader from "@/components/PageHeroHeader";
+import ContactForm from "@/components/ContactForm";
 import { cacheBustUrl } from "@/lib/cacheBustUrl";
 import { getSiteContactSettings } from "@/lib/siteSettings";
 
@@ -69,35 +70,7 @@ export default async function ContactPage() {
           We would love to hear from you. Please share your valuable feedback.
           </p>
 
-          <form className="space-y-6">
-
-            <input
-              placeholder="Name"
-              className="w-full bg-transparent border border-white/30 p-4 rounded-md focus:outline-none"
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <input
-                placeholder="Email*"
-                className="bg-transparent border border-white/30 p-4 rounded-md focus:outline-none"
-              />
-              <input
-                placeholder="Phone"
-                className="bg-transparent border border-white/30 p-4 rounded-md focus:outline-none"
-              />
-            </div>
-
-            <textarea
-              placeholder="Message *"
-              rows={5}
-              className="w-full bg-transparent border border-white/30 p-4 rounded-md focus:outline-none"
-            />
-
-            <button className="bg-primary hover:bg-[#00c2c0] transition px-10 py-4 rounded-md font-semibold">
-              SEND MESSAGE ✈
-            </button>
-
-          </form>
+          <ContactForm />
 
         </div>
       </section>

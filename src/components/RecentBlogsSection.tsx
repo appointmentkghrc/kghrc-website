@@ -4,6 +4,7 @@ import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { blogDisplayIso } from "@/lib/blogDisplayDate";
+import { blogCardImage } from "@/lib/blogImages";
 
 interface Blog {
   id: string;
@@ -14,6 +15,7 @@ interface Blog {
   author: string;
   category: string;
   image?: string;
+  galleryImages?: string[];
   status: string;
   archived: boolean;
   publishedDate?: string | null;
@@ -74,10 +76,10 @@ export default function RecentBlogsSection() {
               key={blog.id}
               className="bg-white shadow-md rounded-lg overflow-hidden group"
             >
-              {blog.image && (
+              {blogCardImage(blog) && (
                 <div className="overflow-hidden">
                   <img
-                    src={blog.image}
+                    src={blogCardImage(blog)}
                     alt={blog.title}
                     className="w-full h-60 object-cover transition-transform duration-500 group-hover:scale-110"
                   />

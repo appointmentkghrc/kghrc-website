@@ -14,6 +14,8 @@ import {
   isoToDateInput,
   todayDateInputValue,
 } from "@/lib/blogDisplayDate";
+import { blogCardImage, blogHeroSlides } from "@/lib/blogImages";
+import BlogImageCarousel from "@/components/BlogImageCarousel";
 import "easymde/dist/easymde.min.css";
 import { DEFAULT_SITE_CONTACT_SETTINGS } from "@/lib/siteSettings";
 
@@ -26,6 +28,7 @@ interface Blog {
   author: string;
   category: string;
   image: string;
+  galleryImages?: string[];
   status: "published" | "draft";
   archived: boolean;
   publishedDate?: string | null;
@@ -59,6 +62,7 @@ export default function BlogsManager() {
     author: "",
     category: "",
     image: "",
+    galleryImages: [] as string[],
     status: "draft" as "published" | "draft",
     publishedDate: todayDateInputValue(),
   });
@@ -144,6 +148,7 @@ export default function BlogsManager() {
       author: "",
       category: "",
       image: "",
+      galleryImages: [],
       status: "draft",
       publishedDate: todayDateInputValue(),
     });
@@ -160,6 +165,7 @@ export default function BlogsManager() {
       author: blog.author,
       category: blog.category,
       image: blog.image,
+      galleryImages: blog.galleryImages ?? [],
       status: blog.status,
       publishedDate: isoToDateInput(
         blog.publishedDate ?? blog.createdAt
@@ -258,10 +264,26 @@ export default function BlogsManager() {
     }
   };
 
-  const handleImageUpload = (res: any) => {
-    if (res && res[0]) {
-      setFormData({ ...formData, image: res[0].url });
+  const handleImageUpload = (res: Array<{ url: string }>) => {
+    if (res?.[0]?.url) {
+      setFormData((prev) => ({ ...prev, image: res[0].url }));
     }
+  };
+
+  const handleGalleryImagesUpload = (res: Array<{ url: string }>) => {
+    if (!res?.length) return;
+    const urls = res.map((r) => r.url).filter(Boolean);
+    setFormData((prev) => ({
+      ...prev,
+      galleryImages: [...prev.galleryImages, ...urls],
+    }));
+  };
+
+  const removeGalleryImageAt = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      galleryImages: prev.galleryImages.filter((_, i) => i !== index),
+    }));
   };
 
   const handleBlogHeroImageUpload = (res: Array<{ url: string }>) => {
@@ -432,8 +454,8 @@ export default function BlogsManager() {
         {filteredBlogs.map((blog) => (
           <div key={blog.id} className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow ${blog.archived ? 'opacity-60' : ''}`}>
             <div className="h-48 bg-gray-200 flex items-center justify-center relative">
-              {blog.image ? (
-                <img src={blog.image} alt={blog.title} className="w-full h-full object-cover" />
+              {blogCardImage(blog) ? (
+                <img src={blogCardImage(blog)} alt={blog.title} className="w-full h-full object-cover" />
               ) : (
                 <i className="fas fa-image text-gray-400 text-4xl"></i>
               )}
@@ -632,10 +654,18 @@ export default function BlogsManager() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Image</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Featured image
+                </label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Used on blog lists and cards. Shown first in the post image carousel.
+                </p>
                 <UploadButton
                   className="ut-primary-upload"
                   endpoint="blogImage"
+                  onBeforeUploadBegin={(files) =>
+                    optimizeImagesForUpload(files, { maxDimension: 1600, quality: 0.84 })
+                  }
                   onClientUploadComplete={handleImageUpload}
                   onUploadError={(error: Error) => {
                     alert(`Upload Error: ${error.message}`);
@@ -643,8 +673,44 @@ export default function BlogsManager() {
                 />
                 {formData.image && (
                   <div className="mt-2 h-32 bg-gray-100 rounded-lg overflow-hidden">
-                    <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                    <img src={formData.image} alt="Featured preview" className="w-full h-full object-cover" />
                   </div>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  More images (carousel)
+                </label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Upload one or more at a time. On the post page, all images appear in a carousel with prev/next.
+                </p>
+                <UploadButton
+                  className="ut-primary-upload"
+                  endpoint="blogGalleryImages"
+                  onBeforeUploadBegin={(files) =>
+                    optimizeImagesForUpload(files, { maxDimension: 1600, quality: 0.84 })
+                  }
+                  onClientUploadComplete={handleGalleryImagesUpload}
+                  onUploadError={(error: Error) => {
+                    alert(`Upload Error: ${error.message}`);
+                  }}
+                />
+                {formData.galleryImages.length > 0 && (
+                  <ul className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {formData.galleryImages.map((url, i) => (
+                      <li key={`${url}-${i}`} className="relative group h-24 rounded-lg overflow-hidden bg-gray-100">
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryImageAt(i)}
+                          className="absolute top-1 right-1 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white text-xs opacity-0 group-hover:opacity-100 transition"
+                          aria-label="Remove image"
+                        >
+                          <i className="fas fa-times" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </div>
               <div>
@@ -694,15 +760,16 @@ export default function BlogsManager() {
             
             <div className="bg-[#f7f7f7] p-8">
               <div className="max-w-4xl mx-auto">
-                <div className="overflow-hidden rounded-lg mb-8">
-                  {previewBlog.image ? (
-                    <img
-                      src={previewBlog.image}
-                      alt={previewBlog.title}
-                      className="w-full h-96 object-cover"
-                    />
+                <div className="mb-8">
+                  {blogHeroSlides(previewBlog).length > 0 ? (
+                    <div className="max-h-[28rem] [&_img]:max-h-[28rem]">
+                      <BlogImageCarousel
+                        images={blogHeroSlides(previewBlog)}
+                        title={previewBlog.title}
+                      />
+                    </div>
                   ) : (
-                    <div className="w-full h-96 bg-gray-200 flex items-center justify-center">
+                    <div className="w-full h-96 bg-gray-200 flex items-center justify-center rounded-lg">
                       <i className="fas fa-image text-gray-400 text-6xl"></i>
                     </div>
                   )}

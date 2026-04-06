@@ -20,6 +20,10 @@ const navLinks = [
   { label: "Contact", href: "/contact", hasDropdown: false },
 ];
 
+/** Translucent green-tinted glass (inner pages + sticky bar on scroll) */
+const navGlassSolid =
+  "bg-[#84ad3b]/28 backdrop-blur-lg backdrop-saturate-125 shadow-[0_8px_32px_rgba(0,0,0,0.06)] border-b border-white/25";
+
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
@@ -32,6 +36,7 @@ export default function Navbar() {
     pathname === "/about" ||
     pathname?.startsWith("/doctors") ||
     pathname === "/services" ||
+    pathname?.startsWith("/services/item") ||
     pathname === "/gallery" ||
     pathname?.startsWith("/diagnostic-services");
 
@@ -67,7 +72,7 @@ export default function Navbar() {
     <>
       {/* Sticky navbar - slides down when scrolled past 40px */}
       <nav
-        className={`fixed top-0 left-0 w-full z-50 bg-white shadow-md transition-transform duration-200 ease-out ${
+        className={`fixed top-0 left-0 w-full z-50 transition-transform duration-200 ease-out ${navGlassSolid} ${
           isSticky
             ? "translate-y-0 opacity-100"
             : "-translate-y-full opacity-0 pointer-events-none"
@@ -77,7 +82,7 @@ export default function Navbar() {
           <div className="flex items-center">
             <button
               type="button"
-              className="lg:hidden rounded p-2 text-gray-800 hover:bg-gray-100"
+              className="lg:hidden rounded p-2 text-gray-900 hover:bg-white/25"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -91,7 +96,7 @@ export default function Navbar() {
             </button>
             <Link
               href="/"
-              className="-ml-2 flex items-center gap-2 sm:-ml-4 sm:gap-3 lg:-ml-8 xl:-ml-10 text-gray-800 font-bold text-xl tracking-wide"
+              className="-ml-2 flex items-center gap-2 sm:-ml-4 sm:gap-3 lg:-ml-8 xl:-ml-10 text-gray-900 font-bold text-xl tracking-wide"
             >
               <Image
                 src="/Ayushman_Bharat_logo.png"
@@ -123,7 +128,7 @@ export default function Navbar() {
               <li key={link.label}>
                 <Link
                   href={link.href}
-                  className="flex items-center text-gray-800 text-sm font-medium capitalize hover:text-primary transition-colors"
+                  className="flex items-center text-gray-900 text-sm font-medium capitalize hover:text-primary transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -132,22 +137,22 @@ export default function Navbar() {
           </ul>
 
           <div className="flex items-center">
-            <div className="hidden lg:flex items-center gap-3 text-gray-800">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+            <div className="hidden lg:flex items-center gap-3 text-gray-900">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/35">
                 <i
                   className="fa-solid fa-headset text-secondary text-xl"
                   aria-hidden
                 />
               </div>
               <div>
-                <p className="text-xs text-gray-600">Contact Us</p>
+                <p className="text-xs text-gray-800/90">Contact Us</p>
                 <a
                   href={
                     emergencyPhone
                       ? `tel:${emergencyPhone.replace(/[^\d+]/g, "")}`
                       : "#"
                   }
-                  className="text-sm font-semibold text-gray-800 hover:text-primary transition-colors"
+                  className="text-sm font-semibold text-gray-900 hover:text-primary transition-colors"
                   aria-busy={contactPhoneLoading}
                 >
                   {contactPhoneLoading
@@ -160,13 +165,13 @@ export default function Navbar() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-gray-200 bg-white">
+          <div className="lg:hidden border-t border-white/20 bg-[#84ad3b]/35 backdrop-blur-lg backdrop-saturate-125">
             <ul className="flex flex-col gap-1 px-6 py-4">
               {navLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="block py-2 text-gray-800 hover:text-primary transition-colors"
+                    className="block py-2 text-gray-900 hover:text-primary transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {link.label}
@@ -178,12 +183,10 @@ export default function Navbar() {
         )}
       </nav>
 
-      {/* Transparent navbar over hero */}
+      {/* Inner pages: green glass. Home at top of page: transparent over hero (sticky bar adds glass after scroll). */}
       <nav
         className={`relative z-20 w-full py-4 lg:py-5 ${
-          isWhiteNavPage
-            ? "bg-white shadow-md border-b border-gray-100"
-            : "lg:border-b lg:border-white/20"
+          isWhiteNavPage ? navGlassSolid : "lg:border-b lg:border-white/20"
         }`}
         style={
           isWhiteNavPage ? undefined : { background: "transparent", boxShadow: "none" }
@@ -195,8 +198,8 @@ export default function Navbar() {
               type="button"
               className={`lg:hidden rounded p-2 ${
                 isWhiteNavPage
-                  ? "text-gray-800 hover:bg-gray-100"
-                  : "text-white hover:bg-white/10"
+                  ? "text-gray-900 hover:bg-white/25"
+                  : "text-white hover:bg-white/15"
               }`}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
@@ -244,7 +247,7 @@ export default function Navbar() {
                 <Link
                   href={link.href}
                   className={`flex items-center text-sm font-medium capitalize hover:text-primary transition-colors ${
-                    isWhiteNavPage ? "text-gray-800" : "text-white"
+                    isWhiteNavPage ? "text-gray-900" : "text-white"
                   }`}
                 >
                   {link.label}
@@ -256,10 +259,14 @@ export default function Navbar() {
           <div className="flex items-center">
             <div
               className={`hidden lg:flex items-center gap-3 ${
-                isWhiteNavPage ? "text-gray-800" : "text-white"
+                isWhiteNavPage ? "text-gray-900" : "text-white"
               }`}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20">
+              <div
+                className={`flex h-12 w-12 items-center justify-center rounded-full ${
+                  isWhiteNavPage ? "bg-white/35" : "bg-white/20"
+                }`}
+              >
                 <i
                   className="fa-solid fa-headset text-secondary text-2xl"
                   aria-hidden
@@ -268,7 +275,7 @@ export default function Navbar() {
               <div>
                 <p
                   className={`text-xs ${
-                    isWhiteNavPage ? "text-gray-600" : "text-white/80"
+                    isWhiteNavPage ? "text-gray-800/90" : "text-white/80"
                   }`}
                 >
                   Contact Us
@@ -280,7 +287,7 @@ export default function Navbar() {
                       : "#"
                   }
                   className={`text-sm font-semibold hover:text-primary transition-colors ${
-                    isWhiteNavPage ? "text-gray-800" : "text-white"
+                    isWhiteNavPage ? "text-gray-900" : "text-white"
                   }`}
                   aria-busy={contactPhoneLoading}
                 >
@@ -297,7 +304,7 @@ export default function Navbar() {
           <div
             className={`lg:hidden border-t ${
               isWhiteNavPage
-                ? "border-gray-200 bg-white"
+                ? "border-white/20 bg-[#84ad3b]/35 backdrop-blur-lg backdrop-saturate-125"
                 : "border-white/20 bg-black/30 backdrop-blur-sm"
             }`}
           >
@@ -307,7 +314,7 @@ export default function Navbar() {
                   <Link
                     href={link.href}
                     className={`block py-2 hover:text-primary transition-colors ${
-                      isWhiteNavPage ? "text-gray-800" : "text-white"
+                      isWhiteNavPage ? "text-gray-900" : "text-white"
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >

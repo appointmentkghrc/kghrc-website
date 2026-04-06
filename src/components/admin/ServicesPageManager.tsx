@@ -3,10 +3,8 @@
 import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  SERVICE_PAGE_ICON_KEYS,
-  ServicePageIcon,
-} from "@/lib/servicePageIcons";
+import FaServiceIconPicker from "@/components/admin/FaServiceIconPicker";
+import { ServicePageIcon } from "@/lib/servicePageIcons";
 import { UploadButton } from "@/lib/uploadthing";
 import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
 import { DEFAULT_SITE_CONTACT_SETTINGS } from "@/lib/siteSettings";
@@ -17,6 +15,9 @@ interface ServicePageItemRow {
   heading: string;
   description: string;
   link: string;
+  detailPageContent: string;
+  detailPageImage: string | null;
+  detailPageHeaderImage: string | null;
   sortOrder: number;
   isActive: boolean;
   createdAt: string;
@@ -24,10 +25,13 @@ interface ServicePageItemRow {
 }
 
 const defaultForm = {
-  icon: "Stethoscope" as string,
+  icon: "FaStethoscope" as string,
   heading: "",
   description: "",
   link: "",
+  detailPageContent: "",
+  detailPageImage: "",
+  detailPageHeaderImage: "",
   sortOrder: 0,
   isActive: true,
 };
@@ -124,10 +128,25 @@ export default function ServicesPageManager() {
       heading: row.heading,
       description: row.description,
       link: row.link,
+      detailPageContent: row.detailPageContent ?? "",
+      detailPageImage: row.detailPageImage ?? "",
+      detailPageHeaderImage: row.detailPageHeaderImage ?? "",
       sortOrder: row.sortOrder,
       isActive: row.isActive,
     });
     setIsModalOpen(true);
+  };
+
+  const handleDetailPageImageUpload = (res: Array<{ url: string }>) => {
+    if (res?.[0]?.url) {
+      setFormData((f) => ({ ...f, detailPageImage: res[0].url }));
+    }
+  };
+
+  const handleDetailPageHeaderUpload = (res: Array<{ url: string }>) => {
+    if (res?.[0]?.url) {
+      setFormData((f) => ({ ...f, detailPageHeaderImage: res[0].url }));
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -148,13 +167,28 @@ export default function ServicesPageManager() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.heading.trim() || !formData.description.trim()) {
+      alert("Heading and description are required.");
+      return;
+    }
+    if (!formData.link.trim() && !formData.detailPageContent.trim()) {
+      alert(
+        "Add either a link (for a simple redirect) or detail page content (for a full page like Diagnostic Services)."
+      );
+      return;
+    }
     setSubmitting(true);
     try {
+      const payload = {
+        ...formData,
+        detailPageImage: formData.detailPageImage.trim() || null,
+        detailPageHeaderImage: formData.detailPageHeaderImage.trim() || null,
+      };
       if (editing) {
         const response = await apiFetch(`/api/service-page-items/${editing.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         });
         if (!response.ok) throw new Error("Failed to update");
         const updated = (await response.json()) as ServicePageItemRow;
@@ -167,7 +201,7 @@ export default function ServicesPageManager() {
         const response = await apiFetch("/api/service-page-items", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         });
         if (!response.ok) throw new Error("Failed to create");
         const created = (await response.json()) as ServicePageItemRow;
@@ -190,8 +224,9 @@ export default function ServicesPageManager() {
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Services page</h2>
           <p className="text-gray-600 mt-1">
-            Cards on the public Services page: icon, title, description, and
-            link (internal path or full URL). No statistics—content only.
+            Cards on <strong>/services</strong>: icon, title, description, and either a
+            link or optional <strong>detail page</strong> (same style as Diagnostic
+            Services). No statistics—content only.
           </p>
         </div>
         <button
@@ -307,7 +342,13 @@ export default function ServicesPageManager() {
                   {item.heading}
                 </h3>
                 <p className="text-sm text-gray-500 mt-1 break-all">
-                  → {item.link || "(no link)"}
+                  {item.detailPageContent?.trim() ? (
+                    <span className="text-blue-700">
+                      → /services/item/{item.id} (detail page)
+                    </span>
+                  ) : (
+                    <>→ {item.link || "(no link)"}</>
+                  )}
                 </p>
                 {!item.isActive && (
                   <span className="inline-block mt-2 text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded">
@@ -354,7 +395,7 @@ export default function ServicesPageManager() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
               <h3 className="text-xl font-semibold text-gray-800">
                 {editing ? "Edit card" : "Add card"}
@@ -370,21 +411,12 @@ export default function ServicesPageManager() {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Icon
+                  Icon (Font Awesome)
                 </label>
-                <select
+                <FaServiceIconPicker
                   value={formData.icon}
-                  onChange={(e) =>
-                    setFormData({ ...formData, icon: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {SERVICE_PAGE_ICON_KEYS.map((key) => (
-                    <option key={key} value={key}>
-                      {key}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(icon) => setFormData({ ...formData, icon })}
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -416,7 +448,7 @@ export default function ServicesPageManager() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Link (redirect on click)
+                  Link (when no detail page below)
                 </label>
                 <input
                   type="text"
@@ -424,10 +456,102 @@ export default function ServicesPageManager() {
                   onChange={(e) =>
                     setFormData({ ...formData, link: e.target.value })
                   }
-                  placeholder="/contact or https://..."
+                  placeholder="/contact or https://... (optional if detail page is filled)"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  If you add detail page content, the card opens that page instead of this
+                  link.
+                </p>
+              </div>
+
+              <div className="border-t border-gray-200 pt-4 space-y-2">
+                <p className="text-sm font-medium text-gray-800">
+                  Optional: full detail page (like Diagnostic Services)
+                </p>
+                <p className="text-xs text-gray-600">
+                  When the detail text box is not empty, the card links to a dedicated page
+                  with the layout Home › Services, hero banner, and your content below the
+                  card description.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Detail page — main content
+                </label>
+                <textarea
+                  value={formData.detailPageContent}
+                  onChange={(e) =>
+                    setFormData({ ...formData, detailPageContent: e.target.value })
+                  }
+                  rows={8}
+                  placeholder="Longer description, lists, or extra information shown only on the detail page..."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Detail page — banner image URL (optional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.detailPageHeaderImage}
+                  onChange={(e) =>
+                    setFormData({ ...formData, detailPageHeaderImage: e.target.value })
+                  }
+                  placeholder="Top strip behind the title; defaults to Services page hero if empty"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <label className="block text-sm font-medium text-gray-700 mb-2 mt-3">
+                  Or upload banner
+                </label>
+                <UploadButton
+                  className="ut-primary-upload"
+                  endpoint="heroSectionImage"
+                  onBeforeUploadBegin={(files) =>
+                    optimizeImagesForUpload(files, { maxDimension: 2200, quality: 0.82 })
+                  }
+                  onClientUploadComplete={handleDetailPageHeaderUpload}
+                  onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Detail page — body image URL (optional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.detailPageImage}
+                  onChange={(e) =>
+                    setFormData({ ...formData, detailPageImage: e.target.value })
+                  }
+                  placeholder="Large image under the title block"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <label className="block text-sm font-medium text-gray-700 mb-2 mt-3">
+                  Or upload image
+                </label>
+                <UploadButton
+                  className="ut-primary-upload"
+                  endpoint="diagnosticServiceImage"
+                  onBeforeUploadBegin={(files) =>
+                    optimizeImagesForUpload(files, { maxDimension: 2200, quality: 0.82 })
+                  }
+                  onClientUploadComplete={handleDetailPageImageUpload}
+                  onUploadError={(error: Error) => alert(`Upload Error: ${error.message}`)}
+                />
+                {formData.detailPageImage.trim() ? (
+                  <div className="mt-2 h-40 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                    <img
+                      src={formData.detailPageImage.trim()}
+                      alt="Detail preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : null}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

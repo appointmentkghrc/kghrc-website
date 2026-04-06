@@ -29,9 +29,31 @@ export async function POST(request: NextRequest) {
     const description =
       typeof body.description === "string" ? body.description.trim() : "";
     const link = typeof body.link === "string" ? body.link.trim() : "";
-    if (!heading || !description || !link) {
+    const detailPageContent =
+      typeof body.detailPageContent === "string"
+        ? body.detailPageContent.trim()
+        : "";
+    const detailPageImage =
+      typeof body.detailPageImage === "string" && body.detailPageImage.trim()
+        ? body.detailPageImage.trim()
+        : null;
+    const detailPageHeaderImage =
+      typeof body.detailPageHeaderImage === "string" &&
+      body.detailPageHeaderImage.trim()
+        ? body.detailPageHeaderImage.trim()
+        : null;
+    if (!heading || !description) {
       return jsonNoStore(
-        { error: "Heading, description, and link are required" },
+        { error: "Heading and description are required" },
+        { status: 400 }
+      );
+    }
+    if (!detailPageContent && !link) {
+      return jsonNoStore(
+        {
+          error:
+            "Either add a link, or fill the detail page content so the card opens a custom page",
+        },
         { status: 400 }
       );
     }
@@ -47,7 +69,10 @@ export async function POST(request: NextRequest) {
         icon,
         heading,
         description,
-        link,
+        link: link || "",
+        detailPageContent,
+        detailPageImage,
+        detailPageHeaderImage,
         sortOrder,
         isActive,
       },
