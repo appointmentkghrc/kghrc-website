@@ -88,7 +88,7 @@ export default async function DoctorDetailsPage({ params }: DoctorPageProps) {
                   {doctor.timings || "Not added yet."}
                 </p>
                 <p>
-                  <span className="font-semibold text-gray-900">About:</span> Dr.{" "}
+                  <span className="font-semibold text-gray-900">About:</span> {" "}
                   {doctor.bio ||
                     `${doctor.name}`}
                 </p>
