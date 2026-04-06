@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 import { optimizeImagesForUpload } from "@/lib/imageUploadOptimization";
+import DoctorPortraitUpload from "@/components/admin/DoctorPortraitUpload";
 import { DEFAULT_SITE_CONTACT_SETTINGS } from "@/lib/siteSettings";
 
 interface Doctor {
@@ -247,12 +248,6 @@ export default function DoctorsManager() {
       alert("Failed to save doctor");
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleImageUpload = (res: Array<{ url: string }>) => {
-    if (res && res[0]?.url) {
-      setFormData({ ...formData, image: res[0].url });
     }
   };
 
@@ -686,22 +681,12 @@ export default function DoctorsManager() {
 
               <div className="border-t pt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Upload Photo</label>
-                <UploadButton
-                  className="ut-primary-upload"
-                  endpoint="doctorImage"
-                  onBeforeUploadBegin={(files) =>
-                    optimizeImagesForUpload(files, { maxDimension: 1400, quality: 0.84 })
+                <DoctorPortraitUpload
+                  imageUrl={formData.image}
+                  onImageUrlChange={(url) =>
+                    setFormData((prev) => ({ ...prev, image: url }))
                   }
-                  onClientUploadComplete={handleImageUpload}
-                  onUploadError={(error: Error) => {
-                    alert(`Upload Error: ${error.message}`);
-                  }}
                 />
-                {formData.image && (
-                  <div className="mt-2 h-48 bg-gray-100 rounded-lg overflow-hidden">
-                    <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
-                  </div>
-                )}
               </div>
 
               <div className="flex justify-end gap-3 pt-4">
