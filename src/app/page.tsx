@@ -42,16 +42,17 @@ export default async function Home() {
 
       {/* Hero Content — top padding + start alignment on small screens so copy is not flush to the top; translate only on lg */}
       <main className="relative z-10 min-h-screen flex items-start justify-center pt-6 pb-12 sm:pt-8 sm:pb-14 lg:items-center lg:py-0">
-        <div className="w-full max-w-7xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 xl:px-16">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24">
-            {/* Left: Hero text */}
-            <div className="max-w-2xl lg:-translate-y-16">
-              <h1 className="text-5xl lg:text-7xl font-semibold text-white leading-[1.1] mb-6">
-                <span className="block whitespace-nowrap">{siteSettings.heroTitleLine1}</span>
-                <span className="block text-primary whitespace-nowrap">{siteSettings.heroTitleLine2}</span>
+        <div className="w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
+          {/* lg: gap + column max widths must fit inside max-w-7xl or columns overlap */}
+          <div className="flex flex-col lg:flex-row lg:items-start items-center gap-12 lg:gap-8 xl:gap-10">
+            {/* Left: Hero text — flex-1 min-w-0 keeps copy in its column (no bleed under the form) */}
+            <div className="w-full min-w-0 flex-1 max-w-2xl lg:max-w-none lg:-translate-y-16">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold text-white leading-[1.1] mb-6 wrap-anywhere">
+                <span className="block sm:whitespace-nowrap">{siteSettings.heroTitleLine1}</span>
+                <span className="block text-primary sm:whitespace-nowrap">{siteSettings.heroTitleLine2}</span>
               </h1>
 
-              <p className="text-white/85 text-lg mb-8 leading-relaxed">
+              <p className="text-white/85 text-base sm:text-lg mb-8 leading-relaxed">
                 {siteSettings.heroDescription}
               </p>
 
@@ -63,9 +64,9 @@ export default async function Home() {
               </Link>
             </div>
 
-            {/* Right: Appointment box — narrower on mobile so it does not span full width */}
-            <div className="w-full max-w-88 sm:max-w-md lg:max-w-[520px] mx-auto lg:mx-0 lg:ml-auto lg:-translate-y-16">
-              <div className="rounded-[30px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl p-6 sm:p-10 lg:p-12">
+            {/* Right: fixed max width on lg so it cannot crowd the headline */}
+            <div className="w-full shrink-0 max-w-88 sm:max-w-md lg:max-w-[360px] xl:max-w-[400px] mx-auto lg:mx-0 lg:-translate-y-16">
+              <div className="rounded-[30px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl p-6 sm:p-10 lg:p-8 xl:p-10">
                 <h2 className="text-2xl font-semibold text-white mb-2">
                   Make An Appointment
                 </h2>
