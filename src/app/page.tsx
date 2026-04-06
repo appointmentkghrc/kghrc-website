@@ -42,7 +42,7 @@ export default async function Home() {
 
       {/* Hero Content — top padding + start alignment on small screens so copy is not flush to the top; translate only on lg */}
       <main className="relative z-10 min-h-screen flex items-start justify-center pt-6 pb-12 sm:pt-8 sm:pb-14 lg:items-center lg:py-0">
-        <div className="w-full max-w-7xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 xl:px-16 [padding-left:max(1.25rem,env(safe-area-inset-left))] [padding-right:max(1.25rem,env(safe-area-inset-right))] sm:px-6 md:px-8 lg:px-10 xl:px-16">
+        <div className="w-full max-w-7xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 xl:px-16 [padding-left:max(1.25rem,env(safe-area-inset-left,0px))] [padding-right:max(1.25rem,env(safe-area-inset-right,0px))]">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24">
             {/* Left: Hero text */}
             <div className="max-w-2xl lg:-translate-y-16">
