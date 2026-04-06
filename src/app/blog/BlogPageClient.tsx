@@ -88,7 +88,7 @@ export default function BlogPageClient({
               <p className="text-gray-500 text-xl">No blogs available yet.</p>
             </div>
           ) : (
-            <div className="space-y-16">
+            <div className="space-y-8">
               {blogs.map((blog) => {
                 const slides = blogHeroSlides(blog);
                 return (

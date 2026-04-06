@@ -79,10 +79,10 @@ export default function Navbar() {
         }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 sm:px-8 lg:px-12 xl:px-16 py-4 lg:py-5">
-          <div className="flex items-center">
+          <div className="flex items-center gap-3 lg:gap-0">
             <button
               type="button"
-              className="lg:hidden rounded p-2 text-gray-900 hover:bg-white/25"
+              className="lg:hidden shrink-0 rounded p-2 text-gray-900 hover:bg-white/25"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -96,7 +96,7 @@ export default function Navbar() {
             </button>
             <Link
               href="/"
-              className="-ml-2 flex items-center gap-2 sm:-ml-4 sm:gap-3 lg:-ml-8 xl:-ml-10 text-gray-900 font-bold text-xl tracking-wide"
+              className="flex min-w-0 items-center gap-2 sm:gap-3 lg:-ml-8 lg:gap-3 xl:-ml-10 text-gray-900 font-bold text-xl tracking-wide"
             >
               <Image
                 src="/Ayushman_Bharat_logo.png"
@@ -193,10 +193,10 @@ export default function Navbar() {
         }
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 sm:px-8 lg:px-12 xl:px-16">
-          <div className="flex items-center">
+          <div className="flex items-center gap-3 lg:gap-0">
             <button
               type="button"
-              className={`lg:hidden rounded p-2 ${
+              className={`lg:hidden shrink-0 rounded p-2 ${
                 isWhiteNavPage
                   ? "text-gray-900 hover:bg-white/25"
                   : "text-white hover:bg-white/15"
@@ -214,7 +214,7 @@ export default function Navbar() {
             </button>
             <Link
               href="/"
-              className="-ml-2 flex items-center gap-2 sm:-ml-4 sm:gap-3 lg:-ml-8 xl:-ml-10"
+              className="flex min-w-0 items-center gap-2 sm:gap-3 lg:-ml-8 lg:gap-3 xl:-ml-10"
             >
               <Image
                 src="/Ayushman_Bharat_logo.png"

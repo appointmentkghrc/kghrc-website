@@ -310,14 +310,6 @@ export default function Footer() {
             <span className="text-red-600">KGH</span>
           </p>
 
-          <div className="flex gap-6 md:mt-0 flex-wrap items-center justify-center">
-            <span className="hover:text-black cursor-pointer">
-              Terms of user
-            </span>
-            <span className="hover:text-black cursor-pointer">License</span>
-            <span className="hover:text-black cursor-pointer">Support</span>
-          </div>
-
           <div className="flex gap-3 min-h-9 items-center">
             {isContactLoading ? (
               <LoadingText />
