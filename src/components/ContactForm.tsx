@@ -10,6 +10,9 @@ export default function ContactForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const emailOk = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
@@ -17,13 +20,38 @@ export default function ContactForm() {
     const website = String(fd.get("website") ?? "");
     if (website) return;
 
+    const nameTrim = name.trim();
+    const phoneDigits = phone.replace(/\D/g, "");
+    const emailTrim = email.trim();
+    if (!nameTrim) {
+      setStatus("error");
+      setErrorMessage("Please enter your name.");
+      return;
+    }
+    if (phoneDigits.length !== 10) {
+      setStatus("error");
+      setErrorMessage("Please enter a valid 10-digit phone number.");
+      return;
+    }
+    if (!emailTrim || !emailOk(emailTrim)) {
+      setStatus("error");
+      setErrorMessage("Please enter a valid email address with @.");
+      return;
+    }
+
     setStatus("loading");
     setErrorMessage("");
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, message, website }),
+        body: JSON.stringify({
+          name: nameTrim,
+          email: emailTrim,
+          phone: phoneDigits,
+          message,
+          website,
+        }),
       });
       const data = (await res.json()) as { error?: string };
       if (!res.ok) {
@@ -43,7 +71,7 @@ export default function ContactForm() {
   }
 
   const inputClass =
-    "w-full bg-transparent border border-white/30 p-4 rounded-md focus:outline-none focus:ring-2 focus:ring-white/40";
+    "w-full bg-transparent border border-white/70 p-4 rounded-md text-white placeholder:text-white [&::placeholder]:opacity-100 focus:outline-none focus:ring-2 focus:ring-white/60";
 
   return (
     <form className="space-y-6 text-left" onSubmit={onSubmit} noValidate>
@@ -58,10 +86,12 @@ export default function ContactForm() {
           name="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Name"
+          placeholder="Name *"
           className={inputClass}
           disabled={status === "loading"}
           autoComplete="name"
+          required
+          aria-required
         />
       </div>
 
@@ -77,10 +107,11 @@ export default function ContactForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email*"
+            placeholder="Email *"
             className={inputClass}
             disabled={status === "loading"}
             autoComplete="email"
+            aria-required
           />
         </div>
         <div>
@@ -91,12 +122,20 @@ export default function ContactForm() {
             id="contact-phone"
             name="phone"
             type="tel"
+            inputMode="numeric"
+            autoComplete="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="Phone"
+            onChange={(e) =>
+              setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+            }
+            placeholder="Phone * (10 digits)"
             className={inputClass}
             disabled={status === "loading"}
-            autoComplete="tel"
+            required
+            aria-required
+            maxLength={10}
+            pattern="[0-9]{10}"
+            title="Enter exactly 10 digits"
           />
         </div>
       </div>
@@ -133,7 +172,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="bg-primary hover:bg-[#00c2c0] transition px-10 py-4 rounded-md font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+          className="bg-blue-600 hover:bg-blue-700 transition px-10 py-4 rounded-md font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {status === "loading" ? "Sending…" : "SEND MESSAGE ✈"}
         </button>

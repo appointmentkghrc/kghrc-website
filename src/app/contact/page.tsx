@@ -61,7 +61,7 @@ export default async function ContactPage() {
       </section>
 
       {/* ================= CONTACT FORM SECTION ================= */}
-      <section className="bg-[#214d80] text-white py-28">
+      <section className="bg-primary text-white py-28">
         <div className="max-w-[1000px] mx-auto px-6 text-center">
 
           <h2 className="text-4xl font-semibold mb-6">Get in touch</h2>

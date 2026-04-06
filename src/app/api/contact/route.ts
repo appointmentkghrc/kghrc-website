@@ -6,7 +6,7 @@ import { jsonNoStore } from "@/lib/jsonNoStore";
 const MAX_LEN = {
   name: 200,
   email: 320,
-  phone: 40,
+  phone: 10,
   message: 5000,
 } as const;
 
@@ -44,8 +44,8 @@ export async function POST(request: NextRequest) {
 
   const name = typeof raw.name === "string" ? raw.name.trim() : "";
   const email = typeof raw.email === "string" ? raw.email.trim() : "";
-  const phone =
-    typeof raw.phone === "string" ? raw.phone.trim().slice(0, MAX_LEN.phone) : "";
+  const phoneRaw = typeof raw.phone === "string" ? raw.phone : "";
+  const phoneDigits = phoneRaw.replace(/\D/g, "").slice(0, MAX_LEN.phone);
   const message = typeof raw.message === "string" ? raw.message.trim() : "";
 
   if (!name || name.length > MAX_LEN.name) {
@@ -53,6 +53,12 @@ export async function POST(request: NextRequest) {
   }
   if (!email || email.length > MAX_LEN.email || !isValidEmail(email)) {
     return jsonNoStore({ error: "Please enter a valid email address." }, { status: 400 });
+  }
+  if (!/^\d{10}$/.test(phoneDigits)) {
+    return jsonNoStore(
+      { error: "Please enter a valid 10-digit phone number." },
+      { status: 400 }
+    );
   }
   if (!message || message.length > MAX_LEN.message) {
     return jsonNoStore({ error: "Please enter a message." }, { status: 400 });
@@ -74,7 +80,7 @@ export async function POST(request: NextRequest) {
     ``,
     `Name: ${name}`,
     `Email: ${email}`,
-    `Phone: ${phone || "(not provided)"}`,
+    `Phone: ${phoneDigits}`,
     ``,
     `Message:`,
     message,
