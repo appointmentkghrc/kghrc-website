@@ -110,7 +110,14 @@ export default function BlogDetailsPage() {
         <div className="relative z-10 text-center">
           <h1 className="text-5xl font-semibold mb-4">Blog Details</h1>
           <div className="bg-black/40 px-6 py-2 rounded-md text-sm">
-            HOME › BLOG › {blog.slug.toUpperCase().replace(/-/g, " ")}
+            <Link href="/" className="hover:text-primary transition-colors">
+              HOME
+            </Link>{" "}
+            ›{" "}
+            <Link href="/blog" className="hover:text-primary transition-colors">
+              BLOG
+            </Link>{" "}
+            › <span className="text-white/90">{blog.slug.toUpperCase().replace(/-/g, " ")}</span>
           </div>
         </div>
       </section>
@@ -152,7 +159,7 @@ export default function BlogDetailsPage() {
                   className="flex-1 border border-gray-300 p-3 rounded-l-lg focus:outline-none focus:border-primary"
                   placeholder="Search..."
                 />
-                <button className="bg-black text-white px-4 py-3 rounded-r-lg hover:bg-gray-800 transition whitespace-nowrap flex-shrink-0">
+                <button className="bg-black text-white px-4 py-3 rounded-r-lg hover:bg-gray-800 transition whitespace-nowrap shrink-0">
                   <i className="fas fa-search"></i>
                 </button>
               </div>

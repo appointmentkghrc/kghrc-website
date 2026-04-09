@@ -68,6 +68,10 @@ export default function Navbar() {
     fetchContactSettings();
   }, []);
 
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   return (
     <>
       {/* Sticky navbar - slides down when scrolled past 40px */}
@@ -165,13 +169,13 @@ export default function Navbar() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-white/20 bg-[#84ad3b]/35 backdrop-blur-lg backdrop-saturate-125">
+          <div className="lg:hidden absolute left-0 right-0 top-full z-50 border-t border-white/10 bg-gray-900 shadow-lg">
             <ul className="flex flex-col gap-1 px-6 py-4">
               {navLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="block py-2 text-gray-900 hover:text-primary transition-colors"
+                    className="block py-2 text-white hover:text-primary transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {link.label}
@@ -302,20 +306,14 @@ export default function Navbar() {
 
         {mobileMenuOpen && (
           <div
-            className={`lg:hidden border-t ${
-              isWhiteNavPage
-                ? "border-white/20 bg-[#84ad3b]/35 backdrop-blur-lg backdrop-saturate-125"
-                : "border-white/20 bg-black/30 backdrop-blur-sm"
-            }`}
+            className="lg:hidden absolute left-0 right-0 top-full z-50 border-t border-white/10 bg-gray-900 shadow-lg"
           >
             <ul className="flex flex-col gap-1 px-6 py-4">
               {navLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className={`block py-2 hover:text-primary transition-colors ${
-                      isWhiteNavPage ? "text-gray-900" : "text-white"
-                    }`}
+                    className="block py-2 text-white hover:text-primary transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {link.label}

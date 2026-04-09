@@ -284,19 +284,71 @@ export default function Footer() {
               <div className="space-y-6 text-white/80 text-sm">
                 <div>
                   <p className="text-white font-semibold mb-1">PHONE</p>
-                  <p>{contactSettings.primaryPhone}</p>
-                  <p>{contactSettings.secondaryPhone}</p>
+                  {contactSettings.primaryPhone.trim() ? (
+                    <p>
+                      <a
+                        href={`tel:${contactSettings.primaryPhone.replace(/[^\d+]/g, "")}`}
+                        className="hover:text-white transition"
+                      >
+                        {contactSettings.primaryPhone}
+                      </a>
+                    </p>
+                  ) : null}
+                  {contactSettings.secondaryPhone.trim() ? (
+                    <p>
+                      <a
+                        href={`tel:${contactSettings.secondaryPhone.replace(/[^\d+]/g, "")}`}
+                        className="hover:text-white transition"
+                      >
+                        {contactSettings.secondaryPhone}
+                      </a>
+                    </p>
+                  ) : null}
                 </div>
 
                 <div>
                   <p className="text-white font-semibold mb-1">EMAIL</p>
-                  <p>{contactSettings.primaryEmail}</p>
-                  <p>{contactSettings.secondaryEmail}</p>
+                  {contactSettings.primaryEmail.trim() ? (
+                    <p>
+                      <a
+                        href={`mailto:${contactSettings.primaryEmail.trim()}`}
+                        className="hover:text-white transition"
+                      >
+                        {contactSettings.primaryEmail}
+                      </a>
+                    </p>
+                  ) : null}
+                  {contactSettings.secondaryEmail.trim() ? (
+                    <p>
+                      <a
+                        href={`mailto:${contactSettings.secondaryEmail.trim()}`}
+                        className="hover:text-white transition"
+                      >
+                        {contactSettings.secondaryEmail}
+                      </a>
+                    </p>
+                  ) : null}
                 </div>
 
                 <div>
                   <p className="text-white font-semibold mb-1">Address</p>
-                  <p>{contactSettings.officeAddress}</p>
+                  {contactSettings.officeAddress.trim() ? (
+                    <p>
+                      <a
+                        href={
+                          contactSettings.mapEmbedUrl.trim() ||
+                          `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                            contactSettings.officeAddress
+                          )}`
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-white transition"
+                      >
+                        {contactSettings.officeAddress}
+                      </a>
+                    </p>
+                  ) : null}
                 </div>
               </div>
             )}

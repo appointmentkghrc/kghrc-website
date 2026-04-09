@@ -1,3 +1,4 @@
+import Link from "next/link";
 import PageHeroHeader from "@/components/PageHeroHeader";
 import ContactForm from "@/components/ContactForm";
 import { cacheBustUrl } from "@/lib/cacheBustUrl";
@@ -21,7 +22,11 @@ export default async function ContactPage() {
         <div className="text-center">
           <h1 className="text-5xl font-semibold mb-6">Contact Us</h1>
           <div className="bg-black/40 px-6 py-3 rounded-md text-sm inline-block">
-            HOME › CONTACT
+            <Link href="/" className="hover:text-primary transition-colors">
+              HOME
+            </Link>{" "}
+            ›{" "}
+            <span className="text-white/90">CONTACT</span>
           </div>
         </div>
       </PageHeroHeader>
@@ -36,7 +41,21 @@ export default async function ContactPage() {
             <div className="text-primary text-4xl mb-6">📍</div>
             <h3 className="text-xl font-semibold mb-4">ADDRESS</h3>
             <div className="w-10 h-[2px] bg-secondary mx-auto mb-6"></div>
-            <p className="text-gray-600 leading-relaxed">{contactSettings.officeAddress}</p>
+            <p className="text-gray-600 leading-relaxed">
+              <a
+                href={
+                  contactSettings.mapEmbedUrl.trim() ||
+                  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    contactSettings.officeAddress
+                  )}`
+                }
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-primary transition"
+              >
+                {contactSettings.officeAddress}
+              </a>
+            </p>
           </div>
 
           {/* Emergency */}
@@ -44,8 +63,22 @@ export default async function ContactPage() {
             <div className="text-4xl mb-6">📞</div>
             <h3 className="text-xl font-semibold mb-4">Contact</h3>
             <div className="w-10 h-[2px] bg-white mx-auto mb-6"></div>
-            <p className="text-2xl font-bold mb-2">{contactSettings.primaryPhone}</p>
-            <p className="text-lg"> {contactSettings.secondaryPhone}</p>
+            <p className="text-2xl font-bold mb-2">
+              <a
+                href={`tel:${contactSettings.primaryPhone.replace(/[^\d+]/g, "")}`}
+                className="hover:text-white/90 transition"
+              >
+                {contactSettings.primaryPhone}
+              </a>
+            </p>
+            <p className="text-lg">
+              <a
+                href={`tel:${contactSettings.secondaryPhone.replace(/[^\d+]/g, "")}`}
+                className="hover:text-white/90 transition"
+              >
+                {contactSettings.secondaryPhone}
+              </a>
+            </p>
           </div>
 
           {/* Email */}
@@ -53,8 +86,22 @@ export default async function ContactPage() {
             <div className="text-primary text-4xl mb-6">✉️</div>
             <h3 className="text-xl font-semibold mb-4">EMAIL</h3>
             <div className="w-10 h-[2px] bg-secondary mx-auto mb-6"></div>
-            <p className="text-gray-600">{contactSettings.primaryEmail}</p>
-            <p className="text-gray-600">{contactSettings.secondaryEmail}</p>
+            <p className="text-gray-600">
+              <a
+                href={`mailto:${contactSettings.primaryEmail.trim()}`}
+                className="hover:text-primary transition"
+              >
+                {contactSettings.primaryEmail}
+              </a>
+            </p>
+            <p className="text-gray-600">
+              <a
+                href={`mailto:${contactSettings.secondaryEmail.trim()}`}
+                className="hover:text-primary transition"
+              >
+                {contactSettings.secondaryEmail}
+              </a>
+            </p>
           </div>
 
         </div>

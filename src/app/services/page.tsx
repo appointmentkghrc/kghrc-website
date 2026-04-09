@@ -1,3 +1,4 @@
+import Link from "next/link";
 import PageHeroHeader from "@/components/PageHeroHeader";
 import DepartmentsSection from "@/components/DepartmentsSection";
 import PatientTestimonialsSection from "@/components/PatientTestimonialsSection";
@@ -27,7 +28,11 @@ export default async function ServicesPage() {
         <div className="text-center">
           <h1 className="text-5xl font-semibold mb-6">Our Services</h1>
           <div className="bg-black/40 px-6 py-3 rounded-md text-sm inline-block">
-            HOME › SERVICES
+            <Link href="/" className="hover:text-primary transition-colors">
+              HOME
+            </Link>{" "}
+            ›{" "}
+            <span className="text-white/90">SERVICES</span>
           </div>
         </div>
       </PageHeroHeader>

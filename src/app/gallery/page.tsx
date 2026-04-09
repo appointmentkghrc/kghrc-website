@@ -2,6 +2,7 @@
 
 import { apiFetch } from "@/lib/apiFetch";
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 type GalleryImage = {
   id: string;
@@ -75,7 +76,11 @@ function GalleryHeader({
       <div className="relative z-20 text-center px-4">
         <h1 className="text-5xl font-semibold mb-6">{title}</h1>
         <div className="bg-black/40 px-6 py-3 rounded-md text-sm inline-block">
-          HOME › GALLERY
+          <Link href="/" className="hover:text-primary transition-colors">
+            HOME
+          </Link>{" "}
+          ›{" "}
+          <span className="text-white/90">GALLERY</span>
         </div>
       </div>
     </section>

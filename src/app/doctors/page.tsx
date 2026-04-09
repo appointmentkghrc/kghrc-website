@@ -1,3 +1,4 @@
+import Link from "next/link";
 import PageHeroHeader from "@/components/PageHeroHeader";
 import SpecialistsSection from "@/components/SpecialistsSection";
 import { cacheBustUrl } from "@/lib/cacheBustUrl";
@@ -21,7 +22,11 @@ export default async function DoctorsPage() {
         <div className="text-center">
           <h1 className="text-5xl font-semibold mb-6">Our Doctors</h1>
           <div className="bg-black/40 px-6 py-3 rounded-md text-sm inline-block">
-            HOME › DOCTORS
+            <Link href="/" className="hover:text-primary transition-colors">
+              HOME
+            </Link>{" "}
+            ›{" "}
+            <span className="text-white/90">DOCTORS</span>
           </div>
         </div>
       </PageHeroHeader>

@@ -72,7 +72,11 @@ export default function BlogPageClient({
           <h1 className="text-5xl font-semibold mb-6">Latest Blog</h1>
 
           <div className="bg-black/40 px-6 py-3 rounded-md text-sm tracking-wide inline-block">
-            HOME › BLOG
+            <Link href="/" className="hover:text-primary transition-colors">
+              HOME
+            </Link>{" "}
+            ›{" "}
+            <span className="text-white/90">BLOG</span>
           </div>
         </div>
       </PageHeroHeader>
@@ -117,7 +121,7 @@ export default function BlogPageClient({
                       })}
                     </span>
                     <span className="text-gray-400">•</span>
-                    <span className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded-full">
+                    <span className="inline-flex items-center justify-center px-3 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded-full text-center leading-tight">
                       {blog.category}
                     </span>
                   </div>

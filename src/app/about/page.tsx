@@ -141,6 +141,9 @@ export default function AboutPage() {
   }
 
   const openingHoursRowsToRender = parseOpeningHoursRows(aboutSettings.openingHoursRows);
+  const aboutBreadcrumbLabel = aboutSettings.heroBreadcrumb
+    .replace(/^HOME\s*›\s*/i, "")
+    .trim() || "ABOUT";
 
   return (
     <div>
@@ -160,7 +163,10 @@ export default function AboutPage() {
         <div className="relative z-10 text-center">
           <h1 className="text-5xl font-semibold mb-6">{aboutSettings.heroTitle}</h1>
           <div className="bg-black/40 px-6 py-3 rounded-md text-sm">
-            {aboutSettings.heroBreadcrumb}
+            <Link href="/" className="hover:text-primary transition-colors">
+              HOME
+            </Link>{" "}
+            › <span className="text-white/90">{aboutBreadcrumbLabel}</span>
           </div>
         </div>
       </section>
@@ -261,7 +267,7 @@ export default function AboutPage() {
         <div className="max-w-[1200px] mx-auto px-6 space-y-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
             <div className="bg-gray-50 rounded-2xl p-8 lg:p-10">
-              <h3 className="text-2xl font-semibold mb-4 text-[#214d80]">{aboutSettings.missionTitle}</h3>
+              <h3 className="text-2xl font-semibold mb-4 text-primary">{aboutSettings.missionTitle}</h3>
               <ul className="space-y-3 text-gray-700">
                 {aboutSettings.missionPoints.map((point, index) => (
                   <li key={`${point}-${index}`}>• {point}</li>
@@ -269,7 +275,7 @@ export default function AboutPage() {
               </ul>
             </div>
             <div className="bg-gray-50 rounded-2xl p-8 lg:p-10">
-              <h3 className="text-2xl font-semibold mb-4 text-[#214d80]">{aboutSettings.visionTitle}</h3>
+              <h3 className="text-2xl font-semibold mb-4 text-primary">{aboutSettings.visionTitle}</h3>
               <ul className="space-y-3 text-gray-700">
                 {aboutSettings.visionPoints.map((point, index) => (
                   <li key={`${point}-${index}`}>• {point}</li>
@@ -280,7 +286,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-              <h3 className="text-xl font-semibold mb-4 text-[#214d80]">{aboutSettings.diagnosticTitle}</h3>
+              <h3 className="text-xl font-semibold mb-4 text-primary">{aboutSettings.diagnosticTitle}</h3>
               <ul className="space-y-2 text-gray-700">
                 {aboutSettings.diagnosticItems.map((item, index) => (
                   <li key={`${item}-${index}`}>• {item}</li>
@@ -288,7 +294,7 @@ export default function AboutPage() {
               </ul>
             </div>
             <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-              <h3 className="text-xl font-semibold mb-4 text-[#214d80]">{aboutSettings.facilitiesTitle}</h3>
+              <h3 className="text-xl font-semibold mb-4 text-primary">{aboutSettings.facilitiesTitle}</h3>
               <ul className="space-y-2 text-gray-700">
                 {aboutSettings.facilitiesItems.map((item, index) => (
                   <li key={`${item}-${index}`}>• {item}</li>
@@ -296,7 +302,7 @@ export default function AboutPage() {
               </ul>
             </div>
             <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-              <h3 className="text-xl font-semibold mb-4 text-[#214d80]">{aboutSettings.servicesTitle}</h3>
+              <h3 className="text-xl font-semibold mb-4 text-primary">{aboutSettings.servicesTitle}</h3>
               <ul className="space-y-2 text-gray-700">
                 {aboutSettings.servicesItems.map((item, index) => (
                   <li key={`${item}-${index}`}>• {item}</li>
@@ -306,7 +312,7 @@ export default function AboutPage() {
           </div>
 
           <div>
-            <h3 className="text-2xl font-semibold mb-6 text-[#214d80] text-center">
+            <h3 className="text-2xl font-semibold mb-6 text-primary text-center">
               List of TPA / Insurance Partners
             </h3>
             {loadingPartners ? (

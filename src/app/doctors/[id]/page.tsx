@@ -63,10 +63,10 @@ export default async function DoctorDetailsPage({ params }: DoctorPageProps) {
 
             <div className="md:col-span-2 p-8 md:p-10">
               <p className="text-sm uppercase tracking-[0.2em] text-primary font-semibold">
-                Speciality
+                {doctor.designation || "Not added yet."}
               </p>
               <h2 className="text-3xl font-semibold mt-1">{doctor.name}</h2>
-              <p className="text-lg text-gray-600 mt-2">{doctor.designation}</p>
+              {/* <p className="text-lg text-gray-600 mt-2">{doctor.designation}</p> */}
 
               <div className="h-px bg-gray-200 my-6" />
 
