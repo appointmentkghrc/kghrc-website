@@ -32,14 +32,24 @@ function GalleryHeader({
 }) {
   const [bgLoaded, setBgLoaded] = useState(false);
   const [bgFailed, setBgFailed] = useState(false);
+  const [bgLoadTimedOut, setBgLoadTimedOut] = useState(false);
 
   useEffect(() => {
     setBgLoaded(false);
     setBgFailed(false);
+    setBgLoadTimedOut(false);
   }, [bannerImage]);
 
+  useEffect(() => {
+    if (!bannerImage || bgLoaded || bgFailed) return undefined;
+    const timer = window.setTimeout(() => {
+      setBgLoadTimedOut(true);
+    }, 10000);
+    return () => window.clearTimeout(timer);
+  }, [bannerImage, bgLoaded, bgFailed]);
+
   const showBannerLoading =
-    !isFetching && Boolean(bannerImage) && !bgLoaded && !bgFailed;
+    !isFetching && Boolean(bannerImage) && !bgLoaded && !bgFailed && !bgLoadTimedOut;
   const showHeroLoading = isFetching || showBannerLoading;
   const bannerVisible = Boolean(bannerImage) && bgLoaded && !bgFailed;
 
@@ -54,6 +64,9 @@ function GalleryHeader({
           }`}
           onLoad={() => setBgLoaded(true)}
           onError={() => setBgFailed(true)}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
           aria-hidden
         />
       ) : null}
